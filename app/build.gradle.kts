@@ -4,9 +4,9 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 
     id("com.google.devtools.ksp")
-     id("com.google.dagger.hilt.android")
-    //apollo
-    id("com.apollographql.apollo") version "4.3.0"
+    id("com.google.dagger.hilt.android")
+    kotlin("plugin.serialization") version "2.1.10"
+
 }
 
 android {
@@ -46,6 +46,7 @@ android {
 
 dependencies {
     val room_version = "2.6.1"
+    val nav_version = "2.8.8"
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -70,7 +71,7 @@ dependencies {
 
     //room
     implementation("androidx.room:room-runtime:$room_version")
-   ksp("androidx.room:room-compiler:$room_version")
+    ksp("androidx.room:room-compiler:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
 
     //hilt
@@ -79,12 +80,18 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.5")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
-    //apollo
-    implementation("com.apollographql.apollo:apollo-runtime:4.3.0")
+    //Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    //Shopify
+    implementation("com.shopify.mobilebuysdk:buy3:2025.4.0")
+
+    //!Navigation
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation("androidx.navigation:navigation-compose:$nav_version")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
+
+
 }
 
-apollo {
-    service("service") {
-        packageName.set("com.example.m_commerce_admin")
-    }
-}

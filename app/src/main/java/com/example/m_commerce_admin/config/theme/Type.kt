@@ -1,4 +1,4 @@
-package com.example.m_commerce_admin.ui.theme
+package com.example.m_commerce_admin.config.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

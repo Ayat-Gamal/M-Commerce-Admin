@@ -1,6 +1,5 @@
-package com.example.m_commerce_admin.ui.theme
+package com.example.m_commerce_admin.config.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
