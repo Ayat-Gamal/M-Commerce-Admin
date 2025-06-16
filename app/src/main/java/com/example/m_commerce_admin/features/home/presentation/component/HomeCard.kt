@@ -18,6 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.dp
+import com.example.m_commerce_admin.config.theme.Gray
+import com.example.m_commerce_admin.config.theme.LightTeal
 import com.example.m_commerce_admin.config.theme.Teal
 import com.example.m_commerce_admin.core.shared.components.SvgImage
 import com.example.m_commerce_admin.features.home.presentation.CardObject
@@ -25,15 +27,18 @@ import com.example.m_commerce_admin.features.home.presentation.CardObject
 @Composable
 fun HomeCard(data: CardObject) {
     Card(
+        colors = CardDefaults.cardColors(
+        containerColor = LightTeal   ),
         elevation = CardDefaults.cardElevation(4.dp),
+        shape = CardDefaults.elevatedShape,
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 8.dp)
-            .background(color = Color.White)
             .border(
                 border = BorderStroke(width = 1.dp, color = Teal),
                 shape = RoundedCornerShape(16.dp)
             )
+            .background(color = Color.White)
     ) {
         Column(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
