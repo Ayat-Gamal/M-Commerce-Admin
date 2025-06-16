@@ -26,6 +26,7 @@ import com.example.m_commerce_admin.config.theme.DarkestGray
 import com.example.m_commerce_admin.config.theme.Gray
 import com.example.m_commerce_admin.config.theme.Teal
 import com.example.m_commerce_admin.config.theme.White
+import com.example.m_commerce_admin.core.shared.components.SvgImage
 
 @Composable
 fun BottomNavigationBar(navController: NavController) {
@@ -83,7 +84,7 @@ fun AddItem(
     val background = if (isSelected) White else Color.Transparent
     Box(
         modifier = Modifier
-            .height(40.dp)
+            .height(height = 40.dp)
             .clip(shape = CircleShape)
             .background(background)
             .clickable(onClick = {

@@ -1,4 +1,4 @@
-package com.example.m_commerce_admin.core.shared.components.bottom_nav_bar
+package com.example.m_commerce_admin.core.shared.components
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
