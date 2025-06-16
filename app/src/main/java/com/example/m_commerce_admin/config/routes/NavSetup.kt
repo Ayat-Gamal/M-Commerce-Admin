@@ -9,7 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.m_commerce_admin.features.coupons.CouponScreenUI
-import com.example.m_commerce_admin.features.home.HomeScreenUI
+import com.example.m_commerce_admin.features.home.presentation.HomeScreenUI
 import com.example.m_commerce_admin.features.inventory.InventoryScreenUI
 import com.example.m_commerce_admin.features.products.ProductScreenUI
 
