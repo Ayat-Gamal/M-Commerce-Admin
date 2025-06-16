@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -35,6 +36,7 @@ fun Main() {
     val navController = rememberNavController()
     val snackBarHostState = remember { SnackbarHostState() }
     Scaffold(
+        modifier = Modifier.safeContentPadding(),
         snackbarHost = {
             SnackbarHost(hostState = snackBarHostState)
         },
