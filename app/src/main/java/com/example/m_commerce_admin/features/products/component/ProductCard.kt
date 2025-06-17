@@ -22,7 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.DarkGray
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -30,6 +30,7 @@ import com.example.m_commerce_admin.config.theme.DarkestGray
 import com.example.m_commerce_admin.config.theme.LightGreen
 import com.example.m_commerce_admin.config.theme.LightTeal
 import com.example.m_commerce_admin.config.theme.Teal
+import com.example.m_commerce_admin.config.theme.White
 import com.example.m_commerce_admin.config.theme.lightRed
 import com.example.m_commerce_admin.core.helpers.formatCreatedAt
 import com.example.m_commerce_admin.core.shared.components.PngImage
@@ -67,14 +68,14 @@ fun ProductCard(product: ProductObject) {
             ) {
 
                 Text(product.title, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
-                Text("EGP ${product.price}", fontSize = 14.sp, color = Color.DarkGray)
+                Text("EGP ${product.price}", fontSize = 14.sp, color = DarkGray)
                 Text("In Stock: ${product.quantity}", fontSize = 12.sp)
 
                 val statusColor = if (product.status == "Active") LightGreen else lightRed
                 Text(
                     product.status,
                     fontSize = 12.sp,
-                    color = Color.White,
+                    color = White,
                     modifier = Modifier
                         .background(statusColor, RoundedCornerShape(8.dp))
                         .padding(horizontal = 8.dp, vertical = 2.dp)
@@ -88,7 +89,7 @@ fun ProductCard(product: ProductObject) {
                     Icon(Icons.Default.Edit, contentDescription = "Edit", tint = Teal)
                 }
                 IconButton(onClick = { }) {
-                    Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color.Red)
+                    Icon(Icons.Default.Delete, contentDescription = "Delete", tint = lightRed)
                 }
             }
         }

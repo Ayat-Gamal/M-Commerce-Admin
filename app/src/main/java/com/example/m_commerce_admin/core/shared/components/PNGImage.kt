@@ -2,7 +2,6 @@ package com.example.m_commerce_admin.core.shared.components
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import coil3.ImageLoader
 import coil3.compose.AsyncImage
@@ -10,10 +9,9 @@ import coil3.request.ImageRequest
 import coil3.svg.SvgDecoder
 
 @Composable
-fun SvgImage(
+fun PngImage(
     resId: Int,
     contentDescription: String?,
-    colorFilter: ColorFilter?,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -31,6 +29,5 @@ fun SvgImage(
         contentDescription = contentDescription,
         imageLoader = imageLoader,
         modifier = modifier,
-        colorFilter = colorFilter
     )
 }

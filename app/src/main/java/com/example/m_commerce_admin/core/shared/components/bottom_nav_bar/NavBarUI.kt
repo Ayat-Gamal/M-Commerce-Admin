@@ -16,7 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -30,13 +30,14 @@ import com.example.m_commerce_admin.core.shared.components.SvgImage
 
 @Composable
 fun BottomNavigationBar(navController: NavController) {
-     val currentDestination = navController.currentBackStackEntryAsState().value?.destination?.route
+    val currentDestination = navController.currentBackStackEntryAsState().value?.destination?.route
 
     val navigationItems = listOf(
         NavigationItem.Home,
         NavigationItem.Product,
         NavigationItem.Inventory,
-        NavigationItem.Coupons,)
+        NavigationItem.Coupons,
+    )
 
     Box(
         modifier = Modifier
@@ -46,7 +47,7 @@ fun BottomNavigationBar(navController: NavController) {
     ) {
         Row(
             modifier = Modifier
-            //    .padding(vertical = 8.dp, horizontal = 8.dp)
+                .padding(vertical = 8.dp, horizontal = 8.dp)
                 .clip(CircleShape)
                 .background(color = DarkestGray)
                 .fillMaxWidth(),
@@ -81,10 +82,10 @@ fun AddItem(
 
     val container = if (isSelected) Teal else DarkestGray
 
-    val background = if (isSelected) White else Color.Transparent
+    val background = if (isSelected) White else Transparent
     Box(
         modifier = Modifier
-            .height(height = 40.dp)
+            .height(height = 42.dp)
             .clip(shape = CircleShape)
             .background(background)
             .clickable(onClick = {

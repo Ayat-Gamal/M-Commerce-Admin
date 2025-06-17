@@ -14,7 +14,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.m_commerce_admin.R
@@ -51,17 +50,31 @@ fun ProductScreenUI(modifier: Modifier = Modifier) {
 
             item {
                 Spacer(modifier = modifier.padding(top = 1.dp))
-                Row(modifier = Modifier
-                    .padding(all = 16.dp)
-                    .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically,) {
-                    CustomHeader("Products", modifier = Modifier
-                            .padding(horizontal = 16.dp, vertical = 2.dp),)
+                Row(
+                    modifier = Modifier
+                        .padding(all = 16.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    CustomHeader(
+                        "Products",
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp, vertical = 2.dp),
+                    )
 
-                    CustomButton(text = "Add Product", height = 36, backgroundColor = Teal, textColor = White, onClick = { Log.i("addProduct", "clicked") })
+                    CustomButton(
+                        text = "Add Product",
+                        height = 36,
+                        backgroundColor = Teal,
+                        textColor = White,
+                        onClick = { Log.i("addProduct", "clicked") })
                 }
-                HorizontalDivider(color = Teal, thickness = 2.dp, modifier = Modifier
+                HorizontalDivider(
+                    color = Teal, thickness = 2.dp, modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 16.dp))
+                        .padding(horizontal = 8.dp, vertical = 16.dp)
+                )
 
             }
             item {
