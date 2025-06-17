@@ -34,3 +34,26 @@ fun SvgImage(
         colorFilter = colorFilter
     )
 }
+@Composable
+fun PngImage(
+    resId: Int,
+    contentDescription: String?,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+
+    val imageLoader = ImageLoader.Builder(context)
+        .components {
+            add(SvgDecoder.Factory())
+        }
+        .build()
+
+    AsyncImage(
+        model = ImageRequest.Builder(context)
+            .data(resId)
+            .build(),
+        contentDescription = contentDescription,
+        imageLoader = imageLoader,
+        modifier = modifier,
+    )
+}
