@@ -24,9 +24,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-           MCommerceAdminTheme {
+            MCommerceAdminTheme {
                 Main()
-           }
+            }
         }
     }
 }
@@ -42,7 +42,7 @@ fun Main() {
         snackbarHost = {
             SnackbarHost(hostState = snackBarHostState)
         },
-containerColor = Color.White,
+        containerColor = Color.White,
         bottomBar = { BottomNavigationBar(navController) }
 
     ) { innerPadding ->

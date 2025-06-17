@@ -28,7 +28,8 @@ import com.example.m_commerce_admin.features.home.presentation.CardObject
 fun HomeCard(data: CardObject) {
     Card(
         colors = CardDefaults.cardColors(
-        containerColor = LightTeal   ),
+        containerColor = LightTeal
+        ),
         elevation = CardDefaults.cardElevation(4.dp),
         shape = CardDefaults.elevatedShape,
         modifier = Modifier
