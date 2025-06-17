@@ -6,12 +6,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.m_commerce_admin.config.theme.DarkestGray
+import com.example.m_commerce_admin.config.theme.Gray
 
 
 @Composable
@@ -23,18 +23,16 @@ fun CardDetails(value: Int?, description: String) {
                 color = DarkestGray,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Normal,
-
-                )
+            )
         )
         Spacer(Modifier.height(12.dp))
 
         Text(
             text = description, style = TextStyle(
-                color = Color.Gray,
+                color = Gray,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Normal,
-
-                )
+            )
         )
 
     }

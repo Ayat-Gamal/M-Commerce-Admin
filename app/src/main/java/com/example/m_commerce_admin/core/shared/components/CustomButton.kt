@@ -1,7 +1,5 @@
 package com.example.m_commerce_admin.core.shared.components
 
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -10,8 +8,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.LightGray
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.m_commerce_admin.config.theme.White
 
 @Composable
 fun CustomButton(
@@ -19,9 +19,10 @@ fun CustomButton(
     modifier: Modifier = Modifier,
     height: Int = 56,
     cornerRadius: Int = 24,
-    backgroundColor: Color = Color.LightGray,
-    textColor: Color = Color.White, // Avoid Color.Unspecified
-    onClick: () -> Unit = {}
+    backgroundColor: Color =
+        LightGray,
+    textColor: Color = White,
+    onClick: () -> Unit
 ) {
     Button(
         onClick = onClick,

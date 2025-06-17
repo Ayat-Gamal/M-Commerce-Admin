@@ -14,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import com.example.m_commerce_admin.config.routes.NavSetup
 import com.example.m_commerce_admin.config.theme.MCommerceAdminTheme
@@ -46,7 +47,9 @@ fun Main() {
         bottomBar = { BottomNavigationBar(navController) }
 
     ) { innerPadding ->
-        NavSetup(navController, snackBarHostState, modifier = Modifier.padding(innerPadding))
+        val bottomPadding = Modifier.padding(bottom = 0.dp)
+
+        NavSetup(navController, snackBarHostState, modifier = bottomPadding)
 
     }
 }

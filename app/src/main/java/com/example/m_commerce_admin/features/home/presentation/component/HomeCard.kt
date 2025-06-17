@@ -15,12 +15,11 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.dp
-import com.example.m_commerce_admin.config.theme.Gray
 import com.example.m_commerce_admin.config.theme.LightTeal
 import com.example.m_commerce_admin.config.theme.Teal
+import com.example.m_commerce_admin.config.theme.White
 import com.example.m_commerce_admin.core.shared.components.SvgImage
 import com.example.m_commerce_admin.features.home.presentation.CardObject
 
@@ -28,7 +27,7 @@ import com.example.m_commerce_admin.features.home.presentation.CardObject
 fun HomeCard(data: CardObject) {
     Card(
         colors = CardDefaults.cardColors(
-        containerColor = LightTeal
+            containerColor = LightTeal
         ),
         elevation = CardDefaults.cardElevation(4.dp),
         shape = CardDefaults.elevatedShape,
@@ -39,7 +38,7 @@ fun HomeCard(data: CardObject) {
                 border = BorderStroke(width = 1.dp, color = Teal),
                 shape = RoundedCornerShape(16.dp)
             )
-            .background(color = Color.White)
+            .background(color = White)
     ) {
         Column(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
@@ -59,7 +58,6 @@ fun HomeCard(data: CardObject) {
                     colorFilter = ColorFilter.tint(Teal),
                 )
             }
-            //card details info
             CardDetails(data.value, data.description)
         }
     }
