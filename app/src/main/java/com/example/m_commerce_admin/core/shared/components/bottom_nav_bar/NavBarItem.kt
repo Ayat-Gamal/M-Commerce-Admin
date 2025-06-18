@@ -2,6 +2,7 @@ package com.example.m_commerce_admin.core.shared.components.bottom_nav_bar
 
 import com.example.m_commerce_admin.R
 import com.example.m_commerce_admin.config.constant.NavRoutes
+import com.example.m_commerce_admin.config.constant.Screens
 import com.example.m_commerce_admin.config.routes.AppRoutes
 import kotlinx.serialization.Serializable
 
@@ -13,8 +14,8 @@ sealed class NavigationItem(
 
 )
 {
-    object Home : NavigationItem("home", AppRoutes.HomeScreen, R.raw.home)
-    object Product : NavigationItem("product", AppRoutes.ProductScreen , R.raw.products)
-    object Inventory : NavigationItem("inventory", AppRoutes.InventoryScreen , R.raw.inventory)
-    object Coupons : NavigationItem("coupons", AppRoutes.CouponScreen , R.raw.coupon)
+    object Home : NavigationItem(Screens.HOME_SCREEN, AppRoutes.HomeScreen, R.raw.home)
+    object Product : NavigationItem(Screens.PRODUCT_SCREEN, AppRoutes.ProductScreen , R.raw.products)
+    object Inventory : NavigationItem(Screens.INVENTORY_SCREEN, AppRoutes.InventoryScreen , R.raw.inventory)
+    object Coupons : NavigationItem(Screens.COUPONS_SCREEN, AppRoutes.CouponScreen , R.raw.coupon)
 }
