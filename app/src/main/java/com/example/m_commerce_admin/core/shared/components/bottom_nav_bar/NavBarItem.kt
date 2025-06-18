@@ -13,8 +13,8 @@ sealed class NavigationItem(
 
 )
 {
-    object Home : NavigationItem(NavRoutes.HOME.name, AppRoutes.HomeScreen, R.raw.home)
-    object Product : NavigationItem(NavRoutes.PRODUCT.name, AppRoutes.ProductScreen , R.raw.products)
-    object Inventory : NavigationItem(NavRoutes.INVENTORY.name, AppRoutes.InventoryScreen , R.raw.inventory)
-    object Coupons : NavigationItem(NavRoutes.COUPONS.name, AppRoutes.CouponScreen , R.raw.coupon)
+    object Home : NavigationItem("home", AppRoutes.HomeScreen, R.raw.home)
+    object Product : NavigationItem("product", AppRoutes.ProductScreen , R.raw.products)
+    object Inventory : NavigationItem("inventory", AppRoutes.InventoryScreen , R.raw.inventory)
+    object Coupons : NavigationItem("coupons", AppRoutes.CouponScreen , R.raw.coupon)
 }
