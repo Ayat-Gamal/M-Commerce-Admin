@@ -11,7 +11,7 @@ import com.example.m_commerce_admin.config.theme.Black
 fun CustomHeader(text: String, modifier: Modifier = Modifier) {
     return Text(
         text,
-        fontSize = 28.sp,
+        fontSize = 22.sp,
         fontWeight = FontWeight.SemiBold,
         color = Black,
         modifier = modifier
