@@ -59,13 +59,16 @@ fun BottomNavigationBar(navController: NavController) {
                     currentDestination?.contains(item.route::class.simpleName.toString()) ?: false
 
                 AddItem(item, isSelected) {
+
                     navController.navigate(item.route) {
-                        popUpTo(navController.graph.findStartDestination().id) {
+                        popUpTo(0) {
+                            inclusive = true
                             saveState = true
+
                         }
-                        launchSingleTop = true
-                        restoreState = true
+
                     }
+
                 }
             }
         }

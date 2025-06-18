@@ -6,7 +6,6 @@ plugins {
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
     kotlin("plugin.serialization") version "2.1.10"
-
 }
 
 android {
@@ -45,6 +44,7 @@ android {
 }
 
 dependencies {
+
     val room_version = "2.6.1"
     val nav_version = "2.8.8"
 
@@ -64,28 +64,38 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-
-    //Coil
-    implementation("io.coil-kt.coil3:coil-compose:3.0.4")
-    implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.4")
-    implementation("io.coil-kt.coil3:coil-svg:3.0.4")
-
-    //room
+    //!Database
+    //*Room
     implementation("androidx.room:room-runtime:$room_version")
     ksp("androidx.room:room-compiler:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
 
-    //hilt
-    implementation("com.google.dagger:hilt-android:2.49")
-    ksp("com.google.dagger:hilt-android-compiler:2.49")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.5")
-    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    //?==================================================
 
-    //Retrofit
+    //!Network
+    //*Apollo
+//    implementation("com.apollographql.apollo:apollo-runtime:4.3.0")
+    //*Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    //Shopify
+    //*Shopify
     implementation("com.shopify.mobilebuysdk:buy3:2025.4.0")
+
+    //?==================================================
+
+    //!UI
+    //*Coil
+    implementation("io.coil-kt.coil3:coil-compose:3.0.4")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.4")
+    implementation("io.coil-kt.coil3:coil-svg:3.0.4")
+
+    //?==================================================
+
+    //!Dependency Injection
+    //*hilt
+    implementation("com.google.dagger:hilt-android:2.51.1")
+    ksp("com.google.dagger:hilt-android-compiler:2.51.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.5")
 
     //!Navigation
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
@@ -94,5 +104,9 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
 
 
-}
+    // extended icons
+    implementation("androidx.compose.material:material-icons-extended:1.6.1")
 
+    // view model
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
+}
