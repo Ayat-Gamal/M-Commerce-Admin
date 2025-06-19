@@ -17,7 +17,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.m_commerce_admin.R
 import com.example.m_commerce_admin.config.theme.Teal
-import com.example.m_commerce_admin.core.shared.components.CustomHeader
 import com.example.m_commerce_admin.features.products.component.ProductCard
 
 data class ProductObject(
