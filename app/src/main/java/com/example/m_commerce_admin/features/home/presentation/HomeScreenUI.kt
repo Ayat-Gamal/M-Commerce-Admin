@@ -29,8 +29,9 @@ fun HomeScreenUI() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .fillMaxHeight()
-    ) {
+            .fillMaxHeight(),
+
+        ) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
@@ -38,6 +39,7 @@ fun HomeScreenUI() {
 
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+
             item {
                 Row(
                     modifier = Modifier

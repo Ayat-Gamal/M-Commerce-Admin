@@ -37,6 +37,7 @@ fun ProductScreenUI(modifier: Modifier = Modifier) {
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .padding(bottom = 48.dp),
 
     ) {
         LazyColumn(
@@ -46,24 +47,7 @@ fun ProductScreenUI(modifier: Modifier = Modifier) {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
 
-            item {
-                Spacer(modifier = modifier.padding(top = 1.dp))
-                Row(
-                    modifier = Modifier
-                        .padding(all = 16.dp)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
 
-                }
-                HorizontalDivider(
-                    color = Teal, thickness = 2.dp, modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 16.dp)
-                )
-
-            }
             item {
                 ProductCard(
                     ProductObject(

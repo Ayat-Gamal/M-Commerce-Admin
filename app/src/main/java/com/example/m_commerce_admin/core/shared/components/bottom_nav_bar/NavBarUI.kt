@@ -42,7 +42,8 @@ fun BottomNavigationBar(navController: NavController) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 0.dp, horizontal = 32.dp),
+            .padding(vertical = 0.dp, horizontal = 32.dp)
+            ,
         contentAlignment = Alignment.Center
     ) {
         Row(
