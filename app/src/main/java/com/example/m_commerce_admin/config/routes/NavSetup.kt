@@ -15,6 +15,7 @@ import com.example.m_commerce_admin.features.home.presentation.HomeScreenUI
 import com.example.m_commerce_admin.features.inventory.InventoryScreenUI
 import com.example.m_commerce_admin.features.login.presentation.LoginScreenUI
 import com.example.m_commerce_admin.features.products.ProductScreenUI
+import com.example.m_commerce_admin.features.splash.SplashScreenUI
 
 
 @Composable
@@ -24,12 +25,12 @@ fun NavSetup(
     modifier: Modifier = Modifier,
     showBottomNavbar: MutableState<Boolean>
 ) {
-    val startingScreen = AppRoutes.LoginScreen
+    val startingScreen = AppRoutes.SplashScreen
 
     NavHost(
         navController = navController,
         startDestination = startingScreen,
-        modifier = modifier.padding( 0.dp )
+        modifier = modifier.padding(0.dp)
     ) {
         composable<AppRoutes.HomeScreen> {
             showBottomNavbar.value = true
@@ -53,12 +54,23 @@ fun NavSetup(
 
             CouponScreenUI()
         }
-        composable<AppRoutes.LoginScreen> {
+        composable<AppRoutes.SplashScreen> {
             showBottomNavbar.value = false
-            LoginScreenUI( snackBarHostState = snackBarHostState) {
-                 navController.navigateAndClear(AppRoutes.HomeScreen)
+
+            SplashScreenUI{
+                route ->
+                navController.navigateAndClear(route)
 
             }
         }
+        composable<AppRoutes.LoginScreen> {
+            showBottomNavbar.value = false
+            LoginScreenUI(snackBarHostState = snackBarHostState) {
+                navController.navigateAndClear(AppRoutes.HomeScreen)
+
+            }
+        }
+
+
     }
 }

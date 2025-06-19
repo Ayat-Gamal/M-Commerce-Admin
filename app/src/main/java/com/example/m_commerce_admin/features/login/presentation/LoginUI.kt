@@ -73,14 +73,10 @@ fun LoginScreenUI(
                         duration = SnackbarDuration.Short
                     )
                     navigate(AppRoutes.HomeScreen)
-
                 }
-
             }
         }
     }
-
-
 
     Box(
         modifier = Modifier

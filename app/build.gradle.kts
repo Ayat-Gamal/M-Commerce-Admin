@@ -109,4 +109,9 @@ dependencies {
 
     // view model
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
+
+    //dataStore
+    implementation("androidx.datastore:datastore-preferences:1.1.7")
+
+
 }

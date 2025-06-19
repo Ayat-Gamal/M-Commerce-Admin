@@ -7,9 +7,10 @@ fun isRouteSelected(route: AppRoutes, currentDestination: NavDestination?): Bool
     val currentRoute = currentDestination?.route ?: return false
     return when (route) {
         is AppRoutes.ProductScreen -> currentRoute.contains("ProductScreen")
+        is AppRoutes.HomeScreen -> currentRoute.contains("HomeScreen")
         is AppRoutes.InventoryScreen -> currentRoute.contains("InventoryScreen")
         is AppRoutes.CouponScreen -> currentRoute.contains("CouponScreen")
-        else ->  {
+        else -> {
             false
         }
     }

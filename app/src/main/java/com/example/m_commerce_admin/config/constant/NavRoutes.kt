@@ -13,5 +13,6 @@ class Screens {
         const val PRODUCT_SCREEN = "Product"
         const val INVENTORY_SCREEN = "Inventory"
         const val COUPONS_SCREEN = "Coupons"
+        const val SPLASH_SCREEN = "Splash"
     }
 }
