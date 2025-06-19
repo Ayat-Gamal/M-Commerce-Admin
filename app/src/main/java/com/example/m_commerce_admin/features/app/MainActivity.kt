@@ -24,9 +24,10 @@ import androidx.navigation.compose.rememberNavController
 import com.example.m_commerce_admin.config.routes.AppRoutes
 import com.example.m_commerce_admin.config.routes.NavSetup
 import com.example.m_commerce_admin.config.theme.MCommerceAdminTheme
-import com.example.m_commerce_admin.core.helpers.isRouteSelected
+import com.example.m_commerce_admin.core.helpers.navigateAndClear
 import com.example.m_commerce_admin.core.shared.components.bottom_nav_bar.BottomNavigationBar
-import com.example.m_commerce_admin.features.app.component.FAB
+import com.example.m_commerce_admin.features.app.component.getFABForRouteWithAction
+import com.example.m_commerce_admin.features.app.component.getTopAppBarForRoute
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -51,33 +52,29 @@ fun Main(showBottomNavbar: MutableState<Boolean>) {
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination
 
+    val topBar = getTopAppBarForRoute(
+        currentDestination = currentRoute,
+        toLogin = {
+            navController.navigateAndClear(AppRoutes.LoginScreen)
+        }
+    )
+
+    val fabComposable = getFABForRouteWithAction(
+        currentDestination = currentRoute,
+    )
 
     Scaffold(
-
         modifier = Modifier.safeContentPadding(),
+
+        topBar = {
+            topBar?.invoke()
+        },
         snackbarHost = {
             SnackbarHost(hostState = snackBarHostState)
         },
 
         floatingActionButton = {
-            when {
-                isRouteSelected(AppRoutes.ProductScreen, currentRoute) -> FAB(
-                    onClick = {},
-                    screen = "Product"
-                )
-
-                isRouteSelected(AppRoutes.InventoryScreen, currentRoute) -> FAB(
-                    onClick = {},
-                    screen = "Inventory"
-                )
-
-                isRouteSelected(AppRoutes.CouponScreen, currentRoute) -> FAB(
-                    onClick = {},
-                    screen = "Coupon "
-                )
-
-                else -> {}
-            }
+            fabComposable?.invoke()
         },
 
         bottomBar = {
@@ -102,6 +99,3 @@ fun Main(showBottomNavbar: MutableState<Boolean>) {
 
     }
 }
-
-
-

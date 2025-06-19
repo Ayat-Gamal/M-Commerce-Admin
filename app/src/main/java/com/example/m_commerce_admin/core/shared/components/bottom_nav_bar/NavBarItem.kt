@@ -1,7 +1,6 @@
 package com.example.m_commerce_admin.core.shared.components.bottom_nav_bar
 
 import com.example.m_commerce_admin.R
-import com.example.m_commerce_admin.config.constant.NavRoutes
 import com.example.m_commerce_admin.config.constant.Screens
 import com.example.m_commerce_admin.config.routes.AppRoutes
 import kotlinx.serialization.Serializable

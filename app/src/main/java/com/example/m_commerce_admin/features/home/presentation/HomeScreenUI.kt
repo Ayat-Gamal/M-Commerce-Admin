@@ -17,7 +17,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.m_commerce_admin.R
 import com.example.m_commerce_admin.config.theme.Teal
-import com.example.m_commerce_admin.core.shared.components.CustomHeader
 import com.example.m_commerce_admin.features.home.presentation.component.HomeCard
 
 data class CardObject(val title: String, val value: Int, val icon: Int, val description: String)
@@ -47,12 +46,7 @@ fun HomeScreenUI() {
                     verticalAlignment = Alignment.CenterVertically,
 
                     ) {
-                    CustomHeader(
-                        "Dashboard",
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp, vertical = 2.dp),
 
-                        )
                 }
                 HorizontalDivider(
                     color = Teal,
@@ -118,6 +112,5 @@ fun HomeScreenUI() {
         }
 
     }
-
 }
 
