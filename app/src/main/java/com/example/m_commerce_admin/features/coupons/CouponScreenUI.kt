@@ -41,7 +41,7 @@ fun CouponScreenUI(modifier: Modifier = Modifier) {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-
+                //TODO( Search)
                 }
 
             }
