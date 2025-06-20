@@ -20,17 +20,13 @@ fun SplashScreenUI(
     navigate: (AppRoutes) -> Unit
 ) {
     val isLoggedIn by viewModel.isLoggedIn.collectAsState()
-    Log.d("TAG", "SplashScreenUI: $isLoggedIn")
 
     LaunchedEffect(isLoggedIn) {
-        Log.d("SplashScreen", "isLoggedIn value: $isLoggedIn")
-       delay(1000L)
+        delay(1000L)
         if (isLoggedIn) {
-            Log.d("SplashScreen", "Navigating to Home")
-            navigate(AppRoutes.HomeScreen)
+             navigate(AppRoutes.HomeScreen)
         } else {
-            Log.d("SplashScreen", "Navigating to Login")
-            navigate(AppRoutes.LoginScreen)
+             navigate(AppRoutes.LoginScreen)
         }
     }
         Box(

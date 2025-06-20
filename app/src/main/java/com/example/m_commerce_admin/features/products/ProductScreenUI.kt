@@ -36,8 +36,7 @@ fun ProductScreenUI(modifier: Modifier = Modifier) {
 
     Box(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(bottom = 48.dp),
+            .wrapContentHeight(),
 
     ) {
         LazyColumn(
