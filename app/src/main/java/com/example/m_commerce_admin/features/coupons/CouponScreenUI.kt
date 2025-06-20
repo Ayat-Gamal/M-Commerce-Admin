@@ -27,8 +27,7 @@ fun CouponScreenUI(modifier: Modifier = Modifier) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(bottom = 48.dp),
+                .wrapContentHeight() ,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
 

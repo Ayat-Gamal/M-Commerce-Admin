@@ -15,7 +15,7 @@ class SplashViewModel @Inject  constructor(
 
     val isLoggedIn = adminPreferences.isLoggedInFlow.stateIn(
         viewModelScope,
-        SharingStarted.Eagerly,  // Or SharingStarted.Lazily
+        SharingStarted.Eagerly,
         false
     )
 

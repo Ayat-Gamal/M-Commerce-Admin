@@ -1,6 +1,7 @@
 package com.example.m_commerce_admin.core.shared.components.top_app_bar
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -26,27 +27,19 @@ fun CustomTAB(
     toLogin: () -> Unit
 ) {
     TopAppBar(
+
         title = { Text(title) },
         actions = {
-            var expanded by remember { mutableStateOf(false) }
 
-            IconButton(onClick = { expanded = true }) {
-                Icon(Icons.Default.MoreVert, contentDescription = "Menu")
+            IconButton(onClick = {
+
+                loginViewModel.logout()
+                toLogin()
+            }) {
+                Icon(Icons.Default.Logout, contentDescription = "Menu")
             }
 
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
-            ) {
-                DropdownMenuItem(
-                    text = { Text("Logout") },
-                    onClick = {
-                        expanded = false
-                        loginViewModel.logout()
-                        toLogin()
-                    }
-                )
-            }
+
         }
     )
 }

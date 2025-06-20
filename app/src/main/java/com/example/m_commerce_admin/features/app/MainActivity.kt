@@ -89,7 +89,7 @@ fun Main(showBottomNavbar: MutableState<Boolean>) {
             start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
             top = innerPadding.calculateTopPadding(),
             end = innerPadding.calculateEndPadding(LayoutDirection.Ltr),
-            bottom = 0.dp
+            bottom = 16.dp
         )
 
         NavSetup(

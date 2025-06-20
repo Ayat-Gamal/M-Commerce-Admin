@@ -28,14 +28,15 @@ fun HomeScreenUI() {
 
     Box(
         modifier = Modifier
-            .fillMaxSize()
-            .fillMaxHeight(),
+           // .fillMaxSize()
+           // .fillMaxHeight()
+            .wrapContentHeight(),
 
         ) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentHeight(),
+               ,
 
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
