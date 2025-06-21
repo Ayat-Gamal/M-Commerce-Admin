@@ -6,6 +6,10 @@ plugins {
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
     kotlin("plugin.serialization") version "2.1.10"
+
+    //apollo
+    id("com.apollographql.apollo") version "4.3.1"
+
 }
 
 android {
@@ -73,8 +77,6 @@ dependencies {
     //?==================================================
 
     //!Network
-    //*Apollo
-//    implementation("com.apollographql.apollo:apollo-runtime:4.3.0")
     //*Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
@@ -113,5 +115,17 @@ dependencies {
     //dataStore
     implementation("androidx.datastore:datastore-preferences:1.1.7")
 
+    //APOLLO
+    implementation("com.apollographql.apollo:apollo-runtime:4.3.1")
 
+
+
+
+
+    apollo {
+        service("service") {
+            packageName.set("com.example.m_commerce_admin")
+
+        }
+    }
 }

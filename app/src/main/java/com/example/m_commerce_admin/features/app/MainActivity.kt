@@ -1,6 +1,7 @@
 package com.example.m_commerce_admin.features.app
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -17,12 +18,15 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.apollographql.apollo.ApolloClient
+import com.example.m_commerce_admin.GetProductByIdQuery
 import com.example.m_commerce_admin.config.routes.AppRoutes
 import com.example.m_commerce_admin.config.routes.NavSetup
 import com.example.m_commerce_admin.config.theme.MCommerceAdminTheme
@@ -31,6 +35,7 @@ import com.example.m_commerce_admin.core.shared.components.bottom_nav_bar.Bottom
 import com.example.m_commerce_admin.features.app.component.getFABForRouteWithAction
 import com.example.m_commerce_admin.features.app.component.getTopAppBarForRoute
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -39,6 +44,25 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val apolloClient = ApolloClient.Builder()
+                .serverUrl("https://mad45-alex-and02.myshopify.com/admin/api/unstable/graphql.json") // replace with your endpoint
+                .addHttpHeader("X-Shopify-Access-Token", "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")
+                .addHttpHeader("Content-Type", "application/json")
+                .build()
+
+            val scope = rememberCoroutineScope()
+            scope.launch {
+                val query = GetProductByIdQuery(id = "gid://shopify/Product/8845374095609")
+
+                val response = apolloClient.query(query).execute()
+                val product = response.data?.product
+                Log.i("TAG", "Product title: ${product?.title}")
+
+                Log.i("TAG", "Raw data: ${response.data}")
+                Log.i("TAG", "Errors: ${response.errors}")
+            }
+
+
             MCommerceAdminTheme {
                 showBottomNavbar = remember { mutableStateOf(false) }
                 Main(showBottomNavbar = showBottomNavbar)

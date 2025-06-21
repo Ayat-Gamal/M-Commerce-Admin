@@ -1,0 +1,47 @@
+type Query {
+    product(id: ID!): Product
+}
+
+type Product {
+    id: ID!
+    title: String
+    descriptionHtml: String
+    vendor: String
+    productType: String
+    tags: [String!]!
+    images(first: Int): ImageConnection
+    variants(first: Int): ProductVariantConnection
+}
+
+type ImageConnection {
+    edges: [ImageEdge!]!
+}
+
+type ImageEdge {
+    node: Image!
+}
+
+type Image {
+    originalSrc: String!
+}
+
+type ProductVariantConnection {
+    edges: [ProductVariantEdge!]!
+}
+
+type ProductVariantEdge {
+    node: ProductVariant!
+}
+
+type ProductVariant {
+    id: ID!
+    title: String
+    price: String
+    sku: String
+    selectedOptions: [SelectedOption!]!
+}
+
+type SelectedOption {
+    name: String!
+    value: String!
+}
