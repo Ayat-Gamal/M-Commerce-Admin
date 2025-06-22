@@ -34,6 +34,7 @@ import com.example.m_commerce_admin.core.helpers.navigateAndClear
 import com.example.m_commerce_admin.core.shared.components.bottom_nav_bar.BottomNavigationBar
 import com.example.m_commerce_admin.features.app.component.getFABForRouteWithAction
 import com.example.m_commerce_admin.features.app.component.getTopAppBarForRoute
+import com.shopify.buy3.BuildConfig
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
