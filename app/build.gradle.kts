@@ -127,7 +127,6 @@ dependencies {
     apollo {
         service("service") {
             packageName.set("com.example.m_commerce_admin")
-
         }
     }
 }

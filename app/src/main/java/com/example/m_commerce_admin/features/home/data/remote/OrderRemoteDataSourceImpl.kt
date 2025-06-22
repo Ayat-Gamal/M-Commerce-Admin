@@ -19,10 +19,10 @@ class OrderRemoteDataSourceImpl @Inject constructor(private val apolloClient: Ap
                     Order(
                         id = node.id,
                         name = node.name ?: "Order Code",
-                        totalAmount = node.totalPriceSet?.shopMoney?.amount ?: "0",
+                        totalAmount = node.totalPriceSet.shopMoney.amount.toString() ,
                         currency = (node.totalPriceSet?.shopMoney?.currencyCode
                             ?: "EGP").toString(),
-                        createdAt = node.createdAt ?: "20250621",
+                        createdAt = node.createdAt.toString(),
                         customerName = node.customer?.displayName,
                         customerEmail = node.customer?.email,
                         status = node.displayFulfillmentStatus?.name
