@@ -1,3 +1,7 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -16,6 +20,17 @@ android {
     namespace = "com.example.m_commerce_admin"
     compileSdk = 35
 
+    val file = rootProject.file("local.properties")
+    val properties = Properties()
+    properties.load(FileInputStream(file))
+
+    val localProperties = Properties().apply {
+        load(rootProject.file("local.properties").inputStream())
+    }
+    val adminToken: String = localProperties.getProperty("ADMIN_TOKEN", "")
+    val shopDomain: String = localProperties.getProperty("SHOP_DOMAIN", "")
+
+
     defaultConfig {
         applicationId = "com.example.m_commerce_admin"
         minSdk = 24
@@ -25,7 +40,12 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-           }
+        buildConfigField("String", "adminToken", properties.getProperty("ADMIN_TOKEN"))
+        buildConfigField("String", "shopDomain", shopDomain)
+        resValue("string", "ADMIN_TOKEN", adminToken)
+
+
+    }
 
     buildTypes {
         release {
