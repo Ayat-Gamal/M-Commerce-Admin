@@ -19,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.m_commerce_admin.core.shared.components.states.Failed
 import com.example.m_commerce_admin.features.home.presentation.HomeState
 import com.example.m_commerce_admin.features.home.presentation.HomeViewModel
 import com.example.m_commerce_admin.features.home.presentation.component.OrderItemCard
@@ -52,7 +53,7 @@ fun OrdersScreenUI(
     ) { padding ->
         when (state) {
             is HomeState.Loading -> CircularProgressIndicator()
-            is HomeState.Error -> Text("Error loading orders.")
+            is HomeState.Error -> Failed("Error loading orders.")
             is HomeState.Success -> {
                 val orders = (state as HomeState.Success).data
                 LazyColumn(modifier = Modifier.padding(padding)) {

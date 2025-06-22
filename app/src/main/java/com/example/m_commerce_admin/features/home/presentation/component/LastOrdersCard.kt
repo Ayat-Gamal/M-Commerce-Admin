@@ -32,6 +32,7 @@ import com.example.m_commerce_admin.config.theme.LightTeal
 import com.example.m_commerce_admin.config.theme.Teal
 import com.example.m_commerce_admin.config.theme.White
 import com.example.m_commerce_admin.core.shared.components.SvgImage
+import com.example.m_commerce_admin.core.shared.components.states.Empty
 import com.example.m_commerce_admin.features.home.domain.entity.Order
 import com.example.m_commerce_admin.features.home.presentation.CardObject
 
@@ -41,7 +42,7 @@ fun LastOrdersCard(
     onViewAllClick: () -> Unit
 ) {
     if (orders.isEmpty()) {
-        HomeCard(data = CardObject("No recent orders", 0, 0, ""))
+       Empty("No Recent Orders.")
         return
     }
 

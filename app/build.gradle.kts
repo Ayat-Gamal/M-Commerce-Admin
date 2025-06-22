@@ -141,6 +141,9 @@ dependencies {
     //APOLLO
     implementation("com.apollographql.apollo:apollo-runtime:4.3.1")
 
+ //lotti
+
+    implementation("com.airbnb.android:lottie-compose:6.3.0")
 
 
 
