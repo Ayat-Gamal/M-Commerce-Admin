@@ -1,5 +1,69 @@
-type Query {
+schema {
+    query: QueryRoot
+}
+
+type QueryRoot {
+    orders(first: Int, reverse: Boolean): OrderConnection
     product(id: ID!): Product
+}
+
+type OrderConnection {
+    edges: [OrderEdge]
+    pageInfo: PageInfo
+}
+
+type OrderEdge {
+    node: Order
+}
+
+type Order {
+    id: ID!
+    name: String
+    totalPriceSet: MoneyBag
+    createdAt: String
+    fulfillmentStatus: FulfillmentStatus
+    customer: Customer
+    displayFulfillmentStatus : FulfillmentStatus
+}
+
+type MoneyBag {
+    shopMoney: MoneyV2
+}
+
+type MoneyV2 {
+    amount: String
+    currencyCode: CurrencyCode
+}
+
+type Customer {
+    displayName: String
+    email: String
+}
+
+type PageInfo {
+    hasNextPage: Boolean
+    hasPreviousPage: Boolean
+    startCursor: String
+    endCursor: String
+}
+
+enum FulfillmentStatus {
+    FULFILLED
+    UNFULFILLED
+    PARTIALLY_FULFILLED
+    RESTOCKED
+    PENDING_FULFILLMENT
+    IN_PROGRESS
+    ON_HOLD
+    OPEN
+    CLOSED
+    CANCELED
+}
+
+enum CurrencyCode {
+    EGP
+    USD
+    EUR
 }
 
 type Product {

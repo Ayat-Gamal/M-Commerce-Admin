@@ -11,7 +11,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object AppModule {
+object UserPreferencesModule {
     @Provides
     @Singleton
     fun provideUserPreferences(@ApplicationContext context: Context): AdminPreferences {

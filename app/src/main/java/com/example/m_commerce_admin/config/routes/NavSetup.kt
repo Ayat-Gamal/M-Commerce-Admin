@@ -12,6 +12,7 @@ import androidx.navigation.compose.composable
 import com.example.m_commerce_admin.core.helpers.navigateAndClear
 import com.example.m_commerce_admin.features.coupons.CouponScreenUI
 import com.example.m_commerce_admin.features.home.presentation.HomeScreenUI
+import com.example.m_commerce_admin.features.home.presentation.orders.OrdersScreenUI
 import com.example.m_commerce_admin.features.inventory.InventoryScreenUI
 import com.example.m_commerce_admin.features.login.presentation.LoginScreenUI
 import com.example.m_commerce_admin.features.products.ProductScreenUI
@@ -35,7 +36,10 @@ fun NavSetup(
         composable<AppRoutes.HomeScreen> {
             showBottomNavbar.value = true
 
-            HomeScreenUI()
+            HomeScreenUI(
+                navController = navController,
+
+                )
         }
 
         composable<AppRoutes.ProductScreen> {
@@ -57,8 +61,7 @@ fun NavSetup(
         composable<AppRoutes.SplashScreen> {
             showBottomNavbar.value = false
 
-            SplashScreenUI{
-                route ->
+            SplashScreenUI { route ->
                 navController.navigateAndClear(route)
 
             }
@@ -70,7 +73,11 @@ fun NavSetup(
 
             }
         }
-
+        composable<AppRoutes.OrdersScreen> {
+            OrdersScreenUI() {
+                navController.popBackStack()
+            }
+        }
 
     }
 }

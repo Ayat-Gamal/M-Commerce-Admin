@@ -44,25 +44,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val apolloClient = ApolloClient.Builder()
-                .serverUrl("https://mad45-alex-and02.myshopify.com/admin/api/unstable/graphql.json") // replace with your endpoint
-                .addHttpHeader("X-Shopify-Access-Token", "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")
-                .addHttpHeader("Content-Type", "application/json")
-                .build()
-
-            val scope = rememberCoroutineScope()
-            scope.launch {
-                val query = GetProductByIdQuery(id = "gid://shopify/Product/8845374095609")
-
-                val response = apolloClient.query(query).execute()
-                val product = response.data?.product
-                Log.i("TAG", "Product title: ${product?.title}")
-
-                Log.i("TAG", "Raw data: ${response.data}")
-                Log.i("TAG", "Errors: ${response.errors}")
-            }
-
-
             MCommerceAdminTheme {
                 showBottomNavbar = remember { mutableStateOf(false) }
                 Main(showBottomNavbar = showBottomNavbar)
