@@ -21,8 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.m_commerce_admin.config.theme.Teal
-import com.example.m_commerce_admin.features.products.presentation.states.GetProductState
 import com.example.m_commerce_admin.features.products.presentation.component.ProductCard
+import com.example.m_commerce_admin.features.products.presentation.states.GetProductState
 import com.example.m_commerce_admin.features.products.presentation.viewModel.ProductsViewModel
 
 
@@ -49,11 +49,13 @@ fun ProductScreenUI(
     }
 
     Scaffold { pad ->
-        Box(modifier = Modifier.padding(pad).fillMaxSize()) {
+        Box(modifier = Modifier
+            .padding(pad)
+            .fillMaxSize()) {
 
             when (state) {
                 is GetProductState.Loading -> {
-                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator(color = Teal)
                     }
                 }
@@ -72,14 +74,6 @@ fun ProductScreenUI(
                         modifier = Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        item {
-                            Text(
-                                text = "Products",
-                                modifier = Modifier.padding(16.dp),
-                                color = Teal
-                            )
-                        }
-
                         items(products) { product ->
                             ProductCard(product = product)
                         }

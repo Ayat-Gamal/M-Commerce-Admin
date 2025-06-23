@@ -81,7 +81,9 @@ fun NavSetup(
         }
         composable<AppRoutes.ProductForm> {
             showBottomNavbar.value = false
-            ProductFormUI()
+            ProductFormUI{
+                navController.popBackStack()
+            }
         }
 
     }

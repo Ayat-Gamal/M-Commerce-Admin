@@ -40,7 +40,7 @@ class ProductRemoteDataSourceImpl @Inject constructor(
                 descriptionHtml = product.descriptionHtml,
                 productType = product.productType,
                 vendor = product.vendor,
-                status = product.status // if this is already com.example.m_commerce_admin.type.ProductStatus
+                status = product.status
             )
 
             val response = apolloClient.mutation(AddProductMutation(gqlInput)).execute()
