@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class GetLastOrdersUseCase @Inject constructor(private  val repo : OrderRepository) : UseCase<Unit, Flow<HomeState<List<Order>>>> {
-    override fun invoke(params: Unit): Flow<HomeState<List<Order>>> {
+    override suspend fun invoke(params: Unit): Flow<HomeState<List<Order>>> {
         return repo.getLastOrders()
     }
 }

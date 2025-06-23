@@ -4,6 +4,7 @@ import com.apollographql.apollo.ApolloClient
 import com.example.m_commerce_admin.features.products.data.remote.ProductRemoteDataSource
 import com.example.m_commerce_admin.features.products.data.remote.ProductRemoteDataSourceImpl
 import com.example.m_commerce_admin.features.products.domain.repository.ProductRepository
+import com.example.m_commerce_admin.features.products.domain.usecase.AddProductUseCase
 import com.example.m_commerce_admin.features.products.domain.usecase.GetAllProductsUseCase
 import dagger.Module
 import dagger.Provides
@@ -25,5 +26,10 @@ object ProductProviderModule {
     @Singleton
     fun provideGetProductUseCase(repo: ProductRepository): GetAllProductsUseCase {
         return GetAllProductsUseCase(repo)
+    }
+    @Provides
+    @Singleton
+    fun provideAddProductUseCase(repo: ProductRepository): AddProductUseCase {
+        return AddProductUseCase(repo)
     }
 }

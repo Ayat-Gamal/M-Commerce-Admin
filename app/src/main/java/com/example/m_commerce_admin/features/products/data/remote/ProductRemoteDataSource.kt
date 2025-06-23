@@ -1,8 +1,11 @@
 package com.example.m_commerce_admin.features.products.data.remote
 
-import com.example.m_commerce_admin.features.products.presentation.ProductState
-import kotlinx.coroutines.flow.Flow
+ import com.example.m_commerce_admin.features.products.presentation.states.GetProductState
+ import com.example.m_commerce_admin.type.ProductInput
+ import kotlinx.coroutines.flow.Flow
 
 interface ProductRemoteDataSource {
-    fun getProducts(first: Int, after: String?): Flow<ProductState>
+    fun getProducts(first: Int, after: String?): Flow<GetProductState>
+    suspend fun addProduct(product: ProductInput): Result<Unit>
+
 }

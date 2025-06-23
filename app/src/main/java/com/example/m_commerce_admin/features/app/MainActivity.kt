@@ -69,6 +69,7 @@ fun Main(showBottomNavbar: MutableState<Boolean>) {
 
     val fabComposable = getFABForRouteWithAction(
         currentDestination = currentRoute,
+        navController
     )
 
     Scaffold(
