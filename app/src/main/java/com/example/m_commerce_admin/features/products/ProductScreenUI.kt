@@ -8,14 +8,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -35,17 +37,25 @@ fun ProductScreenUI(
     val listState = rememberLazyListState()
 
     LaunchedEffect(Unit) {
-        viewModel.loadInitialProducts()
+        viewModel.loadMoreProducts()
     }
 
-    LaunchedEffect(listState) {
-        snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
-            .collect { lastVisible ->
-                val total = listState.layoutInfo.totalItemsCount
-                if (lastVisible == total - 1) {
-                    viewModel.loadMoreProducts()
-                }
-            }
+    // Improved pagination logic
+    val shouldLoadMore by remember {
+        derivedStateOf {
+            val layoutInfo = listState.layoutInfo
+            val totalItemsCount = layoutInfo.totalItemsCount
+            val lastVisibleItemIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            
+            // Load more when we're 3 items away from the end
+            lastVisibleItemIndex >= totalItemsCount - 3 && totalItemsCount > 0
+        }
+    }
+
+    LaunchedEffect(shouldLoadMore) {
+        if (shouldLoadMore) {
+            viewModel.loadMoreProducts()
+        }
     }
 
     Scaffold { pad ->
@@ -60,7 +70,15 @@ fun ProductScreenUI(
 
                 is GetProductState.Error -> {
                     val msg = (state as GetProductState.Error).message
-                    Text("Error: $msg", modifier = Modifier.align(Alignment.Center))
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("Error: $msg")
+                        Button(
+                            onClick = { viewModel.testConnection() },
+                            modifier = Modifier.padding(top = 16.dp)
+                        ) {
+                            Text("Test Connection")
+                        }
+                    }
                 }
 
                 is GetProductState.Success -> {
@@ -86,12 +104,14 @@ fun ProductScreenUI(
 
                         if (hasNext) {
                             item {
-                                CircularProgressIndicator(
+                                Box(
                                     modifier = Modifier
-                                        .padding(16.dp)
-                                        .align(Alignment.Center),
-                                    color = Teal
-                                )
+                                        .fillMaxSize()
+                                        .padding(16.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator(color = Teal)
+                                }
                             }
                         }
                     }

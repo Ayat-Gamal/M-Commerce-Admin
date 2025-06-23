@@ -1,6 +1,7 @@
 package com.example.m_commerce_admin.features.products.data.repository
 
 import com.example.m_commerce_admin.features.products.data.remote.ProductRemoteDataSource
+import com.example.m_commerce_admin.features.products.domain.entity.DomainProductInput
 import com.example.m_commerce_admin.features.products.domain.repository.ProductRepository
 import com.example.m_commerce_admin.features.products.presentation.states.GetProductState
 import com.example.m_commerce_admin.type.ProductInput
@@ -17,6 +18,10 @@ class ProductRepositoryImpl @Inject constructor(
 
     override suspend fun addProduct(product: ProductInput): Result<Unit> {
         return remoteDataSource.addProduct(product)
+    }
+
+    override suspend fun addProductWithImages(product: DomainProductInput, imageUris: List<String>): Result<Unit> {
+        return remoteDataSource.addProductWithImages(product, imageUris)
     }
 
 }

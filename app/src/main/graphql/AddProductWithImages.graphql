@@ -1,0 +1,27 @@
+mutation AddProductWithImages($input: ProductInput!) {
+    productCreate(input: $input) {
+        product {
+            id
+            title
+            status
+            createdAt
+            totalInventory
+            featuredImage {
+                url
+            }
+            images(first: 10) {
+                edges {
+                    node {
+                        id
+                        url
+                        altText
+                    }
+                }
+            }
+        }
+        userErrors {
+            field
+            message
+        }
+    }
+} 
