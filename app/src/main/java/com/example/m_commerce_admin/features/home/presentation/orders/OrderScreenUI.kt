@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.m_commerce_admin.core.shared.components.states.Failed
 import com.example.m_commerce_admin.features.home.presentation.HomeState
-import com.example.m_commerce_admin.features.home.presentation.HomeViewModel
+import com.example.m_commerce_admin.features.home.presentation.viewModel.HomeViewModel
 import com.example.m_commerce_admin.features.home.presentation.component.OrderItemCard
 
 

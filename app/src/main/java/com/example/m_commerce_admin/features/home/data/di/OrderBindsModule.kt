@@ -11,8 +11,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class OrderBindsModule {
-
-
     @Singleton
     @Binds
     abstract fun provideOrderRepository(repo: OrderRepositoryImpl): OrderRepository

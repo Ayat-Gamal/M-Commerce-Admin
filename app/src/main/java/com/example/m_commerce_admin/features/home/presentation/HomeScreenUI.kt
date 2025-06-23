@@ -24,6 +24,7 @@ import androidx.navigation.NavController
 import com.example.m_commerce_admin.config.routes.AppRoutes
 import com.example.m_commerce_admin.config.theme.Teal
 import com.example.m_commerce_admin.features.home.presentation.component.LastOrdersCard
+import com.example.m_commerce_admin.features.home.presentation.viewModel.HomeViewModel
 
 data class CardObject(val title: String, val value: Int, val icon: Int, val description: String)
 

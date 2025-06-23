@@ -28,11 +28,13 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.m_commerce_admin.R
 import com.example.m_commerce_admin.config.routes.AppRoutes
 import com.example.m_commerce_admin.config.theme.SplashTeal
+import com.example.m_commerce_admin.features.home.presentation.viewModel.HomeViewModel
 import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreenUI(
     viewModel: SplashViewModel = hiltViewModel(),
+    homeViewModel: HomeViewModel = hiltViewModel(),
     navigate: (AppRoutes) -> Unit
 ) {
     val isLoggedIn by viewModel.isLoggedIn.collectAsState()
@@ -47,7 +49,8 @@ fun SplashScreenUI(
     )
 
     LaunchedEffect(progress) {
-        if (progress == 1f) {
+        homeViewModel.fetchOrders()
+         if (progress == 1f) {
             delay(300)
             if (isLoggedIn) {
                 navigate(AppRoutes.HomeScreen)

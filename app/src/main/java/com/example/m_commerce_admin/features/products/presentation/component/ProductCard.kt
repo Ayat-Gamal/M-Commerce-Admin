@@ -1,15 +1,16 @@
-package com.example.m_commerce_admin.features.products.component
+package com.example.m_commerce_admin.features.products.presentation.component
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -20,9 +21,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.DarkGray
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,67 +33,74 @@ import com.example.m_commerce_admin.config.theme.LightTeal
 import com.example.m_commerce_admin.config.theme.Teal
 import com.example.m_commerce_admin.config.theme.White
 import com.example.m_commerce_admin.config.theme.lightRed
-import com.example.m_commerce_admin.core.helpers.formatCreatedAt
-import com.example.m_commerce_admin.core.shared.components.PngImage
-import com.example.m_commerce_admin.features.products.ProductObject
+import com.example.m_commerce_admin.core.helpers.formatIsoDate
+import com.example.m_commerce_admin.core.shared.components.NetworkImage
+import com.example.m_commerce_admin.features.products.domain.entity.Product
 
-
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ProductCard(product: ProductObject) {
+fun ProductCard(product: Product) {
     Card(
         colors = CardDefaults.cardColors(containerColor = LightTeal),
-        elevation = CardDefaults.cardElevation(4.dp),
+        elevation = CardDefaults.cardElevation(6.dp),
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 8.dp)
+            .padding(horizontal = 12.dp, vertical = 8.dp)
             .border(BorderStroke(1.dp, Teal), RoundedCornerShape(16.dp))
     ) {
-        Row(
+        Column(
             modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            PngImage(
-                product.image,
-                modifier = Modifier.size(80.dp),
-                contentDescription = product.title,
+            // Larger Image on Top
+            NetworkImage(
+                url = product.featuredImage ?: "",
+                contentDescription = "Product image",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(180.dp)
+                    .background(White, RoundedCornerShape(12.dp)),
+                contentScale = ContentScale.Crop
             )
 
-            Spacer(modifier = Modifier.size(16.dp))
-
             Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
+                verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
+                Text(product.title, fontWeight = FontWeight.Bold, fontSize = 18.sp)
 
-                Text(product.title, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
-                Text("EGP ${product.price}", fontSize = 14.sp, color = DarkGray)
-                Text("In Stock: ${product.quantity}", fontSize = 12.sp)
+                Text("EGP ${product.variants}", fontSize = 14.sp, color = DarkGray)
+                Text("In Stock: ${product.totalInventory}", fontSize = 13.sp)
 
-                val statusColor = if (product.status == "Active") LightGreen else lightRed
+                val statusColor =
+                    if (product.status.equals("Active", true)) LightGreen else lightRed
                 Text(
-                    product.status,
-                    fontSize = 12.sp,
+                    text = product.status,
                     color = White,
+                    fontSize = 12.sp,
                     modifier = Modifier
-                        .background(statusColor, RoundedCornerShape(8.dp))
+                        .background(statusColor, RoundedCornerShape(6.dp))
                         .padding(horizontal = 8.dp, vertical = 2.dp)
                 )
-                val createdDate = formatCreatedAt(product.createdAt)
+
+                val createdDate = formatIsoDate(product.createdAt)
                 Text("Created: $createdDate", fontSize = 12.sp, color = DarkestGray)
             }
 
-            Column {
-                IconButton(onClick = { }) {
+            // Action Buttons Row
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                IconButton(onClick = { /* Edit */ }) {
                     Icon(Icons.Default.Edit, contentDescription = "Edit", tint = Teal)
                 }
-                IconButton(onClick = { }) {
+                IconButton(onClick = { /* Delete */ }) {
                     Icon(Icons.Default.Delete, contentDescription = "Delete", tint = lightRed)
                 }
             }
         }
     }
-
 }

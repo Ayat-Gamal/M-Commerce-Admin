@@ -1,0 +1,29 @@
+package com.example.m_commerce_admin.features.products.data.di
+
+import com.apollographql.apollo.ApolloClient
+import com.example.m_commerce_admin.features.products.data.remote.ProductRemoteDataSource
+import com.example.m_commerce_admin.features.products.data.remote.ProductRemoteDataSourceImpl
+import com.example.m_commerce_admin.features.products.domain.repository.ProductRepository
+import com.example.m_commerce_admin.features.products.domain.usecase.GetAllProductsUseCase
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
+
+@Module
+@InstallIn(SingletonComponent::class)
+object ProductProviderModule {
+
+    @Provides
+    @Singleton
+    fun ProductRemoteDataSource(apolloClient: ApolloClient): ProductRemoteDataSource {
+        return ProductRemoteDataSourceImpl(apolloClient)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetProductUseCase(repo: ProductRepository): GetAllProductsUseCase {
+        return GetAllProductsUseCase(repo)
+    }
+}
