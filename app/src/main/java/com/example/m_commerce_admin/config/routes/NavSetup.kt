@@ -1,5 +1,7 @@
 package com.example.m_commerce_admin.config.routes
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -20,6 +22,7 @@ import com.example.m_commerce_admin.features.products.presentation.component.Pro
 import com.example.m_commerce_admin.features.splash.SplashScreenUI
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NavSetup(
     navController: NavHostController,
@@ -81,7 +84,9 @@ fun NavSetup(
         }
         composable<AppRoutes.ProductForm> {
             showBottomNavbar.value = false
+
             ProductFormUI(navController = navController)
+
         }
 
     }

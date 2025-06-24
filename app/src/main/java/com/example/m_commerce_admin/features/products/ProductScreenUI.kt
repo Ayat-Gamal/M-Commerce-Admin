@@ -35,8 +35,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.m_commerce_admin.config.theme.Teal
 import com.example.m_commerce_admin.core.shared.components.states.Failed
-import com.example.m_commerce_admin.features.products.presentation.states.GetProductState
+
 import com.example.m_commerce_admin.features.products.presentation.component.ProductCard
+import com.example.m_commerce_admin.features.products.presentation.states.GetProductState
 import com.example.m_commerce_admin.features.products.presentation.viewModel.ProductsViewModel
 import kotlinx.coroutines.launch
 
@@ -44,8 +45,7 @@ import kotlinx.coroutines.launch
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ProductScreenUI(
-    viewModel: ProductsViewModel = hiltViewModel()
-) {
+    viewModel: ProductsViewModel = hiltViewModel()) {
     val state by viewModel.productsState.collectAsState()
     val listState = rememberLazyListState()
     val deleteState by viewModel.deleteProductState.collectAsState()
@@ -83,14 +83,17 @@ fun ProductScreenUI(
         }
     }
 
+
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { pad ->
-        Box(modifier = Modifier.padding(pad).fillMaxSize()) {
+        Box(modifier = Modifier
+            .padding(pad)
+            .fillMaxSize()) {
 
             when (state) {
                 is GetProductState.Loading -> {
-                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator(color = Teal)
                     }
                 }
@@ -105,13 +108,23 @@ fun ProductScreenUI(
                 is GetProductState.Success -> {
                     val products = (state as GetProductState.Success).data
                     val hasNext = (state as GetProductState.Success).hasNext
-                    
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        LazyColumn(
-                            state = listState,
-                            modifier = Modifier.fillMaxSize(),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
+
+
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        items(products) { product ->
+                            ProductCard(product = product,
+                                onDelete ={viewModel.deleteProduct(productId = product.id)} ,
+                                onEdit = {}
+                                )
+
+
+                        }
+
+                        if (hasNext) {
                             item {
                                 Row(
                                     modifier = Modifier
@@ -143,7 +156,9 @@ fun ProductScreenUI(
                                 ProductCard(
                                     product = product,
                                     onEdit = { /* TODO: Edit logic */ },
-                                    onDelete = { viewModel.deleteProduct(product.id) }
+                                    onDelete = {
+
+                                        viewModel.deleteProduct(product.id) }
                                 )
                             }
 

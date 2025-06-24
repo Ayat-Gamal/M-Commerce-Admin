@@ -73,7 +73,16 @@ class ProductRemoteDataSourceImpl @Inject constructor(
 
     override suspend fun addProduct(product: ProductInput): Result<Unit> {
         return try {
+
             val response = apolloClient.mutation(AddProductMutation(product)).execute()
+
+            val gqlInput = ProductInput(
+                title = product.title,
+                descriptionHtml = product.descriptionHtml,
+                productType = product.productType,
+                vendor = product.vendor,
+                status = product.status
+            )
 
             response.data?.productCreate?.userErrors?.let { errors ->
                 if (errors.isNotEmpty()) {

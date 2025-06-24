@@ -43,8 +43,8 @@ import com.example.m_commerce_admin.features.products.domain.entity.Product
 @Composable
 fun ProductCard(
     product: Product,
-    onEdit: () -> Unit = {},
-    onDelete: () -> Unit = {}
+    onEdit: () -> Unit,
+    onDelete: () -> Unit
 ) {
     Card(
         colors = CardDefaults.cardColors(containerColor = LightTeal),

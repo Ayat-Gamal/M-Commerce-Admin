@@ -6,6 +6,7 @@ data class DomainProductInput(
     val productType: String,
     val vendor: String,
     val status: ProductStatus,
+
     val price: String,
     val category: String,
     val inStock: Boolean,
@@ -16,10 +17,8 @@ data class ProductImage(
     val uri: String,
     val fileName: String,
     val mimeType: String
-)
 
+)
 enum class ProductStatus {
-    ACTIVE,
-    DRAFT,
-    ARCHIVED
+    ACTIVE, DRAFT, ARCHIVED
 }
