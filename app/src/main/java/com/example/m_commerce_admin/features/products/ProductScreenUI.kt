@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.m_commerce_admin.config.theme.Teal
+import com.example.m_commerce_admin.core.shared.components.states.Failed
 import com.example.m_commerce_admin.features.products.presentation.states.GetProductState
 import com.example.m_commerce_admin.features.products.presentation.component.ProductCard
 import com.example.m_commerce_admin.features.products.presentation.viewModel.ProductsViewModel
@@ -71,13 +72,7 @@ fun ProductScreenUI(
                 is GetProductState.Error -> {
                     val msg = (state as GetProductState.Error).message
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("Error: $msg")
-                        Button(
-                            onClick = { viewModel.testConnection() },
-                            modifier = Modifier.padding(top = 16.dp)
-                        ) {
-                            Text("Test Connection")
-                        }
+                        Failed(msg)
                     }
                 }
 

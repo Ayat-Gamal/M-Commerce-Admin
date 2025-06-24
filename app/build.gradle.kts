@@ -141,6 +141,9 @@ dependencies {
     //APOLLO
     implementation("com.apollographql.apollo:apollo-runtime:4.3.1")
 
+    //JSON parsing for Shopify API
+    implementation("org.json:json:20231013")
+
  //lotti
 
     implementation("com.airbnb.android:lottie-compose:6.3.0")

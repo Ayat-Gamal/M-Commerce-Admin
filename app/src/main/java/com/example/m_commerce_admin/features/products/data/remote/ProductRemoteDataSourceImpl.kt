@@ -2,6 +2,7 @@ package com.example.m_commerce_admin.features.products.data.remote
 
 import android.content.Context
 import android.net.Uri
+import android.provider.OpenableColumns
 import android.util.Log
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.api.Optional
@@ -9,21 +10,33 @@ import com.apollographql.apollo.exception.ApolloException
 import com.example.m_commerce_admin.AddProductMutation
 import com.example.m_commerce_admin.AddProductWithImagesMutation
 import com.example.m_commerce_admin.GetProductsQuery
-import com.example.m_commerce_admin.TestProductsQuery
+import com.example.m_commerce_admin.StagedUploadsCreateMutation
 import com.example.m_commerce_admin.features.products.data.mapper.toDomain
+import com.example.m_commerce_admin.features.products.data.mapper.toGraphQL
+import com.example.m_commerce_admin.features.products.data.model.StagedUploadInput
+import com.example.m_commerce_admin.features.products.data.model.StagedUploadTarget
 import com.example.m_commerce_admin.features.products.domain.entity.DomainProductInput
 import com.example.m_commerce_admin.features.products.presentation.states.GetProductState
 import com.example.m_commerce_admin.type.CreateMediaInput
+import com.example.m_commerce_admin.type.MediaContentType
 import com.example.m_commerce_admin.type.ProductInput
+import com.example.m_commerce_admin.type.StagedUploadTargetGenerateUploadResource
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import java.io.ByteArrayOutputStream
-import java.io.InputStream
+import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody
+import okio.BufferedSink
 import javax.inject.Inject
 
 class ProductRemoteDataSourceImpl @Inject constructor(
     private val apolloClient: ApolloClient,
-    private val context: Context
+    private val okHttpClient: OkHttpClient
+
 ) : ProductRemoteDataSource {
 
     override fun getProducts(first: Int, after: String?): Flow<GetProductState> = flow {
@@ -35,11 +48,6 @@ class ProductRemoteDataSourceImpl @Inject constructor(
             val response = apolloClient.query(
                 GetProductsQuery(first = first, after = Optional.presentIfNotNull(after))
             ).execute()
-
-            Log.d("ProductRemoteDataSource", "Query executed. Has errors: ${response.hasErrors()}")
-            Log.d("ProductRemoteDataSource", "Response data: ${response.data != null}")
-            Log.d("ProductRemoteDataSource", "Response errors: ${response.errors}")
-
             if (response.hasErrors()) {
                 val errorMessage = response.errors?.firstOrNull()?.message ?: "GraphQL error occurred"
                 Log.e("ProductRemoteDataSource", "GraphQL errors: ${response.errors}")
@@ -73,107 +81,145 @@ class ProductRemoteDataSourceImpl @Inject constructor(
 
     override suspend fun addProduct(product: ProductInput): Result<Unit> {
         return try {
-            val gqlInput = ProductInput(
-                title = product.title,
-                descriptionHtml = product.descriptionHtml,
-                productType = product.productType,
-                vendor = product.vendor,
-                status = product.status
-            )
+            val response = apolloClient.mutation(AddProductMutation(product)).execute()
 
-            val response = apolloClient.mutation(AddProductMutation(gqlInput)).execute()
-
-            val errors = response.data?.productCreate?.userErrors
-            if (!errors.isNullOrEmpty()) {
-                Result.failure(Exception(errors.first().message))
-            } else {
-                Result.success(Unit)
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    override suspend fun addProductWithImages(product: DomainProductInput, imageUris: List<String>): Result<Unit> {
-        return try {
-            Log.d("ProductRemoteDataSource", "Starting addProductWithImages with ${imageUris.size} images")
-            
-            // Convert URIs to base64 encoded strings
-            val mediaInputs = mutableListOf<CreateMediaInput>()
-            
-            for (uriString in imageUris) {
-                try {
-                    val uri = Uri.parse(uriString)
-                    val base64Data = convertImageToBase64(uri)
-                    val mimeType = getMimeType(uri)
-                    
-                    val mediaInput = CreateMediaInput(
-                        mediaContentType = com.example.m_commerce_admin.type.MediaContentType.IMAGE,
-                        originalSource = base64Data
-                    )
-                    mediaInputs.add(mediaInput)
-                    
-                    Log.d("ProductRemoteDataSource", "Converted image to base64: ${base64Data.take(50)}...")
-                } catch (e: Exception) {
-                    Log.e("ProductRemoteDataSource", "Error converting image $uriString", e)
-                    return Result.failure(Exception("Failed to process image: ${e.message}"))
+            response.data?.productCreate?.userErrors?.let { errors ->
+                if (errors.isNotEmpty()) {
+                    return Result.failure(Exception(errors.first().message))
                 }
             }
 
-            val gqlInput = ProductInput(
-                title = Optional.presentIfNotNull(product.title),
-                descriptionHtml = Optional.presentIfNotNull(product.descriptionHtml),
-                productType = Optional.presentIfNotNull(product.productType),
-                vendor = Optional.presentIfNotNull(product.vendor),
-                status = Optional.presentIfNotNull(product.status.toGraphQLStatus())
-            )
-
-            Log.d("ProductRemoteDataSource", "Executing AddProductWithImages mutation")
-            val response = apolloClient.mutation(
-                AddProductWithImagesMutation(
-                    input = gqlInput,
-                    media = Optional.presentIfNotNull(mediaInputs)
-                )
-            ).execute()
-
-            Log.d("ProductRemoteDataSource", "Mutation executed. Has errors: ${response.hasErrors()}")
-            
-            val errors = response.data?.productCreate?.userErrors
-            if (!errors.isNullOrEmpty()) {
-                val errorMessage = errors.first().message
-                Log.e("ProductRemoteDataSource", "GraphQL errors: $errorMessage")
-                Result.failure(Exception(errorMessage))
-            } else {
-                Log.d("ProductRemoteDataSource", "Product created successfully with images")
-                Result.success(Unit)
-            }
+            Result.success(Unit)
         } catch (e: Exception) {
-            Log.e("ProductRemoteDataSource", "Exception in addProductWithImages", e)
             Result.failure(e)
         }
     }
 
-    private fun convertImageToBase64(uri: Uri): String {
-        val inputStream: InputStream = context.contentResolver.openInputStream(uri)
-            ?: throw Exception("Could not open image file")
-        
-        val byteArrayOutputStream = ByteArrayOutputStream()
-        val buffer = ByteArray(1024)
-        var bytesRead: Int
-        
-        while (inputStream.read(buffer).also { bytesRead = it } != -1) {
-            byteArrayOutputStream.write(buffer, 0, bytesRead)
+    override suspend fun prepareStagedUploadInputs(
+        context: Context,
+        imageUris: List<Uri>
+    ): List<StagedUploadInput> {
+        return imageUris.map { uri ->
+            val fileName = context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+                val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                cursor.moveToFirst()
+                cursor.getString(nameIndex)
+            } ?: uri.lastPathSegment ?: "image_${System.currentTimeMillis()}.jpg"
+
+            val mimeType = context.contentResolver.getType(uri) ?: "image/jpeg"
+
+            StagedUploadInput(
+                fileName = fileName,
+                mimeType = mimeType,
+                resource =StagedUploadTargetGenerateUploadResource.IMAGE// Shopify expects this for image uploads
+            )
         }
-        
-        val imageBytes = byteArrayOutputStream.toByteArray()
-        inputStream.close()
-        byteArrayOutputStream.close()
-        
-        return android.util.Base64.encodeToString(imageBytes, android.util.Base64.DEFAULT)
     }
 
-    private fun getMimeType(uri: Uri): String {
-        return context.contentResolver.getType(uri) ?: "image/jpeg"
+    override suspend fun requestStagedUploads(
+        inputs: List<StagedUploadInput>
+    ): List<StagedUploadTarget> {
+        val gqlInputs = inputs.map { it.toGraphQL() }
+        val response = apolloClient.mutation(StagedUploadsCreateMutation(gqlInputs)).execute()
+
+        return response.data?.stagedUploadsCreate?.stagedTargets?.map { target ->
+            StagedUploadTarget(
+                url = target.url.toString(),
+                resourceUrl = target.resourceUrl.toString(),
+                parameters = target.parameters.associate { param ->
+                    param.name to param.value
+                }
+            )
+        } ?: throw Exception("Failed to get staged upload targets")
+    }
+    suspend fun uploadImageToStagedTarget(
+        context: Context,
+        uri: Uri,
+        target: StagedUploadTarget
+    ): Boolean = withContext(Dispatchers.IO) {
+        try {
+            val contentResolver = context.contentResolver
+            val inputStream = contentResolver.openInputStream(uri) ?: return@withContext false
+            val imageBytes = inputStream.readBytes()
+            inputStream.close()
+
+            // 1. Get accurate file metadata
+            val mimeType = contentResolver.getType(uri) ?: "image/jpeg"
+            val fileName = target.parameters["key"]?.substringAfterLast('/')
+                ?: uri.lastPathSegment
+                ?: "upload_${System.currentTimeMillis()}.jpg"
+
+            // 2. Build the multipart request with EXACT parameter order
+            val requestBodyBuilder = MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .apply {
+                    // Add parameters in EXACT order received from Shopify
+                    target.parameters.entries.sortedBy { it.key }.forEach { (key, value) ->
+                        addFormDataPart(key, value)
+                        Log.d("UploadParam", "Added param: $key=$value")
+                    }
+
+                    // File part MUST be last
+                    addFormDataPart(
+                        "file",
+                        fileName,
+                        RequestBody.create(mimeType.toMediaTypeOrNull(), imageBytes)
+                    )
+                }
+
+            // 3. Create and execute request
+            val request = Request.Builder()
+                .url(target.url)
+                .header("Host", "shopify-staged-uploads.storage.googleapis.com")
+                .post(requestBodyBuilder.build())
+                .build()
+
+            val response = okHttpClient.newCall(request).execute()
+
+            if (!response.isSuccessful) {
+                val errorBody = response.body?.string()
+                Log.e("Upload", "❌ Failed: ${response.code} - $errorBody")
+                return@withContext false
+            }
+
+            Log.d("Upload", "✅ Upload success")
+            true
+        } catch (e: Exception) {
+            Log.e("Upload", "❌ Exception", e)
+            false
+        }
+    }
+
+
+    override suspend fun addProductWithMedia(
+        product: ProductInput,
+        media: List<CreateMediaInput>
+    ): Result<Unit> {
+        return try {
+            val response = apolloClient.mutation(
+                AddProductWithImagesMutation(
+                    input = product,
+                    media = Optional.Present(media)
+                )
+            ).execute()
+            Log.d("AddProductWithMedia", "Mutation Data: ${response.data}")
+            Log.d("AddProductWithMedia", "UserErrors: ${response.data?.productCreate?.userErrors}")
+
+            if (response.hasErrors()) {
+                val errorMessage = response.errors?.firstOrNull()?.message ?: "Unknown error"
+                return Result.failure(Exception(errorMessage))
+            }
+
+            response.data?.productCreate?.userErrors?.let { errors ->
+                if (errors.isNotEmpty()) {
+                    return Result.failure(Exception(errors.first().message))
+                }
+            }
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 }
 

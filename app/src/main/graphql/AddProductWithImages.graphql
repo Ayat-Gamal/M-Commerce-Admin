@@ -1,5 +1,5 @@
-mutation AddProductWithImages($input: ProductInput!) {
-    productCreate(input: $input) {
+mutation AddProductWithImages($input: ProductInput!, $media: [CreateMediaInput!]) {
+    productCreate(input: $input, media: $media) {
         product {
             id
             title
