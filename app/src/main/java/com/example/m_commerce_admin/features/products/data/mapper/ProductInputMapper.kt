@@ -15,8 +15,6 @@ fun DomainProductInput.toGraphQL(): ProductInput {
         vendor = Optional.presentIfNotNull(this.vendor),
         status = Optional.presentIfNotNull(this.status.toGraphQLStatus()),
 
-        // Note: Price and inventory are handled through variants in Shopify
-        // We'll need to create variants separately or use a different approach
     )
 }
 

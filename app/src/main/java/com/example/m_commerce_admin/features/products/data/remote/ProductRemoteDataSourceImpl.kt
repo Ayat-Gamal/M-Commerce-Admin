@@ -16,10 +16,8 @@ import com.example.m_commerce_admin.features.products.data.mapper.toDomain
 import com.example.m_commerce_admin.features.products.data.mapper.toGraphQL
 import com.example.m_commerce_admin.features.products.data.model.StagedUploadInput
 import com.example.m_commerce_admin.features.products.data.model.StagedUploadTarget
-import com.example.m_commerce_admin.features.products.domain.entity.DomainProductInput
 import com.example.m_commerce_admin.features.products.presentation.states.GetProductState
 import com.example.m_commerce_admin.type.CreateMediaInput
-import com.example.m_commerce_admin.type.MediaContentType
 import com.example.m_commerce_admin.type.ProductInput
 import com.example.m_commerce_admin.type.StagedUploadTargetGenerateUploadResource
 import kotlinx.coroutines.Dispatchers
@@ -46,13 +44,14 @@ class ProductRemoteDataSourceImpl @Inject constructor(
                 GetProductsQuery(first = first, after = Optional.presentIfNotNull(after))
             ).execute()
             if (response.hasErrors()) {
-                val errorMessage = response.errors?.firstOrNull()?.message ?: "GraphQL error occurred"
-                 emit(GetProductState.Error(errorMessage))
+                val errorMessage =
+                    response.errors?.firstOrNull()?.message ?: "GraphQL error occurred"
+                emit(GetProductState.Error(errorMessage))
                 return@flow
             }
 
             if (response.data == null) {
-                 emit(GetProductState.Error("No data received from server"))
+                emit(GetProductState.Error("No data received from server"))
                 return@flow
             }
 
@@ -101,11 +100,12 @@ class ProductRemoteDataSourceImpl @Inject constructor(
         imageUris: List<Uri>
     ): List<StagedUploadInput> {
         return imageUris.map { uri ->
-            val fileName = context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
-                val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-                cursor.moveToFirst()
-                cursor.getString(nameIndex)
-            } ?: uri.lastPathSegment ?: "image_${System.currentTimeMillis()}.jpg"
+            val fileName =
+                context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+                    val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                    cursor.moveToFirst()
+                    cursor.getString(nameIndex)
+                } ?: uri.lastPathSegment ?: "image_${System.currentTimeMillis()}.jpg"
 
             val mimeType = context.contentResolver.getType(uri) ?: "image/jpeg"
 
@@ -125,10 +125,11 @@ class ProductRemoteDataSourceImpl @Inject constructor(
             val response = apolloClient.mutation(StagedUploadsCreateMutation(gqlInputs)).execute()
 
             if (response.hasErrors()) {
-                val errorMessage = response.errors?.firstOrNull()?.message ?: "Unknown GraphQL error"
+                val errorMessage =
+                    response.errors?.firstOrNull()?.message ?: "Unknown GraphQL error"
                 throw Exception("GraphQL Error: $errorMessage")
             }
-            
+
             // Check for user errors
             response.data?.stagedUploadsCreate?.userErrors?.let { errors ->
                 if (errors.isNotEmpty()) {
@@ -136,12 +137,12 @@ class ProductRemoteDataSourceImpl @Inject constructor(
                     throw Exception("User Error: $errorMessage")
                 }
             }
-            
+
             val targets = response.data?.stagedUploadsCreate?.stagedTargets
             if (targets.isNullOrEmpty()) {
                 throw Exception("No staged upload targets received from Shopify")
             }
-            
+
 
             return targets.map { target ->
                 StagedUploadTarget(
@@ -156,6 +157,7 @@ class ProductRemoteDataSourceImpl @Inject constructor(
             throw e
         }
     }
+
     override suspend fun uploadImageToStagedTarget(
         context: Context,
         uri: Uri,
@@ -166,14 +168,14 @@ class ProductRemoteDataSourceImpl @Inject constructor(
             val inputStream = contentResolver.openInputStream(uri) ?: run {
                 return@withContext false
             }
-            
+
             val imageBytes = inputStream.readBytes()
             inputStream.close()
-            
+
             if (imageBytes.isEmpty()) {
                 return@withContext false
             }
-            
+
             val fileSizeMB = imageBytes.size / (1024 * 1024.0)
             if (fileSizeMB > 20) {
                 return@withContext false

@@ -1,6 +1,5 @@
 package com.example.m_commerce_admin.config.routes
 
-import com.example.m_commerce_admin.features.home.domain.entity.Order
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -17,6 +16,7 @@ sealed class AppRoutes {
 
     @Serializable
     object CouponScreen : AppRoutes()
+
     @Serializable
     object LoginScreen : AppRoutes()
 
@@ -25,9 +25,9 @@ sealed class AppRoutes {
 
 
     @Serializable
-   object OrdersScreen  : AppRoutes()
+    object OrdersScreen : AppRoutes()
 
     @Serializable
-   object ProductForm  : AppRoutes()
+    object ProductForm : AppRoutes()
 
 }

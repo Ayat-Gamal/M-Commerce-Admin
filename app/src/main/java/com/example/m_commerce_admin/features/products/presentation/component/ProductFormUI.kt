@@ -3,6 +3,7 @@ package com.example.m_commerce_admin.features.products.presentation.component
 import android.net.Uri
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -12,13 +13,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.m_commerce_admin.config.theme.DarkestGray
 import com.example.m_commerce_admin.config.theme.Teal
 import com.example.m_commerce_admin.core.shared.components.ImagePicker
 import com.example.m_commerce_admin.features.products.domain.entity.DomainProductInput
@@ -70,7 +74,10 @@ fun ProductFormUI(
             selectedStatus = ProductStatus.ACTIVE
             selectedImages = emptyList()
             delay(2000)
-            navController?.popBackStack()
+            scope.launch {
+                snackbarHostState.showSnackbar("Product added Successfully!")
+            }
+         //   navController?.popBackStack()
         } else if (state is AddProductState.Error) {
             scope.launch {
                 snackbarHostState.showSnackbar("Error: ${(state as AddProductState.Error).message}")
@@ -193,14 +200,16 @@ fun FormField(
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text("$label") },
-        placeholder = { Text(placeholder) },
+        label = { Text("$label" ,style = TextStyle(color = DarkestGray )) },
+        placeholder = { Text(placeholder,style = TextStyle(color = DarkestGray )) },
         modifier = Modifier.fillMaxWidth(),
         singleLine = singleLine,
         isError = isError,
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         supportingText = {
             if (isError) Text("$label is required", color = Teal)
-        }
-    )
+        },
+ 
+        shape = RoundedCornerShape(16.dp),
+     )
 }

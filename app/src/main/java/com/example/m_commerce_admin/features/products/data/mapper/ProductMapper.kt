@@ -5,8 +5,7 @@ import com.example.m_commerce_admin.GetProductsQuery
 import com.example.m_commerce_admin.features.products.domain.entity.Product
 
 fun GetProductsQuery.Node.toDomain(): Product {
-    // Get the first variant (most products have at least one variant)
-    val firstVariant = this.variants.edges.firstOrNull()?.node
+     val firstVariant = this.variants.edges.firstOrNull()?.node
 
     val imageUrls: List<String> = this.images.edges.mapNotNull { edge ->
         edge.node.url.toString()

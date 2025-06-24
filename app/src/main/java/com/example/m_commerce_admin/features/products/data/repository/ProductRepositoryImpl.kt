@@ -62,10 +62,8 @@ class ProductRepositoryImpl @Inject constructor(
             )
         }
 
-        // 5. Convert domain product to GraphQL input (without price/inventory for now)
         val productInput = product.toGraphQL()
 
-        // 6. Create product with media references
            val result = remoteDataSource.addProductWithMedia(productInput, mediaInputs)
          if (result.isFailure) {
             Log.e("ProductRepo", "❌ Failed to create product", result.exceptionOrNull())

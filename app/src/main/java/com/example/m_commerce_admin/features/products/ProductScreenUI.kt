@@ -1,28 +1,26 @@
 package com.example.m_commerce_admin.features.products
 
- import android.os.Build
+import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
- 
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -36,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.m_commerce_admin.config.theme.Teal
 import com.example.m_commerce_admin.core.shared.components.states.Failed
-
 import com.example.m_commerce_admin.features.products.presentation.component.ProductCard
 import com.example.m_commerce_admin.features.products.presentation.states.GetProductState
 import com.example.m_commerce_admin.features.products.presentation.viewModel.ProductsViewModel
@@ -46,7 +43,8 @@ import kotlinx.coroutines.launch
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ProductScreenUI(
-    viewModel: ProductsViewModel = hiltViewModel()) {
+    viewModel: ProductsViewModel = hiltViewModel()
+) {
     val state by viewModel.productsState.collectAsState()
     val listState = rememberLazyListState()
     val deleteState by viewModel.deleteProductState.collectAsState()
@@ -58,14 +56,12 @@ fun ProductScreenUI(
         viewModel.refreshProducts()
     }
 
-    // Improved pagination logic
     val shouldLoadMore by remember {
         derivedStateOf {
             val layoutInfo = listState.layoutInfo
             val totalItemsCount = layoutInfo.totalItemsCount
             val lastVisibleItemIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-            
-            // Load more when we're 3 items away from the end
+
             lastVisibleItemIndex >= totalItemsCount - 3 && totalItemsCount > 0
         }
     }
@@ -88,9 +84,11 @@ fun ProductScreenUI(
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { pad ->
-        Box(modifier = Modifier
-            .padding(pad)
-            .fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .padding(pad)
+                .fillMaxSize()
+        ) {
 
             when (state) {
                 is GetProductState.Loading -> {
@@ -118,9 +116,9 @@ fun ProductScreenUI(
                     ) {
                         items(products) { product ->
                             ProductCard(product = product,
-                                onDelete ={viewModel.deleteProduct(productId = product.id)} ,
+                                onDelete = { viewModel.deleteProduct(productId = product.id) },
                                 onEdit = {}
-                                )
+                            )
 
 
                         }
@@ -159,7 +157,8 @@ fun ProductScreenUI(
                                     onEdit = { /* TODO: Edit logic */ },
                                     onDelete = {
 
-                                        viewModel.deleteProduct(product.id) }
+                                        viewModel.deleteProduct(product.id)
+                                    }
                                 )
                             }
 

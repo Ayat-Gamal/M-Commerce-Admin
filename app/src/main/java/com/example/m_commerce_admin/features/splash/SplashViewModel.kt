@@ -7,10 +7,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
-@HiltViewModel
-class SplashViewModel @Inject  constructor(
 
-    adminPreferences: AdminPreferences
+@HiltViewModel
+class SplashViewModel @Inject constructor(
+
+    adminPreferences: AdminPreferences,
+
 ) : ViewModel() {
 
     val isLoggedIn = adminPreferences.isLoggedInFlow.stateIn(

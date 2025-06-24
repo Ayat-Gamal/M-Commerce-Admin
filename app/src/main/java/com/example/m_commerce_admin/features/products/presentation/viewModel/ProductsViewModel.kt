@@ -8,6 +8,7 @@ import com.example.m_commerce_admin.features.products.domain.entity.DomainProduc
 import com.example.m_commerce_admin.features.products.domain.entity.Product
 import com.example.m_commerce_admin.features.products.domain.usecase.AddProductWithImagesParams
 import com.example.m_commerce_admin.features.products.domain.usecase.AddProductWithImagesUseCase
+import com.example.m_commerce_admin.features.products.domain.usecase.DeleteProductUseCase
 import com.example.m_commerce_admin.features.products.domain.usecase.GetAllProductsUseCase
 import com.example.m_commerce_admin.features.products.domain.usecase.GetProductsParams
 import com.example.m_commerce_admin.features.products.presentation.states.AddProductState
@@ -18,7 +19,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.example.m_commerce_admin.features.products.domain.usecase.DeleteProductUseCase
 
 @HiltViewModel
 class ProductsViewModel @Inject constructor(
@@ -146,7 +146,8 @@ class ProductsViewModel @Inject constructor(
             _deleteProductState.value = result
             if (result.isSuccess) {
                 val removed = currentList.removeAll { it.id == productId }
-                _productsState.value = GetProductState.Success(currentList.toList(), hasNextPage, cursor)
+                _productsState.value =
+                    GetProductState.Success(currentList.toList(), hasNextPage, cursor)
             }
         }
     }
