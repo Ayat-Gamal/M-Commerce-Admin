@@ -2,6 +2,7 @@ package com.example.m_commerce_admin.features.app
 
 import android.os.Bundle
 import android.util.Log
+
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -37,6 +38,7 @@ import com.example.m_commerce_admin.features.app.component.getTopAppBarForRoute
 import com.shopify.buy3.BuildConfig
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -70,6 +72,7 @@ fun Main(showBottomNavbar: MutableState<Boolean>) {
     val fabComposable = getFABForRouteWithAction(
         currentDestination = currentRoute,
         navController
+
     )
 
     Scaffold(

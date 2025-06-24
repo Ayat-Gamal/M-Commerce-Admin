@@ -26,6 +26,9 @@ import com.example.m_commerce_admin.config.theme.Teal
 import com.example.m_commerce_admin.features.home.presentation.component.LastOrdersCard
 import com.example.m_commerce_admin.features.home.presentation.viewModel.HomeViewModel
 
+import com.example.m_commerce_admin.features.home.presentation.component.HomeCard
+
+
 data class CardObject(val title: String, val value: Int, val icon: Int, val description: String)
 
 @Composable
@@ -45,6 +48,7 @@ fun HomeScreenUI(
                 .padding(padValue)
                 .wrapContentHeight(),
         ) {
+
 
             when (state) {
                 is HomeState.Loading ->
@@ -73,6 +77,7 @@ fun HomeScreenUI(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically,
 
+
                                 ) {
 
                             }
@@ -95,7 +100,6 @@ fun HomeScreenUI(
             }
         }
     }
-
 }
 
 

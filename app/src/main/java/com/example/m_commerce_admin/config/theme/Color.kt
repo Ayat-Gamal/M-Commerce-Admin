@@ -18,6 +18,7 @@ val lightRed = Color(0xFFFF4545)
 val LightTeal = Color(0xFFD0EAE9)
 val LightGreen = Color(0xFF59CB86)
 val SplashTeal = Color(0xFF2FC57E)
+
 val White = Color(0xFFFFFFFF)
 val Black = Color(0xFF000000)
 val Gray = Color(0xFF8a8a8a)

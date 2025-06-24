@@ -9,6 +9,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import android.util.Log
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,12 +32,16 @@ import com.example.m_commerce_admin.R
 import com.example.m_commerce_admin.config.routes.AppRoutes
 import com.example.m_commerce_admin.config.theme.SplashTeal
 import com.example.m_commerce_admin.features.home.presentation.viewModel.HomeViewModel
+
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.m_commerce_admin.config.routes.AppRoutes
 import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreenUI(
     viewModel: SplashViewModel = hiltViewModel(),
     homeViewModel: HomeViewModel = hiltViewModel(),
+
     navigate: (AppRoutes) -> Unit
 ) {
     val isLoggedIn by viewModel.isLoggedIn.collectAsState()

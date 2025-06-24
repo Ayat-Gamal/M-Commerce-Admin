@@ -23,9 +23,11 @@ sealed class AppRoutes {
     @Serializable
     object SplashScreen : AppRoutes()
 
+
     @Serializable
    object OrdersScreen  : AppRoutes()
 
     @Serializable
    object ProductForm  : AppRoutes()
+
 }
