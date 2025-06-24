@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.apollographql.apollo.api.Optional
 import com.example.m_commerce_admin.config.theme.Teal
 import com.example.m_commerce_admin.core.shared.components.ImagePicker
 import com.example.m_commerce_admin.features.products.domain.entity.DomainProductInput
@@ -25,6 +26,8 @@ import com.example.m_commerce_admin.features.products.domain.entity.ProductImage
 import com.example.m_commerce_admin.features.products.domain.entity.ProductStatus
 import com.example.m_commerce_admin.features.products.presentation.states.AddProductState
 import com.example.m_commerce_admin.features.products.presentation.viewModel.ProductsViewModel
+import com.example.m_commerce_admin.type.Product
+import com.example.m_commerce_admin.type.ProductInput
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,6 +39,10 @@ fun ProductFormUI(
     var description by remember { mutableStateOf("") }
     var productType by remember { mutableStateOf("") }
     var vendor by remember { mutableStateOf("") }
+    var price by remember { mutableStateOf("") }
+    var category by remember { mutableStateOf("") }
+    var inStock by remember { mutableStateOf(true) }
+    var selectedStatus by remember { mutableStateOf(ProductStatus.ACTIVE) }
     var selectedImages by remember { mutableStateOf(listOf<Uri>()) }
     var isFormValid by remember { mutableStateOf(false) }
     
@@ -43,9 +50,11 @@ fun ProductFormUI(
     val scrollState = rememberScrollState()
 
     // Validate form
-    LaunchedEffect(title, description, productType, vendor) {
+    LaunchedEffect(title, description, productType, vendor, price, category) {
+        val isPriceValid = price.isNotBlank() && price.toDoubleOrNull() != null && price.toDoubleOrNull()!! > 0
         isFormValid = title.isNotBlank() && description.isNotBlank() && 
-                     productType.isNotBlank() && vendor.isNotBlank()
+                     productType.isNotBlank() && vendor.isNotBlank() &&
+                     price.isNotBlank() && category.isNotBlank() && isPriceValid
     }
 
     // Handle success state
@@ -56,6 +65,10 @@ fun ProductFormUI(
             description = ""
             productType = ""
             vendor = ""
+            price = ""
+            category = ""
+            inStock = true
+            selectedStatus = ProductStatus.ACTIVE
             selectedImages = emptyList()
             
             // Navigate back after a short delay
@@ -96,6 +109,7 @@ fun ProductFormUI(
                 value = title,
                 onValueChange = { title = it },
                 label = { Text("Product Title *") },
+                placeholder = { Text("Enter product name") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 isError = title.isBlank() && title.isNotEmpty()
@@ -106,10 +120,46 @@ fun ProductFormUI(
                 value = description,
                 onValueChange = { description = it },
                 label = { Text("Product Description *") },
+                placeholder = { Text("Describe your product features and benefits") },
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 3,
                 maxLines = 5,
                 isError = description.isBlank() && description.isNotEmpty()
+            )
+
+            // Price Field
+            OutlinedTextField(
+                value = price,
+                onValueChange = { 
+                    // Only allow numbers and decimal point
+                    if (it.isEmpty() || it.matches(Regex("^\\d*\\.?\\d*$"))) {
+                        price = it
+                    }
+                },
+                label = { Text("Price (EGP) *") },
+                placeholder = { Text("0.00") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                isError = price.isNotBlank() && (price.toDoubleOrNull() == null || price.toDoubleOrNull()!! <= 0),
+                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                    keyboardType = androidx.compose.ui.text.input.KeyboardType.Decimal
+                ),
+                supportingText = {
+                    if (price.isNotBlank() && (price.toDoubleOrNull() == null || price.toDoubleOrNull()!! <= 0)) {
+                        Text("Please enter a valid price greater than 0", color = Color.Red)
+                    }
+                }
+            )
+
+            // Category Field
+            OutlinedTextField(
+                value = category,
+                onValueChange = { category = it },
+                label = { Text("Category *") },
+                placeholder = { Text("e.g., Electronics, Clothing, Books") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                isError = category.isBlank() && category.isNotEmpty()
             )
 
             // Product Type Field
@@ -117,6 +167,7 @@ fun ProductFormUI(
                 value = productType,
                 onValueChange = { productType = it },
                 label = { Text("Product Type *") },
+                placeholder = { Text("e.g., Smartphone, T-Shirt, Novel") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 isError = productType.isBlank() && productType.isNotEmpty()
@@ -127,10 +178,63 @@ fun ProductFormUI(
                 value = vendor,
                 onValueChange = { vendor = it },
                 label = { Text("Vendor *") },
+                placeholder = { Text("Brand or manufacturer name") },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 isError = vendor.isBlank() && vendor.isNotEmpty()
             )
+
+            // In Stock Toggle
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA))
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "In Stock",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Switch(
+                        checked = inStock,
+                        onCheckedChange = { inStock = it }
+                    )
+                }
+            }
+
+            // Status Selection
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA))
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = "Product Status",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        ProductStatus.entries.forEach { status ->
+                            FilterChip(
+                                onClick = { selectedStatus = status },
+                                label = { Text(status.name) },
+                                selected = status == selectedStatus,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
+                }
+            }
 
             // Image picker
             Card(
@@ -157,52 +261,8 @@ fun ProductFormUI(
                 }
             }
 
-            // Status Selection
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA))
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = "Product Status",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        ProductStatus.values().forEach { status ->
-                            FilterChip(
-                                onClick = { /* Status will be set to ACTIVE by default */ },
-                                label = { Text(status.name) },
-                                selected = status == ProductStatus.ACTIVE,
-                                modifier = Modifier.weight(1f)
-                            )
-                        }
-                    }
-                }
-            }
-
             val context = LocalContext.current
 
-            // Debug Button (only show when images are selected)
-            if (selectedImages.isNotEmpty()) {
-                OutlinedButton(
-                    onClick = {
-                        viewModel.debugUploadProcess(selectedImages, context)
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = Color.Gray
-                    )
-                ) {
-                    Text("🔍 Debug Upload Process", fontSize = 14.sp)
-                }
-            }
 
             // Submit Button
             Button(
@@ -212,7 +272,10 @@ fun ProductFormUI(
                         descriptionHtml = description,
                         productType = productType,
                         vendor = vendor,
-                        status = ProductStatus.ACTIVE,
+                        status = selectedStatus,
+                        price = price,
+                        category = category,
+                        inStock = inStock,
                         images = selectedImages.map { uri ->
                             ProductImage(
                                 uri = uri.toString(),
@@ -222,8 +285,8 @@ fun ProductFormUI(
                         }
                     )
 
-                    // ✅ Call the ViewModel with proper Uri list + context
                     viewModel.addProductWithImages(input, selectedImages, context)
+
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -247,9 +310,9 @@ fun ProductFormUI(
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E8))
                     ) {
-                        Row(
+                        Column(
                             modifier = Modifier.padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             Text(
                                 text = "✅ Product added successfully!",

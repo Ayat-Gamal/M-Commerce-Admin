@@ -18,10 +18,21 @@ mutation AddProductWithImages($input: ProductInput!, $media: [CreateMediaInput!]
                     }
                 }
             }
+            variants(first: 10) {
+                edges {
+                    node {
+                        id
+                        title
+                        price
+                        sku
+                        inventoryQuantity
+                    }
+                }
+            }
         }
         userErrors {
             field
             message
         }
     }
-} 
+}

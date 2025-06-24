@@ -6,6 +6,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,6 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.DarkGray
 import androidx.compose.ui.layout.ContentScale
@@ -56,34 +58,75 @@ fun ProductCard(product: Product) {
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             // Larger Image on Top
-            NetworkImage(
-                url = product.featuredImage ?: "",
-                contentDescription = "Product image",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(180.dp)
-                    .background(White, RoundedCornerShape(12.dp)),
-                contentScale = ContentScale.Crop
-            )
+            val imageUrl = product.featuredImage ?: product.images.firstOrNull()
+            
+            if (imageUrl.isNullOrEmpty()) {
+                // Show placeholder when no image is available
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp)
+                        .background(White, RoundedCornerShape(12.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "No Image",
+                        color = DarkGray,
+                        fontSize = 14.sp
+                    )
+                }
+            } else {
+                NetworkImage(
+                    url = imageUrl,
+                    contentDescription = "Product image",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp)
+                        .background(White, RoundedCornerShape(12.dp)),
+                    contentScale = ContentScale.Crop
+                )
+            }
 
             Column(
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 Text(product.title, fontWeight = FontWeight.Bold, fontSize = 18.sp)
 
-                Text("EGP ${product.variants}", fontSize = 14.sp, color = DarkGray)
-                Text("In Stock: ${product.totalInventory}", fontSize = 13.sp)
+                // Essential admin information
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column {
+                        // Price and inventory - critical for admin
+                        if (product.price != "0.00") {
+                            Text("EGP ${product.price}", fontSize = 14.sp, color = DarkGray, fontWeight = FontWeight.Medium)
+                        }
+                        Text("Stock: ${product.inventoryQuantity}", fontSize = 13.sp, color = DarkGray)
+                    }
+                    
+                    Column(horizontalAlignment = Alignment.End) {
+                        // Status and image count
+                        val statusColor = if (product.status.equals("Active", true)) LightGreen else lightRed
+                        Text(
+                            text = product.status,
+                            color = White,
+                            fontSize = 12.sp,
+                            modifier = Modifier
+                                .background(statusColor, RoundedCornerShape(6.dp))
+                                .padding(horizontal = 8.dp, vertical = 2.dp)
+                        )
+                        
+                        if (product.images.size > 1) {
+                            Text("${product.images.size} images", fontSize = 11.sp, color = DarkGray)
+                        }
+                    }
+                }
 
-                val statusColor =
-                    if (product.status.equals("Active", true)) LightGreen else lightRed
-                Text(
-                    text = product.status,
-                    color = White,
-                    fontSize = 12.sp,
-                    modifier = Modifier
-                        .background(statusColor, RoundedCornerShape(6.dp))
-                        .padding(horizontal = 8.dp, vertical = 2.dp)
-                )
+                // Additional admin details
+                if (product.sku.isNotBlank()) {
+                    Text("SKU: ${product.sku}", fontSize = 12.sp, color = DarkGray)
+                }
 
                 val createdDate = formatIsoDate(product.createdAt)
                 Text("Created: $createdDate", fontSize = 12.sp, color = DarkestGray)
@@ -92,7 +135,7 @@ fun ProductCard(product: Product) {
             // Action Buttons Row
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
+                horizontalArrangement = Arrangement.Start
             ) {
                 IconButton(onClick = { /* Edit */ }) {
                     Icon(Icons.Default.Edit, contentDescription = "Edit", tint = Teal)

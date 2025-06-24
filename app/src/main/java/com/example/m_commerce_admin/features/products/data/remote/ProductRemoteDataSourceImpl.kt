@@ -39,23 +39,19 @@ class ProductRemoteDataSourceImpl @Inject constructor(
 
     override fun getProducts(first: Int, after: String?): Flow<GetProductState> = flow {
         try {
-            Log.d("ProductRemoteDataSource", "Starting getProducts: first=$first, after=$after")
             emit(GetProductState.Loading)
 
-            Log.d("ProductRemoteDataSource", "Executing GraphQL query...")
             val response = apolloClient.query(
                 GetProductsQuery(first = first, after = Optional.presentIfNotNull(after))
             ).execute()
             if (response.hasErrors()) {
                 val errorMessage = response.errors?.firstOrNull()?.message ?: "GraphQL error occurred"
-                Log.e("ProductRemoteDataSource", "GraphQL errors: ${response.errors}")
-                emit(GetProductState.Error(errorMessage))
+                 emit(GetProductState.Error(errorMessage))
                 return@flow
             }
 
             if (response.data == null) {
-                Log.e("ProductRemoteDataSource", "Response data is null")
-                emit(GetProductState.Error("No data received from server"))
+                 emit(GetProductState.Error("No data received from server"))
                 return@flow
             }
 
@@ -66,13 +62,10 @@ class ProductRemoteDataSourceImpl @Inject constructor(
             val hasNextPage = response.data?.products?.pageInfo?.hasNextPage ?: false
             val endCursor = response.data?.products?.pageInfo?.endCursor
 
-            Log.d("ProductRemoteDataSource", "Products loaded: ${products.size}, hasNext: $hasNextPage, cursor: $endCursor")
             emit(GetProductState.Success(products, hasNextPage, endCursor))
         } catch (e: ApolloException) {
-            Log.e("ProductRemoteDataSource", "ApolloException in getProducts", e)
             emit(GetProductState.Error("GraphQL error: ${e.message}"))
         } catch (e: Exception) {
-            Log.e("ProductRemoteDataSource", "Exception in getProducts", e)
             emit(GetProductState.Error(e.message ?: "Network error occurred"))
         }
     }
@@ -105,8 +98,6 @@ class ProductRemoteDataSourceImpl @Inject constructor(
             } ?: uri.lastPathSegment ?: "image_${System.currentTimeMillis()}.jpg"
 
             val mimeType = context.contentResolver.getType(uri) ?: "image/jpeg"
-            
-            Log.d("StagedUpload", "📁 Preparing upload for: $fileName (MIME: $mimeType, URI: $uri)")
 
             StagedUploadInput(
                 fileName = fileName,
@@ -122,11 +113,9 @@ class ProductRemoteDataSourceImpl @Inject constructor(
         try {
             val gqlInputs = inputs.map { it.toGraphQL() }
             val response = apolloClient.mutation(StagedUploadsCreateMutation(gqlInputs)).execute()
-            
-            // Check for GraphQL errors
+
             if (response.hasErrors()) {
                 val errorMessage = response.errors?.firstOrNull()?.message ?: "Unknown GraphQL error"
-                Log.e("StagedUpload", "GraphQL Error: $errorMessage")
                 throw Exception("GraphQL Error: $errorMessage")
             }
             
@@ -134,7 +123,6 @@ class ProductRemoteDataSourceImpl @Inject constructor(
             response.data?.stagedUploadsCreate?.userErrors?.let { errors ->
                 if (errors.isNotEmpty()) {
                     val errorMessage = errors.first().message
-                    Log.e("StagedUpload", "User Error: $errorMessage")
                     throw Exception("User Error: $errorMessage")
                 }
             }
@@ -144,8 +132,7 @@ class ProductRemoteDataSourceImpl @Inject constructor(
                 throw Exception("No staged upload targets received from Shopify")
             }
             
-            Log.d("StagedUpload", "Successfully received ${targets.size} upload targets")
-            
+
             return targets.map { target ->
                 StagedUploadTarget(
                     url = target.url.toString(),
@@ -156,7 +143,6 @@ class ProductRemoteDataSourceImpl @Inject constructor(
                 )
             }
         } catch (e: Exception) {
-            Log.e("StagedUpload", "Failed to request staged uploads", e)
             throw e
         }
     }
@@ -168,7 +154,6 @@ class ProductRemoteDataSourceImpl @Inject constructor(
         try {
             val contentResolver = context.contentResolver
             val inputStream = contentResolver.openInputStream(uri) ?: run {
-                Log.e("Upload", "❌ Cannot open input stream for URI: $uri")
                 return@withContext false
             }
             
@@ -176,14 +161,11 @@ class ProductRemoteDataSourceImpl @Inject constructor(
             inputStream.close()
             
             if (imageBytes.isEmpty()) {
-                Log.e("Upload", "❌ Image bytes are empty for URI: $uri")
                 return@withContext false
             }
             
-            // Check file size (Shopify has limits, typically 20MB for images)
             val fileSizeMB = imageBytes.size / (1024 * 1024.0)
             if (fileSizeMB > 20) {
-                Log.e("Upload", "❌ File too large: ${String.format("%.2f", fileSizeMB)}MB (max 20MB)")
                 return@withContext false
             }
 
@@ -192,18 +174,9 @@ class ProductRemoteDataSourceImpl @Inject constructor(
             val fileName = target.parameters["key"]?.substringAfterLast('/')
                 ?: uri.lastPathSegment
                 ?: "upload_${System.currentTimeMillis()}.jpg"
-
-            Log.d("Upload", "📁 Uploading file: $fileName (${String.format("%.2f", fileSizeMB)}MB, $mimeType)")
-            Log.d("Upload", "🎯 Target URL: ${target.url}")
-            Log.d("Upload", "🔗 Resource URL: ${target.resourceUrl}")
-            Log.d("Upload", "📋 Parameters: ${target.parameters}")
-
-            // For pre-signed URLs, we need to send the file directly as the request body
-            // with the correct content type header
             val requestBody = RequestBody.create(mimeType.toMediaTypeOrNull(), imageBytes)
 
-            // Create and execute request with file as direct body
-            // Try PUT method which is more common for pre-signed URL uploads
+
             val request = Request.Builder()
                 .url(target.url)
                 .put(requestBody)
@@ -214,14 +187,12 @@ class ProductRemoteDataSourceImpl @Inject constructor(
             if (!response.isSuccessful) {
                 val errorBody = response.body?.string()
                 Log.e("Upload", "❌ Upload failed: ${response.code} - $errorBody")
-                Log.e("Upload", "❌ Response headers: ${response.headers}")
                 return@withContext false
             }
 
             Log.d("Upload", "✅ Upload successful for: $fileName")
             true
         } catch (e: Exception) {
-            Log.e("Upload", "❌ Exception during upload", e)
             false
         }
     }
@@ -239,7 +210,6 @@ class ProductRemoteDataSourceImpl @Inject constructor(
                 )
             ).execute()
             Log.d("AddProductWithMedia", "Mutation Data: ${response.data}")
-            Log.d("AddProductWithMedia", "UserErrors: ${response.data?.productCreate?.userErrors}")
 
             if (response.hasErrors()) {
                 val errorMessage = response.errors?.firstOrNull()?.message ?: "Unknown error"

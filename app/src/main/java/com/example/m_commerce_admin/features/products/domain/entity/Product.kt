@@ -1,12 +1,18 @@
 package com.example.m_commerce_admin.features.products.domain.entity
+
 data class Product(
     val id: String,
     val title: String,
     val status: String,
     val createdAt: String,
     val totalInventory: Int,
-    val featuredImage:String?,
-    val variants: String
+    val featuredImage: String?,
+    val price: String,
+    val sku: String,
+    val variantId: String,
+    val variantTitle: String,
+    val inventoryQuantity: Int,
+    val images: List<String> = emptyList()
 )
 
 data class FeaturedImage(
@@ -22,5 +28,9 @@ data class VariantEdge(
 )
 
 data class Variant(
-    val price: String
+    val id: String,
+    val title: String,
+    val price: String,
+    val sku: String,
+    val inventoryQuantity: Int
 )

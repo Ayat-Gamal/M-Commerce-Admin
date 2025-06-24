@@ -1,10 +1,14 @@
 package com.example.m_commerce_admin.features.products
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -12,6 +16,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Icon
+
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -37,8 +46,9 @@ fun ProductScreenUI(
     val state by viewModel.productsState.collectAsState()
     val listState = rememberLazyListState()
 
+
     LaunchedEffect(Unit) {
-        viewModel.loadMoreProducts()
+        viewModel.refreshProducts()
     }
 
     // Improved pagination logic
@@ -79,33 +89,54 @@ fun ProductScreenUI(
                 is GetProductState.Success -> {
                     val products = (state as GetProductState.Success).data
                     val hasNext = (state as GetProductState.Success).hasNext
-
-                    LazyColumn(
-                        state = listState,
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        item {
-                            Text(
-                                text = "Products",
-                                modifier = Modifier.padding(16.dp),
-                                color = Teal
-                            )
-                        }
-
-                        items(products) { product ->
-                            ProductCard(product = product)
-                        }
-
-                        if (hasNext) {
+                    
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        LazyColumn(
+                            state = listState,
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
                             item {
-                                Box(
+                                Row(
                                     modifier = Modifier
-                                        .fillMaxSize()
+                                        .fillMaxWidth()
                                         .padding(16.dp),
-                                    contentAlignment = Alignment.Center
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    CircularProgressIndicator(color = Teal)
+                                    Text(
+                                        text = "Products (${products.size})",
+                                        color = Teal
+                                    )
+                                    IconButton(
+                                        onClick = {
+                                            Log.d("ProductScreenUI", "🔄 Manual refresh triggered")
+                                            viewModel.refreshProducts()
+                                        }
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Refresh,
+                                            contentDescription = "Refresh",
+                                            tint = Teal
+                                        )
+                                    }
+                                }
+                            }
+
+                            items(products) { product ->
+                                ProductCard(product = product)
+                            }
+
+                            if (hasNext) {
+                                item {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .padding(16.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        CircularProgressIndicator(color = Teal)
+                                    }
                                 }
                             }
                         }

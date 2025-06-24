@@ -9,6 +9,17 @@ mutation AddProduct($input: ProductInput!) {
             featuredImage {
                 url
             }
+            variants(first: 10) {
+                edges {
+                    node {
+                        id
+                        title
+                        price
+                        sku
+                        inventoryQuantity
+                    }
+                }
+            }
         }
         userErrors {
             field

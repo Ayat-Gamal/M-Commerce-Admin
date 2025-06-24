@@ -6,6 +6,9 @@ data class DomainProductInput(
     val productType: String,
     val vendor: String,
     val status: ProductStatus,
+    val price: String,
+    val category: String,
+    val inStock: Boolean,
     val images: List<ProductImage> = emptyList()
 )
 

@@ -11,10 +11,22 @@ query GetProducts($first: Int!, $after: String) {
                 featuredImage {
                     url
                 }
-                variants(first: 1) {
+                images(first: 10) {
                     edges {
                         node {
+                            url
+                            altText
+                        }
+                    }
+                }
+                variants(first: 10) {
+                    edges {
+                        node {
+                            id
+                            title
                             price
+                            sku
+                            inventoryQuantity
                         }
                     }
                 }
