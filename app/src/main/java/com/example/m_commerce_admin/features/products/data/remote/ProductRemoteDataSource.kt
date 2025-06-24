@@ -2,14 +2,12 @@ package com.example.m_commerce_admin.features.products.data.remote
 
 import android.content.Context
 import android.net.Uri
-import com.example.m_commerce_admin.features.products.data.model.StagedUploadInput
-import com.example.m_commerce_admin.features.products.data.model.StagedUploadTarget
+import com.example.m_commerce_admin.features.products.domain.entity.StagedUploadInput
+import com.example.m_commerce_admin.features.products.domain.entity.StagedUploadTarget
 import com.example.m_commerce_admin.features.products.presentation.states.GetProductState
 import com.example.m_commerce_admin.type.CreateMediaInput
 import com.example.m_commerce_admin.type.ProductInput
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.withContext
 
 interface ProductRemoteDataSource {
     fun getProducts(first: Int, after: String?): Flow<GetProductState>

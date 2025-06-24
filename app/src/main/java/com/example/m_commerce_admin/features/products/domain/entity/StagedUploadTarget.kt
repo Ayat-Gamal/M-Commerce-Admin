@@ -1,4 +1,4 @@
-package com.example.m_commerce_admin.features.products.data.model
+package com.example.m_commerce_admin.features.products.domain.entity
 
 
 data class StagedUploadTarget(

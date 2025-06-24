@@ -9,20 +9,23 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.m_commerce_admin.features.coupons.component.Coupon
-import com.example.m_commerce_admin.features.coupons.component.CouponCard
-
+import com.example.m_commerce_admin.features.coupons.presentation.component.CouponCard
+import com.example.m_commerce_admin.features.coupons.presentation.CouponsViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.m_commerce_admin.features.coupons.domain.entity.CouponItem
 
 @Composable
-fun CouponScreenUI(modifier: Modifier = Modifier) {
+fun CouponScreenUI(modifier: Modifier = Modifier, viewModel: CouponsViewModel = hiltViewModel()) {
+    val coupons = viewModel.coupons.collectAsState().value
     Box(
         modifier = Modifier
             .fillMaxSize()
-
     ) {
         LazyColumn(
             modifier = Modifier
@@ -30,7 +33,6 @@ fun CouponScreenUI(modifier: Modifier = Modifier) {
                 .wrapContentHeight() ,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-
             item {
                 Spacer(modifier = modifier.padding(top = 1.dp))
                 Row(
@@ -42,41 +44,25 @@ fun CouponScreenUI(modifier: Modifier = Modifier) {
                 ) {
                 //TODO( Search)
                 }
-
             }
-            item {
+            items(coupons) { coupon ->
                 CouponCard(
-                    Coupon(code = "SUMMER25", value = 20.0, usedCount = 5, startsAt = "20250520", endsAt = "20250622")
+                    CouponItem(
+                        code = coupon.code,
+                        value = coupon.value!!,
+                        usedCount = coupon.usedCount,
+                        startsAt = coupon.startsAt!!,
+                        endsAt = coupon.endsAt,
+                        title = coupon.title,
+                        summary = coupon.summary,
+                        usageLimit = coupon.usageLimit,
+                        createdAt = coupon.createdAt,
+                        updatedAt = coupon.updatedAt,
+                        amount = coupon.amount,
+                        currencyCode = coupon.currencyCode
+                    )
                 )
             }
-            item {
-                CouponCard(
-                    Coupon(code = "SUMMER25", value = 20.0, usedCount = 5, startsAt = "20250520", endsAt = "20250622")
-                )
-            }
-            item {
-                CouponCard(
-                    Coupon(code = "SUMMER25", value = 20.0, usedCount = 5, startsAt = "20250520", endsAt = "20250622")
-                )
-            }
-            item {
-                CouponCard(
-                    Coupon(code = "SUMMER25", value = 20.0, usedCount = 5, startsAt = "20250520", endsAt = "20250622")
-                )
-            }
-            item {
-                CouponCard(
-                    Coupon(code = "SUMMER25", value = 20.0, usedCount = 5, startsAt = "20250520", endsAt = "20250622")
-                )
-            }
-            item {
-                CouponCard(
-                    Coupon(code = "SUMMER25", value = 20.0, usedCount = 5, startsAt = "20250520", endsAt = "20250622")
-                )
-            }
-
         }
-
-
     }
 }

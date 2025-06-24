@@ -5,9 +5,8 @@ import android.net.Uri
 import android.util.Log
 import com.apollographql.apollo.api.Optional
 import com.example.m_commerce_admin.features.products.data.mapper.toGraphQL
-import com.example.m_commerce_admin.features.products.data.model.StagedUploadTarget
+import com.example.m_commerce_admin.features.products.domain.entity.StagedUploadTarget
 import com.example.m_commerce_admin.features.products.data.remote.ProductRemoteDataSource
-import com.example.m_commerce_admin.features.products.data.remote.ProductRemoteDataSourceImpl
 import com.example.m_commerce_admin.features.products.domain.entity.DomainProductInput
 import com.example.m_commerce_admin.features.products.domain.repository.ProductRepository
 import com.example.m_commerce_admin.features.products.presentation.states.GetProductState

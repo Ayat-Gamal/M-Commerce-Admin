@@ -14,8 +14,8 @@ import com.example.m_commerce_admin.GetProductsQuery
 import com.example.m_commerce_admin.StagedUploadsCreateMutation
 import com.example.m_commerce_admin.features.products.data.mapper.toDomain
 import com.example.m_commerce_admin.features.products.data.mapper.toGraphQL
-import com.example.m_commerce_admin.features.products.data.model.StagedUploadInput
-import com.example.m_commerce_admin.features.products.data.model.StagedUploadTarget
+import com.example.m_commerce_admin.features.products.domain.entity.StagedUploadInput
+import com.example.m_commerce_admin.features.products.domain.entity.StagedUploadTarget
 import com.example.m_commerce_admin.features.products.presentation.states.GetProductState
 import com.example.m_commerce_admin.type.CreateMediaInput
 import com.example.m_commerce_admin.type.ProductInput

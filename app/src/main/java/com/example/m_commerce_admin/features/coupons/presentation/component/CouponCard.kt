@@ -1,5 +1,8 @@
-package com.example.m_commerce_admin.features.coupons.component
+package com.example.m_commerce_admin.features.coupons.presentation.component
 
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -22,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.DarkGray
+import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -31,19 +35,15 @@ import com.example.m_commerce_admin.config.theme.LightTeal
 import com.example.m_commerce_admin.config.theme.Teal
 import com.example.m_commerce_admin.config.theme.White
 import com.example.m_commerce_admin.config.theme.lightRed
-import com.example.m_commerce_admin.core.helpers.formatCreatedAt
+import com.example.m_commerce_admin.core.helpers.formatIsoDate
+import com.example.m_commerce_admin.features.coupons.domain.entity.CouponItem
+import java.text.SimpleDateFormat
+import java.util.*
 
-data class Coupon(
-    val code: String,
-    val value: Double,
-    val usedCount: Int?,
-    val startsAt: String,
-    val endsAt: String?,
-)
-
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun CouponCard(
-    coupon: Coupon,
+    coupon: CouponItem,
     onEditClick: () -> Unit = {},
     onDeleteClick: () -> Unit = {}
 ) {
@@ -58,18 +58,17 @@ fun CouponCard(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
 
-             Row(
+            Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = "Code: ${coupon.code}",
-                    fontWeight = FontWeight.SemiBold,
+                    fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
                     color = DarkestGray
                 )
-
                 Row {
                     IconButton(onClick = onEditClick) {
                         Icon(Icons.Default.Edit, contentDescription = "Edit", tint = Teal)
@@ -82,33 +81,52 @@ fun CouponCard(
 
             Spacer(modifier = Modifier.padding(4.dp))
 
+            coupon.title?.let {
+                Text(
+                    text = it,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 16.sp,
+                    color = DarkGray
+                )
+            }
+
+            // Summary
+            coupon.summary?.let {
+                Text(
+                    text = it,
+                    fontSize = 13.sp,
+                    color = DarkGray,
+                    modifier = Modifier.padding(top = 2.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.padding(4.dp))
+
             Text(
-                text = "Discount: ${coupon.value}%",
+                text = "Discount: ${coupon.value?.times(100)?.toInt()}%",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
                 color = DarkGray
             )
 
+            if (coupon.amount != null && coupon.currencyCode != null) {
+                Text(
+                    text = "Amount: ${coupon.amount} ${coupon.currencyCode}",
+                    fontSize = 14.sp,
+                    color = DarkGray
+                )
+            }
             Text(
-                text = "Used: ${coupon.usedCount ?: 0} times",
-                fontSize = 13.sp,
-                color = DarkGray
-            )
-
-            Text(
-                text = "Validity: ${formatCreatedAt(coupon.startsAt.toInt())} - ${
-                    formatCreatedAt(
-                        coupon.endsAt?.toInt() ?: 20250625
-                    )
-                }",
+                text = "Start: ${formatIsoDate(coupon.startsAt ?: "00:00:00")}",
                 fontSize = 13.sp,
                 color = White,
-
                 modifier = Modifier
-                    .padding(top = 4.dp)
-                    .background(color = LightGreen, RoundedCornerShape(8.dp))
-                    .padding(horizontal = 8.dp, vertical = 2.dp)
+                    .padding(top = 6.dp)
+                    .background(color = LightGreen, shape = RoundedCornerShape(8.dp))
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
             )
         }
     }
 }
+
+
