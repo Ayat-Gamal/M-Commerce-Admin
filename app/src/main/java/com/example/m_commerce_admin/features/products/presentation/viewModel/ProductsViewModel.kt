@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.m_commerce_admin.features.products.data.mapper.toGraphQL
 import com.example.m_commerce_admin.features.products.data.remote.ProductRemoteDataSource
+import com.example.m_commerce_admin.features.products.data.remote.ProductRemoteDataSourceImpl
 import com.example.m_commerce_admin.features.products.domain.entity.DomainProductInput
 import com.example.m_commerce_admin.features.products.domain.entity.Product
 import com.example.m_commerce_admin.features.products.domain.usecase.AddProductUseCase
@@ -27,8 +28,8 @@ import javax.inject.Inject
 class ProductsViewModel @Inject constructor(
     private val getAllProductsUseCase: GetAllProductsUseCase,
     private val addProductUseCase: AddProductUseCase,
-    private val addProductWithImagesUseCase: AddProductWithImagesUseCase, // ✅ Add this
-
+    private val addProductWithImagesUseCase: AddProductWithImagesUseCase,
+    private val remoteDataSource: ProductRemoteDataSource
 ) : ViewModel() {
 
     private val _productsState = MutableStateFlow<GetProductState>(GetProductState.Loading)
@@ -135,21 +136,67 @@ class ProductsViewModel @Inject constructor(
         viewModelScope.launch {
             _uiAddProductState.value = AddProductState.Loading
 
-            val result = addProductWithImagesUseCase(
-                AddProductWithImagesParams(
-                    product = product,
-                    imageUris = imageUris,
-                    context = context
+            try {
+                val result = addProductWithImagesUseCase(
+                    AddProductWithImagesParams(
+                        product = product,
+                        imageUris = imageUris,
+                        context = context
+                    )
                 )
-            )
 
-            _uiAddProductState.value = if (result.isSuccess) {
-                AddProductState.Success
-            } else {
-                AddProductState.Error(result.exceptionOrNull()?.message ?: "Unknown error")
+                _uiAddProductState.value = if (result.isSuccess) {
+                    AddProductState.Success
+                } else {
+                    val errorMessage = result.exceptionOrNull()?.message ?: "Unknown error occurred"
+                    Log.e("ProductsViewModel", "Failed to add product with images: $errorMessage")
+                    AddProductState.Error(errorMessage)
+                }
+            } catch (e: Exception) {
+                Log.e("ProductsViewModel", "Exception during addProductWithImages", e)
+                _uiAddProductState.value = AddProductState.Error(e.message ?: "An unexpected error occurred")
             }
         }
     }
 
+    // Debug method to test upload process step by step
+    fun debugUploadProcess(imageUris: List<Uri>, context: Context) {
+        viewModelScope.launch {
+            try {
+                Log.d("DebugUpload", "🔍 Starting debug upload process")
+                
+                // Test 1: Prepare upload inputs
+                val inputs = remoteDataSource.prepareStagedUploadInputs(context, imageUris)
+                Log.d("DebugUpload", "✅ Step 1 - Prepared inputs: ${inputs.size} items")
+                
+                if (inputs.isEmpty()) {
+                    Log.e("DebugUpload", "❌ No inputs prepared")
+                    return@launch
+                }
+                
+                // Test 2: Request staged uploads
+                val targets = remoteDataSource.requestStagedUploads(inputs)
+                Log.d("DebugUpload", "✅ Step 2 - Received targets: ${targets.size} items")
+                
+                if (targets.isEmpty()) {
+                    Log.e("DebugUpload", "❌ No targets received")
+                    return@launch
+                }
+                
+                // Test 3: Try uploading first image
+                val firstUri = imageUris.firstOrNull()
+                val firstTarget = targets.firstOrNull()
+                
+                if (firstUri != null && firstTarget != null) {
+                    Log.d("DebugUpload", "🔄 Testing upload for: ${firstUri.lastPathSegment}")
+                    val uploadSuccess = remoteDataSource.uploadImageToStagedTarget(context, firstUri, firstTarget)
+                    Log.d("DebugUpload", "✅ Step 3 - Upload result: $uploadSuccess")
+                }
+                
+            } catch (e: Exception) {
+                Log.e("DebugUpload", "❌ Debug process failed", e)
+            }
+        }
+    }
 
 }

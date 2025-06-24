@@ -187,7 +187,24 @@ fun ProductFormUI(
 
             val context = LocalContext.current
 
-// Submit Button
+            // Debug Button (only show when images are selected)
+            if (selectedImages.isNotEmpty()) {
+                OutlinedButton(
+                    onClick = {
+                        viewModel.debugUploadProcess(selectedImages, context)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = Color.Gray
+                    )
+                ) {
+                    Text("🔍 Debug Upload Process", fontSize = 14.sp)
+                }
+            }
+
+            // Submit Button
             Button(
                 onClick = {
                     val input = DomainProductInput(
@@ -222,7 +239,6 @@ fun ProductFormUI(
                     Text("Add Product", fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 }
             }
-
 
             // Status Messages
             when (state) {

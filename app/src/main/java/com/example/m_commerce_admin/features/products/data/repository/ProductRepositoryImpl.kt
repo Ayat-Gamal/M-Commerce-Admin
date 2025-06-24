@@ -35,39 +35,53 @@ class ProductRepositoryImpl @Inject constructor(
         imageUris: List<Uri>,
         context: Context
     ): Result<Unit> = runCatching {
+        Log.d("ProductRepo", "🚀 Starting image upload process for ${imageUris.size} images")
+        
         // 1. Prepare upload inputs
         val inputs = remoteDataSource.prepareStagedUploadInputs(context, imageUris)
+        Log.d("ProductRepo", "📋 Prepared ${inputs.size} upload inputs")
 
         // 2. Get upload targets from Shopify
         val targets = remoteDataSource.requestStagedUploads(inputs)
-        targets.forEach { Log.d("DebugTargets", it.toString()) }
+        Log.d("ProductRepo", "🎯 Received ${targets.size} upload targets from Shopify")
 
         // 3. Upload each image to its target
-        imageUris.zip(targets).forEach { (uri, target) ->
+        imageUris.zip(targets).forEachIndexed { index, (uri, target) ->
+            Log.d("ProductRepo", "📤 Uploading image ${index + 1}/${imageUris.size}: ${uri.lastPathSegment}")
             val success = uploadFileToTarget(context, uri, target)
-            if (!success) throw Exception("Failed to upload image ${uri.lastPathSegment}")
+            if (!success) {
+                val errorMsg = "Failed to upload image ${uri.lastPathSegment} (${index + 1}/${imageUris.size})"
+                Log.e("ProductRepo", "❌ $errorMsg")
+                throw Exception(errorMsg)
+            }
+            Log.d("ProductRepo", "✅ Successfully uploaded image ${index + 1}/${imageUris.size}")
         }
 
         // 4. Create media inputs for product
         val mediaInputs = targets.map { target ->
-            targets.forEach { Log.d("DebugTargets", it.toString()) }
-
             CreateMediaInput(
                 originalSource = target.resourceUrl,
                 alt = Optional.Absent,
                 mediaContentType = MediaContentType.IMAGE
             )
         }
+        Log.d("ProductRepo", "🖼️ Created ${mediaInputs.size} media inputs")
 
         // 5. Convert domain product to GraphQL input
         val productInput = product.toGraphQL()
 
         // 6. Create product with media references
+        Log.d("ProductRepo", "🏪 Creating product with ${mediaInputs.size} images")
         remoteDataSource.addProductWithMedia(productInput, mediaInputs)
             .getOrThrow()
+            
+        Log.d("ProductRepo", "🎉 Product created successfully with images!")
     }.fold(
         onSuccess = { Result.success(Unit) },
-        onFailure = { Result.failure(it) }
+        onFailure = { 
+            Log.e("ProductRepo", "💥 Failed to upload images and create product", it)
+            Result.failure(it) 
+        }
     )
 
     private suspend fun uploadFileToTarget(
@@ -75,9 +89,6 @@ class ProductRepositoryImpl @Inject constructor(
         uri: Uri,
         target: StagedUploadTarget
     ): Boolean {
-        // This should be implemented in your remote data source
-        // but we're keeping it here temporarily for backward compatibility
-        return (remoteDataSource as? ProductRemoteDataSourceImpl)?.uploadImageToStagedTarget(context, uri, target)
-            ?: throw IllegalStateException("Missing file upload implementation")
+        return remoteDataSource.uploadImageToStagedTarget(context, uri, target)
     }
 }

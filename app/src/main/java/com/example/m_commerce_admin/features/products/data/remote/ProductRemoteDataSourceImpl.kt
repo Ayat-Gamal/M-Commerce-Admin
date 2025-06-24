@@ -26,11 +26,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
-import okio.BufferedSink
 import javax.inject.Inject
 
 class ProductRemoteDataSourceImpl @Inject constructor(
@@ -107,11 +105,13 @@ class ProductRemoteDataSourceImpl @Inject constructor(
             } ?: uri.lastPathSegment ?: "image_${System.currentTimeMillis()}.jpg"
 
             val mimeType = context.contentResolver.getType(uri) ?: "image/jpeg"
+            
+            Log.d("StagedUpload", "📁 Preparing upload for: $fileName (MIME: $mimeType, URI: $uri)")
 
             StagedUploadInput(
                 fileName = fileName,
                 mimeType = mimeType,
-                resource =StagedUploadTargetGenerateUploadResource.IMAGE// Shopify expects this for image uploads
+                resource = StagedUploadTargetGenerateUploadResource.IMAGE
             )
         }
     }
@@ -119,73 +119,109 @@ class ProductRemoteDataSourceImpl @Inject constructor(
     override suspend fun requestStagedUploads(
         inputs: List<StagedUploadInput>
     ): List<StagedUploadTarget> {
-        val gqlInputs = inputs.map { it.toGraphQL() }
-        val response = apolloClient.mutation(StagedUploadsCreateMutation(gqlInputs)).execute()
-
-        return response.data?.stagedUploadsCreate?.stagedTargets?.map { target ->
-            StagedUploadTarget(
-                url = target.url.toString(),
-                resourceUrl = target.resourceUrl.toString(),
-                parameters = target.parameters.associate { param ->
-                    param.name to param.value
+        try {
+            val gqlInputs = inputs.map { it.toGraphQL() }
+            val response = apolloClient.mutation(StagedUploadsCreateMutation(gqlInputs)).execute()
+            
+            // Check for GraphQL errors
+            if (response.hasErrors()) {
+                val errorMessage = response.errors?.firstOrNull()?.message ?: "Unknown GraphQL error"
+                Log.e("StagedUpload", "GraphQL Error: $errorMessage")
+                throw Exception("GraphQL Error: $errorMessage")
+            }
+            
+            // Check for user errors
+            response.data?.stagedUploadsCreate?.userErrors?.let { errors ->
+                if (errors.isNotEmpty()) {
+                    val errorMessage = errors.first().message
+                    Log.e("StagedUpload", "User Error: $errorMessage")
+                    throw Exception("User Error: $errorMessage")
                 }
-            )
-        } ?: throw Exception("Failed to get staged upload targets")
+            }
+            
+            val targets = response.data?.stagedUploadsCreate?.stagedTargets
+            if (targets.isNullOrEmpty()) {
+                throw Exception("No staged upload targets received from Shopify")
+            }
+            
+            Log.d("StagedUpload", "Successfully received ${targets.size} upload targets")
+            
+            return targets.map { target ->
+                StagedUploadTarget(
+                    url = target.url.toString(),
+                    resourceUrl = target.resourceUrl.toString(),
+                    parameters = target.parameters.associate { param ->
+                        param.name to param.value
+                    }
+                )
+            }
+        } catch (e: Exception) {
+            Log.e("StagedUpload", "Failed to request staged uploads", e)
+            throw e
+        }
     }
-    suspend fun uploadImageToStagedTarget(
+    override suspend fun uploadImageToStagedTarget(
         context: Context,
         uri: Uri,
         target: StagedUploadTarget
     ): Boolean = withContext(Dispatchers.IO) {
         try {
             val contentResolver = context.contentResolver
-            val inputStream = contentResolver.openInputStream(uri) ?: return@withContext false
+            val inputStream = contentResolver.openInputStream(uri) ?: run {
+                Log.e("Upload", "❌ Cannot open input stream for URI: $uri")
+                return@withContext false
+            }
+            
             val imageBytes = inputStream.readBytes()
             inputStream.close()
+            
+            if (imageBytes.isEmpty()) {
+                Log.e("Upload", "❌ Image bytes are empty for URI: $uri")
+                return@withContext false
+            }
+            
+            // Check file size (Shopify has limits, typically 20MB for images)
+            val fileSizeMB = imageBytes.size / (1024 * 1024.0)
+            if (fileSizeMB > 20) {
+                Log.e("Upload", "❌ File too large: ${String.format("%.2f", fileSizeMB)}MB (max 20MB)")
+                return@withContext false
+            }
 
-            // 1. Get accurate file metadata
+            // Get accurate file metadata
             val mimeType = contentResolver.getType(uri) ?: "image/jpeg"
             val fileName = target.parameters["key"]?.substringAfterLast('/')
                 ?: uri.lastPathSegment
                 ?: "upload_${System.currentTimeMillis()}.jpg"
 
-            // 2. Build the multipart request with EXACT parameter order
-            val requestBodyBuilder = MultipartBody.Builder()
-                .setType(MultipartBody.FORM)
-                .apply {
-                    // Add parameters in EXACT order received from Shopify
-                    target.parameters.entries.sortedBy { it.key }.forEach { (key, value) ->
-                        addFormDataPart(key, value)
-                        Log.d("UploadParam", "Added param: $key=$value")
-                    }
+            Log.d("Upload", "📁 Uploading file: $fileName (${String.format("%.2f", fileSizeMB)}MB, $mimeType)")
+            Log.d("Upload", "🎯 Target URL: ${target.url}")
+            Log.d("Upload", "🔗 Resource URL: ${target.resourceUrl}")
+            Log.d("Upload", "📋 Parameters: ${target.parameters}")
 
-                    // File part MUST be last
-                    addFormDataPart(
-                        "file",
-                        fileName,
-                        RequestBody.create(mimeType.toMediaTypeOrNull(), imageBytes)
-                    )
-                }
+            // For pre-signed URLs, we need to send the file directly as the request body
+            // with the correct content type header
+            val requestBody = RequestBody.create(mimeType.toMediaTypeOrNull(), imageBytes)
 
-            // 3. Create and execute request
+            // Create and execute request with file as direct body
+            // Try PUT method which is more common for pre-signed URL uploads
             val request = Request.Builder()
                 .url(target.url)
-                .header("Host", "shopify-staged-uploads.storage.googleapis.com")
-                .post(requestBodyBuilder.build())
+                .put(requestBody)
                 .build()
 
             val response = okHttpClient.newCall(request).execute()
 
             if (!response.isSuccessful) {
                 val errorBody = response.body?.string()
-                Log.e("Upload", "❌ Failed: ${response.code} - $errorBody")
+                Log.e("Upload", "❌ Upload failed: ${response.code} - $errorBody")
+                Log.e("Upload", "❌ Response headers: ${response.headers}")
                 return@withContext false
             }
 
-            Log.d("Upload", "✅ Upload success")
+            Log.d("Upload", "✅ Upload successful for: $fileName")
             true
         } catch (e: Exception) {
-            Log.e("Upload", "❌ Exception", e)
+            Log.e("Upload", "❌ Exception during upload", e)
             false
         }
     }
