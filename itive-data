@@ -1,0 +1,174 @@
+[33mcommit 66e57735756edf597abe9e6b91441b3905857554[m[33m ([m[1;36mHEAD -> [m[1;32mhomeApiCalls[m[33m)[m
+Author: Ayat Gamal <ayat.ga106@gmail.com>
+Date:   Sun Jun 22 16:49:12 2025 +0300
+
+    add secrect keys
+
+[1mdiff --git a/app/src/main/java/com/example/m_commerce_admin/core/di/NetworkProviderModule.kt b/app/src/main/java/com/example/m_commerce_admin/core/di/NetworkProviderModule.kt[m
+[1mindex 629ef25..6956f50 100644[m
+[1m--- a/app/src/main/java/com/example/m_commerce_admin/core/di/NetworkProviderModule.kt[m
+[1m+++ b/app/src/main/java/com/example/m_commerce_admin/core/di/NetworkProviderModule.kt[m
+[36m@@ -1,7 +1,8 @@[m
+ package com.example.m_commerce_admin.core.di[m
+ [m
+ import com.apollographql.apollo.ApolloClient[m
+[31m-import com.shopify.buy3.BuildConfig[m
+[32m+[m[32mimport com.apollographql.apollo.api.Builder[m
+[32m+[m[32mimport com.example.m_commerce_admin.BuildConfig[m
+ import dagger.Module[m
+ import dagger.Provides[m
+ import dagger.hilt.InstallIn[m
+[36m@@ -15,12 +16,12 @@[m [mobject NetworkProviderModule {[m
+     @Provides[m
+     @Singleton[m
+     fun provideApolloClient(): ApolloClient {[m
+[31m-[m
+[31m-        return ApolloClient.Builder()[m
+[31m-            .serverUrl("https://mad45-alex-and02.myshopify.com/admin/api/unstable/graphql.json") // replace with your endpoint[m
+[31m-            .addHttpHeader("X-Shopify-Access-Token", "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")[m
+[32m+[m[32m          return ApolloClient.Builder()[m
+[32m+[m[32m            .serverUrl(BuildConfig.shopDomain) // replace with your endpoint[m
+[32m+[m[32m            .addHttpHeader("X-Shopify-Access-Token", BuildConfig.adminToken)[m
+             .addHttpHeader("Content-Type", "application/json")[m
+             .build()[m
+[32m+[m
+     }[m
+ }[m
+ [m
+
+[33mcommit de1369ac98653db1b4380b40d0b9a18b932862c3[m
+Author: Ayat Gamal <ayat.ga106@gmail.com>
+Date:   Sun Jun 22 05:11:46 2025 +0300
+
+    create last orders ApiCall
+
+[1mdiff --git a/app/src/main/java/com/example/m_commerce_admin/core/di/NetworkProviderModule.kt b/app/src/main/java/com/example/m_commerce_admin/core/di/NetworkProviderModule.kt[m
+[1mnew file mode 100644[m
+[1mindex 0000000..a9d99db[m
+[1m--- /dev/null[m
+[1m+++ b/app/src/main/java/com/example/m_commerce_admin/core/di/NetworkProviderModule.kt[m
+[36m@@ -0,0 +1,25 @@[m
+[32m+[m[32mpackage com.example.m_commerce_admin.core.di[m
+[32m+[m
+[32m+[m[32mimport com.apollographql.apollo.ApolloClient[m
+[32m+[m[32mimport dagger.Module[m
+[32m+[m[32mimport dagger.Provides[m
+[32m+[m[32mimport dagger.hilt.InstallIn[m
+[32m+[m[32mimport dagger.hilt.components.SingletonComponent[m
+[32m+[m[32mimport javax.inject.Singleton[m
+[32m+[m
+[32m+[m[32m@Module[m
+[32m+[m[32m@InstallIn(SingletonComponent::class)[m
+[32m+[m[32mobject NetworkProviderModule {[m
+[32m+[m
+[32m+[m[32m    @Provides[m
+[32m+[m[32m    @Singleton[m
+[32m+[m[32m    fun provideApolloClient(): ApolloClient {[m
+[32m+[m[32m        return ApolloClient.Builder()[m
+[32m+[m[32m            .serverUrl("https://mad45-alex-and02.myshopify.com/admin/api/unstable/graphql.json") // replace with your endpoint[m
+[32m+[m[32m            .addHttpHeader("X-Shopify-Access-Token", "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")[m
+[32m+[m[32m            .addHttpHeader("Content-Type", "application/json")[m
+[32m+[m[32m            .build()[m
+[32m+[m[32m    }[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m
+[1mdiff --git a/app/src/main/java/com/example/m_commerce_admin/features/app/MainActivity.kt b/app/src/main/java/com/example/m_commerce_admin/features/app/MainActivity.kt[m
+[1mindex 92a306f..8530ec5 100644[m
+[1m--- a/app/src/main/java/com/example/m_commerce_admin/features/app/MainActivity.kt[m
+[1m+++ b/app/src/main/java/com/example/m_commerce_admin/features/app/MainActivity.kt[m
+[36m@@ -44,25 +44,6 @@[m [mclass MainActivity : ComponentActivity() {[m
+         super.onCreate(savedInstanceState)[m
+         enableEdgeToEdge()[m
+         setContent {[m
+[31m-            val apolloClient = ApolloClient.Builder()[m
+[31m-                .serverUrl("https://mad45-alex-and02.myshopify.com/admin/api/unstable/graphql.json") // replace with your endpoint[m
+[31m-                .addHttpHeader("X-Shopify-Access-Token", "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")[m
+[31m-                .addHttpHeader("Content-Type", "application/json")[m
+[31m-                .build()[m
+[31m-[m
+[31m-            val scope = rememberCoroutineScope()[m
+[31m-            scope.launch {[m
+[31m-                val query = GetProductByIdQuery(id = "gid://shopify/Product/8845374095609")[m
+[31m-[m
+[31m-                val response = apolloClient.query(query).execute()[m
+[31m-                val product = response.data?.product[m
+[31m-                Log.i("TAG", "Product title: ${product?.title}")[m
+[31m-[m
+[31m-                Log.i("TAG", "Raw data: ${response.data}")[m
+[31m-                Log.i("TAG", "Errors: ${response.errors}")[m
+[31m-            }[m
+[31m-[m
+[31m-[m
+             MCommerceAdminTheme {[m
+                 showBottomNavbar = remember { mutableStateOf(false) }[m
+                 Main(showBottomNavbar = showBottomNavbar)[m
+
+[33mcommit cfbbbea6493ba4166f338827db144f4418832ccb[m
+Author: Ayat Gamal <ayat.ga106@gmail.com>
+Date:   Sun Jun 22 00:35:25 2025 +0300
+
+    setup apollo
+
+[1mdiff --git a/app/src/main/java/com/example/m_commerce_admin/features/app/MainActivity.kt b/app/src/main/java/com/example/m_commerce_admin/features/app/MainActivity.kt[m
+[1mindex 2ac7f05..92a306f 100644[m
+[1m--- a/app/src/main/java/com/example/m_commerce_admin/features/app/MainActivity.kt[m
+[1m+++ b/app/src/main/java/com/example/m_commerce_admin/features/app/MainActivity.kt[m
+[36m@@ -1,6 +1,7 @@[m
+ package com.example.m_commerce_admin.features.app[m
+ [m
+ import android.os.Bundle[m
+[32m+[m[32mimport android.util.Log[m
+ import androidx.activity.ComponentActivity[m
+ import androidx.activity.compose.setContent[m
+ import androidx.activity.enableEdgeToEdge[m
+[36m@@ -17,12 +18,15 @@[m [mimport androidx.compose.runtime.MutableState[m
+ import androidx.compose.runtime.getValue[m
+ import androidx.compose.runtime.mutableStateOf[m
+ import androidx.compose.runtime.remember[m
+[32m+[m[32mimport androidx.compose.runtime.rememberCoroutineScope[m
+ import androidx.compose.ui.Modifier[m
+ import androidx.compose.ui.graphics.Color.Companion.Transparent[m
+ import androidx.compose.ui.unit.LayoutDirection[m
+ import androidx.compose.ui.unit.dp[m
+ import androidx.navigation.compose.currentBackStackEntryAsState[m
+ import androidx.navigation.compose.rememberNavController[m
+[32m+[m[32mimport com.apollographql.apollo.ApolloClient[m
+[32m+[m[32mimport com.example.m_commerce_admin.GetProductByIdQuery[m
+ import com.example.m_commerce_admin.config.routes.AppRoutes[m
+ import com.example.m_commerce_admin.config.routes.NavSetup[m
+ import com.example.m_commerce_admin.config.theme.MCommerceAdminTheme[m
+[36m@@ -31,6 +35,7 @@[m [mimport com.example.m_commerce_admin.core.shared.components.bottom_nav_bar.Bottom[m
+ import com.example.m_commerce_admin.features.app.component.getFABForRouteWithAction[m
+ import com.example.m_commerce_admin.features.app.component.getTopAppBarForRoute[m
+ import dagger.hilt.android.AndroidEntryPoint[m
+[32m+[m[32mimport kotlinx.coroutines.launch[m
+ [m
+ @AndroidEntryPoint[m
+ class MainActivity : ComponentActivity() {[m
+[36m@@ -39,6 +44,25 @@[m [mclass MainActivity : ComponentActivity() {[m
+         super.onCreate(savedInstanceState)[m
+         enableEdgeToEdge()[m
+         setContent {[m
+[32m+[m[32m            val apolloClient = ApolloClient.Builder()[m
+[32m+[m[32m                .serverUrl("https://mad45-alex-and02.myshopify.com/admin/api/unstable/graphql.json") // replace with your endpoint[m
+[32m+[m[32m                .addHttpHeader("X-Shopify-Access-Token", "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")[m
+[32m+[m[32m                .addHttpHeader("Content-Type", "application/json")[m
+[32m+[m[32m                .build()[m
+[32m+[m
+[32m+[m[32m            val scope = rememberCoroutineScope()[m
+[32m+[m[32m            scope.launch {[m
+[32m+[m[32m                val query = GetProductByIdQuery(id = "gid://shopify/Product/8845374095609")[m
+[32m+[m
+[32m+[m[32m                val response = apolloClient.query(query).execute()[m
+[32m+[m[32m                val product = response.data?.product[m
+[32m+[m[32m                Log.i("TAG", "Product title: ${product?.title}")[m
+[32m+[m
+[32m+[m[32m                Log.i("TAG", "Raw data: ${response.data}")[m
+[32m+[m[32m                Log.i("TAG", "Errors: ${response.errors}")[m
+[32m+[m[32m            }[m
+[32m+[m
+[32m+[m
+             MCommerceAdminTheme {[m
+                 showBottomNavbar = remember { mutableStateOf(false) }[m
+                 Main(showBottomNavbar = showBottomNavbar)[m

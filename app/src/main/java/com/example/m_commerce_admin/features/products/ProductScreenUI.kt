@@ -1,121 +1,185 @@
 package com.example.m_commerce_admin.features.products
 
-import androidx.compose.foundation.layout.Arrangement
+ import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Icon
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+ 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.m_commerce_admin.R
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.m_commerce_admin.config.theme.Teal
-import com.example.m_commerce_admin.features.products.component.ProductCard
+import com.example.m_commerce_admin.core.shared.components.states.Failed
 
-data class ProductObject(
-    val title: String,
-    val image: Int,
-    val price: Double,
-    val createdAt: Int,
-    val status: String,
-    val quantity: Int
-)
+import com.example.m_commerce_admin.features.products.presentation.component.ProductCard
+import com.example.m_commerce_admin.features.products.presentation.states.GetProductState
+import com.example.m_commerce_admin.features.products.presentation.viewModel.ProductsViewModel
+import kotlinx.coroutines.launch
 
 
-@Preview(showBackground = true)
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ProductScreenUI(modifier: Modifier = Modifier) {
+fun ProductScreenUI(
+    viewModel: ProductsViewModel = hiltViewModel()) {
+    val state by viewModel.productsState.collectAsState()
+    val listState = rememberLazyListState()
+    val deleteState by viewModel.deleteProductState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
 
 
-    Box(
-        modifier = Modifier
-            .wrapContentHeight(),
+    LaunchedEffect(Unit) {
+        viewModel.refreshProducts()
+    }
 
-    ) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
+    // Improved pagination logic
+    val shouldLoadMore by remember {
+        derivedStateOf {
+            val layoutInfo = listState.layoutInfo
+            val totalItemsCount = layoutInfo.totalItemsCount
+            val lastVisibleItemIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            
+            // Load more when we're 3 items away from the end
+            lastVisibleItemIndex >= totalItemsCount - 3 && totalItemsCount > 0
+        }
+    }
 
+    LaunchedEffect(shouldLoadMore) {
+        if (shouldLoadMore) {
+            viewModel.loadMoreProducts()
+        }
+    }
 
-            item {
-                ProductCard(
-                    ProductObject(
-                        "T-Shirt",
-                        R.drawable.placeholder2,
-                        820.0,
-                        20240610,
-                        "Inactive",
-                        20
-                    )
-                )
-            }
-            item {
-                ProductCard(
-                    ProductObject(
-                        "Sneakers",
-                        R.drawable.shose1,
-                        230.0,
-                        20240125,
-                        "Active",
-                        40
-                    )
-                )
-            }
-            item {
-                ProductCard(
-                    ProductObject(
-                        "Blouse",
-                        R.drawable.tshitt1,
-                        120.0,
-                        20240825,
-                        "Inactive",
-                        14
-                    )
-                )
-            }
-            item {
-                ProductCard(
-                    ProductObject(
-                        "T-Shirt",
-                        R.drawable.placeholder2,
-                        120.0,
-                        20240614,
-                        "Active",
-                        33
-                    )
-                )
-            }
-            item {
-                ProductCard(
-                    ProductObject(
-                        "T-Shirt",
-                        R.drawable.tshitt1,
-                        120.0,
-                        20240610,
-                        "Active",
-                        20
-                    )
-                )
+    LaunchedEffect(deleteState) {
+        if (deleteState != null && deleteState!!.isSuccess) {
+            coroutineScope.launch {
+                snackbarHostState.showSnackbar("Product deleted successfully")
             }
         }
+    }
 
 
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { pad ->
+        Box(modifier = Modifier
+            .padding(pad)
+            .fillMaxSize()) {
+
+            when (state) {
+                is GetProductState.Loading -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = Teal)
+                    }
+                }
+
+                is GetProductState.Error -> {
+                    val msg = (state as GetProductState.Error).message
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Failed(msg)
+                    }
+                }
+
+                is GetProductState.Success -> {
+                    val products = (state as GetProductState.Success).data
+                    val hasNext = (state as GetProductState.Success).hasNext
+
+
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        items(products) { product ->
+                            ProductCard(product = product,
+                                onDelete ={viewModel.deleteProduct(productId = product.id)} ,
+                                onEdit = {}
+                                )
+
+
+                        }
+
+                        if (hasNext) {
+                            item {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = "Products (${products.size})",
+                                        color = Teal
+                                    )
+                                    IconButton(
+                                        onClick = {
+                                            Log.d("ProductScreenUI", "🔄 Manual refresh triggered")
+                                            viewModel.refreshProducts()
+                                        }
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Refresh,
+                                            contentDescription = "Refresh",
+                                            tint = Teal
+                                        )
+                                    }
+                                }
+                            }
+
+                            items(products) { product ->
+                                ProductCard(
+                                    product = product,
+                                    onEdit = { /* TODO: Edit logic */ },
+                                    onDelete = {
+
+                                        viewModel.deleteProduct(product.id) }
+                                )
+                            }
+
+                            if (hasNext) {
+                                item {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .padding(16.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        CircularProgressIndicator(color = Teal)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewProductCard() {
-    ProductCard(ProductObject("Sneakers", R.drawable.shose1, 199.99, 20240616, "Active", 12))
-}

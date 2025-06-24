@@ -1,3 +1,8 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import java.io.FileInputStream
+import java.util.Properties
+
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -6,11 +11,26 @@ plugins {
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
     kotlin("plugin.serialization") version "2.1.10"
+
+    //apollo
+    id("com.apollographql.apollo") version "4.3.1"
+
 }
 
 android {
     namespace = "com.example.m_commerce_admin"
     compileSdk = 35
+
+    val file = rootProject.file("local.properties")
+    val properties = Properties()
+    properties.load(FileInputStream(file))
+
+    val localProperties = Properties().apply {
+        load(rootProject.file("local.properties").inputStream())
+    }
+    val adminToken: String = localProperties.getProperty("ADMIN_TOKEN", "")
+    val shopDomain: String = localProperties.getProperty("SHOP_DOMAIN", "")
+
 
     defaultConfig {
         applicationId = "com.example.m_commerce_admin"
@@ -20,6 +40,12 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "adminToken", properties.getProperty("ADMIN_TOKEN"))
+        buildConfigField("String", "shopDomain", shopDomain)
+        resValue("string", "ADMIN_TOKEN", adminToken)
+
+
     }
 
     buildTypes {
@@ -40,6 +66,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -73,8 +100,7 @@ dependencies {
     //?==================================================
 
     //!Network
-    //*Apollo
-//    implementation("com.apollographql.apollo:apollo-runtime:4.3.0")
+
     //*Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
@@ -113,5 +139,23 @@ dependencies {
     //dataStore
     implementation("androidx.datastore:datastore-preferences:1.1.7")
 
+    //APOLLO
+    implementation("com.apollographql.apollo:apollo-runtime:4.3.1")
 
+    //JSON parsing for Shopify API
+    implementation("org.json:json:20231013")
+
+ //lotti
+
+    implementation("com.airbnb.android:lottie-compose:6.3.0")
+
+
+
+
+    apollo {
+        service("service") {
+            packageName.set("com.example.m_commerce_admin")
+        }
+    }
 }
+

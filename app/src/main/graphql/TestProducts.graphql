@@ -1,0 +1,15 @@
+query TestProducts($first: Int!) {
+    products(first: $first) {
+        edges {
+            node {
+                id
+                title
+                status
+            }
+        }
+        pageInfo {
+            hasNextPage
+            endCursor
+        }
+    }
+} 

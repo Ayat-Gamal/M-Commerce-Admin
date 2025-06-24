@@ -8,5 +8,8 @@ plugins {
 
     //hilt
     id("com.google.dagger.hilt.android") version "2.51.1" apply false
+    //apollo
+    id("com.apollographql.apollo") version "4.3.1" apply false
+
 
 }
