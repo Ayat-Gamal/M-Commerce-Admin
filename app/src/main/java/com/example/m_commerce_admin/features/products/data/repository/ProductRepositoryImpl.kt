@@ -29,6 +29,9 @@ class ProductRepositoryImpl @Inject constructor(
         return remoteDataSource.addProduct(product)
     }
 
+    override suspend fun deleteProduct(productId: String): Result<Unit> {
+        return remoteDataSource.deleteProduct(productId)
+    }
 
     override suspend fun uploadImagesAndAddProduct(
         product: DomainProductInput,

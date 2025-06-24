@@ -16,5 +16,6 @@ interface ProductRepository {
         imageUris: List<Uri>,
         context: Context
     ): Result<Unit>
+    suspend fun deleteProduct(productId: String): Result<Unit>
 
 }

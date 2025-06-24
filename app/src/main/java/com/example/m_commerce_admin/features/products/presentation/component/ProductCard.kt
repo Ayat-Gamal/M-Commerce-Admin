@@ -41,7 +41,11 @@ import com.example.m_commerce_admin.features.products.domain.entity.Product
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ProductCard(product: Product) {
+fun ProductCard(
+    product: Product,
+    onEdit: () -> Unit = {},
+    onDelete: () -> Unit = {}
+) {
     Card(
         colors = CardDefaults.cardColors(containerColor = LightTeal),
         elevation = CardDefaults.cardElevation(6.dp),
@@ -137,10 +141,10 @@ fun ProductCard(product: Product) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Start
             ) {
-                IconButton(onClick = { /* Edit */ }) {
+                IconButton(onClick = onEdit) {
                     Icon(Icons.Default.Edit, contentDescription = "Edit", tint = Teal)
                 }
-                IconButton(onClick = { /* Delete */ }) {
+                IconButton(onClick = onDelete) {
                     Icon(Icons.Default.Delete, contentDescription = "Delete", tint = lightRed)
                 }
             }

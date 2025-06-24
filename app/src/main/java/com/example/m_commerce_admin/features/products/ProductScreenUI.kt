@@ -20,13 +20,15 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Icon
-
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -36,6 +38,7 @@ import com.example.m_commerce_admin.core.shared.components.states.Failed
 import com.example.m_commerce_admin.features.products.presentation.states.GetProductState
 import com.example.m_commerce_admin.features.products.presentation.component.ProductCard
 import com.example.m_commerce_admin.features.products.presentation.viewModel.ProductsViewModel
+import kotlinx.coroutines.launch
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -45,6 +48,9 @@ fun ProductScreenUI(
 ) {
     val state by viewModel.productsState.collectAsState()
     val listState = rememberLazyListState()
+    val deleteState by viewModel.deleteProductState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
 
 
     LaunchedEffect(Unit) {
@@ -69,7 +75,17 @@ fun ProductScreenUI(
         }
     }
 
-    Scaffold { pad ->
+    LaunchedEffect(deleteState) {
+        if (deleteState != null && deleteState!!.isSuccess) {
+            coroutineScope.launch {
+                snackbarHostState.showSnackbar("Product deleted successfully")
+            }
+        }
+    }
+
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+    ) { pad ->
         Box(modifier = Modifier.padding(pad).fillMaxSize()) {
 
             when (state) {
@@ -124,7 +140,11 @@ fun ProductScreenUI(
                             }
 
                             items(products) { product ->
-                                ProductCard(product = product)
+                                ProductCard(
+                                    product = product,
+                                    onEdit = { /* TODO: Edit logic */ },
+                                    onDelete = { viewModel.deleteProduct(product.id) }
+                                )
                             }
 
                             if (hasNext) {

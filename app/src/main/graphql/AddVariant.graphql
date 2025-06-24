@@ -1,0 +1,14 @@
+mutation AddVariant($input: ProductVariantInput!) {
+  productVariantCreate(input: $input) {
+    productVariant {
+      id
+      price
+      inventoryQuantity
+      availableForSale
+    }
+    userErrors {
+      field
+      message
+    }
+  }
+} 

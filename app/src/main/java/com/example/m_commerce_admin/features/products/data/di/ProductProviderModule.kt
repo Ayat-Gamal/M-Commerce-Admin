@@ -5,6 +5,7 @@ import com.example.m_commerce_admin.features.products.data.remote.ProductRemoteD
 import com.example.m_commerce_admin.features.products.data.remote.ProductRemoteDataSourceImpl
 import com.example.m_commerce_admin.features.products.domain.repository.ProductRepository
 import com.example.m_commerce_admin.features.products.domain.usecase.AddProductUseCase
+import com.example.m_commerce_admin.features.products.domain.usecase.DeleteProductUseCase
 import com.example.m_commerce_admin.features.products.domain.usecase.GetAllProductsUseCase
 import dagger.Module
 import dagger.Provides
@@ -32,5 +33,10 @@ object ProductProviderModule {
     @Singleton
     fun provideAddProductUseCase(repo: ProductRepository): AddProductUseCase {
         return AddProductUseCase(repo)
+    }
+    @Provides
+    @Singleton
+    fun provideDeleteProductUseCase(repo: ProductRepository): DeleteProductUseCase {
+        return DeleteProductUseCase(repo)
     }
 }

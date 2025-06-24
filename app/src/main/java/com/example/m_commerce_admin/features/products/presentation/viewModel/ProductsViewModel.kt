@@ -18,11 +18,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.example.m_commerce_admin.features.products.domain.usecase.DeleteProductUseCase
 
 @HiltViewModel
 class ProductsViewModel @Inject constructor(
     private val getAllProductsUseCase: GetAllProductsUseCase,
     private val addProductWithImagesUseCase: AddProductWithImagesUseCase,
+    private val deleteProductUseCase: DeleteProductUseCase,
 ) : ViewModel() {
 
     private val _productsState = MutableStateFlow<GetProductState>(GetProductState.Loading)
@@ -35,6 +37,9 @@ class ProductsViewModel @Inject constructor(
 
     private val _uiAddProductState = MutableStateFlow<AddProductState>(AddProductState.Idle)
     val uiAddProductState: StateFlow<AddProductState> = _uiAddProductState
+
+    private val _deleteProductState = MutableStateFlow<Result<Unit>?>(null)
+    val deleteProductState: StateFlow<Result<Unit>?> = _deleteProductState
 
     fun loadMoreProducts() {
         if (isPaginating || !hasNextPage) {
@@ -130,6 +135,18 @@ class ProductsViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiAddProductState.value =
                     AddProductState.Error(e.message ?: "An unexpected error occurred")
+            }
+        }
+    }
+
+    fun deleteProduct(productId: String) {
+        viewModelScope.launch {
+            _deleteProductState.value = null
+            val result = deleteProductUseCase(productId)
+            _deleteProductState.value = result
+            if (result.isSuccess) {
+                val removed = currentList.removeAll { it.id == productId }
+                _productsState.value = GetProductState.Success(currentList.toList(), hasNextPage, cursor)
             }
         }
     }

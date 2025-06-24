@@ -9,6 +9,7 @@ import com.apollographql.apollo.api.Optional
 import com.apollographql.apollo.exception.ApolloException
 import com.example.m_commerce_admin.AddProductMutation
 import com.example.m_commerce_admin.AddProductWithImagesMutation
+import com.example.m_commerce_admin.DeleteProductMutation
 import com.example.m_commerce_admin.GetProductsQuery
 import com.example.m_commerce_admin.StagedUploadsCreateMutation
 import com.example.m_commerce_admin.features.products.data.mapper.toDomain
@@ -222,6 +223,20 @@ class ProductRemoteDataSourceImpl @Inject constructor(
                 }
             }
 
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun deleteProduct(productId: String): Result<Unit> {
+        return try {
+            val response = apolloClient.mutation(DeleteProductMutation(productId)).execute()
+            response.data?.productDelete?.userErrors?.let { errors ->
+                if (errors.isNotEmpty()) {
+                    return Result.failure(Exception(errors.first().message))
+                }
+            }
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)

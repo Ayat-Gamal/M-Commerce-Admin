@@ -21,5 +21,6 @@ interface ProductRemoteDataSource {
     suspend fun uploadImageToStagedTarget(context: Context, uri: Uri, target: StagedUploadTarget): Boolean
     suspend fun addProductWithMedia(product: ProductInput, media: List<CreateMediaInput>): Result<Unit>
 
+    suspend fun deleteProduct(productId: String): Result<Unit>
 
 }
