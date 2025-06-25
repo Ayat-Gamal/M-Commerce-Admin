@@ -3,7 +3,7 @@ package com.example.m_commerce_admin.features.home.data.remote
 import com.apollographql.apollo.ApolloClient
 import com.example.m_commerce_admin.GetLastOrdersQuery
 import com.example.m_commerce_admin.features.home.domain.entity.Order
-import com.example.m_commerce_admin.features.home.presentation.HomeState
+import com.example.m_commerce_admin.features.home.presentation.state.HomeState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject

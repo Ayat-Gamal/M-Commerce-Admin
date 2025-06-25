@@ -3,7 +3,7 @@ package com.example.m_commerce_admin.features.home.domain.usecase
 import com.example.m_commerce_admin.core.shared.components.usecase.UseCase
 import com.example.m_commerce_admin.features.home.domain.entity.Order
 import com.example.m_commerce_admin.features.home.domain.repository.OrderRepository
-import com.example.m_commerce_admin.features.home.presentation.HomeState
+import com.example.m_commerce_admin.features.home.presentation.state.HomeState
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

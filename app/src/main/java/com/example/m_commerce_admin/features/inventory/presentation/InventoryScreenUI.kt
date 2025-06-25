@@ -25,10 +25,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.m_commerce_admin.config.theme.Teal
 import com.example.m_commerce_admin.core.shared.components.states.Empty
 import com.example.m_commerce_admin.core.shared.components.states.Failed
-import com.example.m_commerce_admin.features.inventory.InventoryViewModel
 import com.example.m_commerce_admin.features.inventory.presentation.component.AdjustInventorySheet
 import com.example.m_commerce_admin.features.inventory.presentation.component.InventoryCard
 import com.example.m_commerce_admin.features.inventory.presentation.state.InventoryLevelsState
+import com.example.m_commerce_admin.features.inventory.presentation.viewModel.InventoryViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,8 +55,7 @@ fun InventoryScreenUI(
     )
 
 
-    // --- Screen Layout ---
-    Scaffold { innerPadding ->
+     Scaffold { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             when (uiState) {
                 InventoryLevelsState.Loading -> {

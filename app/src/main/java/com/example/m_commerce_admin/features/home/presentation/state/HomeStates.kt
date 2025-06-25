@@ -1,4 +1,4 @@
-package com.example.m_commerce_admin.features.home.presentation
+package com.example.m_commerce_admin.features.home.presentation.state
 
 sealed class HomeState<out T> {
     object Loading : HomeState<Nothing>()

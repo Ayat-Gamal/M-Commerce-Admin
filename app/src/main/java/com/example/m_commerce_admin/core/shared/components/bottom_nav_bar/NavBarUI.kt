@@ -88,8 +88,8 @@ fun AddItem(
 ) {
 
     val container = if (isSelected) Teal else DarkestGray
-
     val background = if (isSelected) White else Transparent
+
     Box(
         modifier = Modifier
             .height(height = 42.dp)

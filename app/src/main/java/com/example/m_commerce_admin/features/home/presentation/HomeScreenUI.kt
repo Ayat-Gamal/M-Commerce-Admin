@@ -11,20 +11,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,13 +35,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.m_commerce_admin.R
 import com.example.m_commerce_admin.config.routes.AppRoutes
-import com.example.m_commerce_admin.config.theme.Gray
 import com.example.m_commerce_admin.config.theme.Teal
 import com.example.m_commerce_admin.config.theme.White
 import com.example.m_commerce_admin.core.shared.components.SvgImage
 import com.example.m_commerce_admin.features.home.presentation.component.LastOrdersCard
+import com.example.m_commerce_admin.features.home.presentation.component.QuickAccessButtons
+import com.example.m_commerce_admin.features.home.presentation.state.HomeState
 import com.example.m_commerce_admin.features.home.presentation.viewModel.HomeViewModel
-import com.example.m_commerce_admin.features.inventory.InventoryViewModel
+import com.example.m_commerce_admin.features.inventory.presentation.viewModel.InventoryViewModel
 
 
 @Composable
@@ -90,33 +84,29 @@ fun HomeScreenUI(
                             .fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-
                         item {
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically,
-
-
-                                ) {
-
-                            }
-                            HorizontalDivider(
-                                color = Teal,
-                                thickness = 2.dp,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 8.dp, vertical = 16.dp)
                             )
-                        }
+                            {
 
+                                HorizontalDivider(
+                                    color = Teal,
+                                    thickness = 2.dp,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 8.dp, vertical = 16.dp)
+                                )
+                            }
+                        }
                         item {
                             LastOrdersCard(orders = orders, onViewAllClick = {
                                 navController.navigate(AppRoutes.OrdersScreen)
                             })
                         }
-
                         item {
                             Card(
                                 elevation = CardDefaults.cardElevation(4.dp),
@@ -159,12 +149,10 @@ fun HomeScreenUI(
                                             color = Red
                                         ),
                                     )
-
                                 }
-
                             }
                         }
-                        item{
+                        item {
                             Card(
                                 elevation = CardDefaults.cardElevation(4.dp),
                                 shape = RoundedCornerShape(16.dp),
@@ -206,65 +194,13 @@ fun HomeScreenUI(
                                             navController.navigate(AppRoutes.AddCouponForm)
                                         }
                                     )
-
                                 }
-
-                            }
-
                             }
                         }
-
                     }
                 }
             }
         }
     }
-
-
-
-@Composable
-fun QuickAccessButtons(
-    onAddProductClick: () -> Unit,
-    onAddCouponClick: () -> Unit
-) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Button(
-                onClick = onAddProductClick,
-
-                modifier = Modifier.padding(8.dp), colors = ButtonColors(
-                    contentColor = White,
-                    containerColor = Teal,
-                    disabledContainerColor = Gray,
-                    disabledContentColor = White)
-            ) {
-                Icon(Icons.Default.Add, contentDescription = null)
-                Spacer(modifier = Modifier.width(4.dp))
-                Text("Add Product", style = MaterialTheme.typography.bodyMedium)
-            }
-
-            Button(
-                onClick = onAddCouponClick,
-                modifier = Modifier.padding(8.dp), colors = ButtonColors(
-                    contentColor = White,
-                    containerColor = Teal,
-                    disabledContainerColor = Gray,
-                    disabledContentColor = White)
-
-
-            ) {
-                Icon(Icons.Default.Add, contentDescription = null)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Add Coupon", style = MaterialTheme.typography.bodyMedium)
-            }
-        }
-
-    }
 }
+

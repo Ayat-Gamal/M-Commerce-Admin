@@ -27,9 +27,6 @@ interface ShopifyCouponApi {
     @GET("price_rules.json")
     suspend fun getPriceRules(@Query("limit") limit: Int = 250): Response<PriceRulesListResponse>
 
-    @GET("price_rules/{price_rule_id}.json")
-    suspend fun getPriceRule(@Path("price_rule_id") priceRuleId: Long): Response<PriceRuleResponse>
-
     @GET("price_rules/{price_rule_id}/discount_codes.json")
     suspend fun getDiscountCodes(@Path("price_rule_id") priceRuleId: Long): Response<DiscountCodeResponse>
 

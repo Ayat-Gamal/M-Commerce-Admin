@@ -79,7 +79,6 @@ fun ProductScreenUI(
         }
     }
 
-
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { pad ->
@@ -88,7 +87,6 @@ fun ProductScreenUI(
                 .padding(pad)
                 .fillMaxSize()
         ) {
-
             when (state) {
                 is GetProductState.Loading -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

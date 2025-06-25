@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.m_commerce_admin.features.home.domain.entity.Order
 import com.example.m_commerce_admin.features.home.domain.usecase.GetLastOrdersUseCase
-import com.example.m_commerce_admin.features.home.presentation.HomeState
+import com.example.m_commerce_admin.features.home.presentation.state.HomeState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

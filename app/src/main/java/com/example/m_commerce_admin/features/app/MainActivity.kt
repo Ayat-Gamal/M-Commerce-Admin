@@ -2,13 +2,10 @@ package com.example.m_commerce_admin.features.app
 
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
-
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.padding
@@ -21,15 +18,11 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.apollographql.apollo.ApolloClient
-import com.example.m_commerce_admin.GetProductByIdQuery
 import com.example.m_commerce_admin.config.routes.AppRoutes
 import com.example.m_commerce_admin.config.routes.NavSetup
 import com.example.m_commerce_admin.config.theme.MCommerceAdminTheme
@@ -37,9 +30,7 @@ import com.example.m_commerce_admin.core.helpers.navigateAndClear
 import com.example.m_commerce_admin.core.shared.components.bottom_nav_bar.BottomNavigationBar
 import com.example.m_commerce_admin.features.app.component.getFABForRouteWithAction
 import com.example.m_commerce_admin.features.app.component.getTopAppBarForRoute
-import com.shopify.buy3.BuildConfig
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -75,7 +66,6 @@ fun Main(showBottomNavbar: MutableState<Boolean>) {
     val fabComposable = getFABForRouteWithAction(
         currentDestination = currentRoute,
         navController
-
     )
 
     Scaffold(

@@ -2,9 +2,7 @@ package com.example.m_commerce_admin.features.coupons.presentation.component
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,7 +27,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.m_commerce_admin.config.theme.DarkestGray
 import com.example.m_commerce_admin.config.theme.LightGreen
-import com.example.m_commerce_admin.config.theme.LightTeal
 import com.example.m_commerce_admin.config.theme.Teal
 import com.example.m_commerce_admin.config.theme.White
 import com.example.m_commerce_admin.config.theme.lightRed
@@ -98,19 +95,23 @@ fun CouponCard(
             Spacer(modifier = Modifier.padding(4.dp))
 
             Text(
-                text = "Discount: ${coupon.value?.times(100)?.toInt()}%",
+                text =
+                if (coupon.value == null) "Fixed Amount Coupon" else "Discount: ${
+                    coupon.value?.times(
+                        100
+                    )?.toInt()
+                }%",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
                 color = DarkGray
             )
 
-            if (coupon.currencyCode != null) {
-                Text(
-                    text = "Amount: ${coupon.amount} ${coupon.currencyCode}",
-                    fontSize = 14.sp,
-                    color = DarkGray
-                )
-            }
+            Text(
+                text = if (coupon.amount.equals(0.0)) "Percentage Coupon" else "${coupon.amount} ${coupon.currencyCode}",
+                fontSize = 14.sp,
+                color = DarkGray
+            )
+
             Text(
                 text = "Start: ${formatIsoDate(coupon.startsAt ?: "00:00:00")}",
                 fontSize = 13.sp,
