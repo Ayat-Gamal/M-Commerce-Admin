@@ -12,7 +12,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.m_commerce_admin.core.helpers.navigateAndClear
-import com.example.m_commerce_admin.features.coupons.CouponScreenUI
+import com.example.m_commerce_admin.features.coupons.presentation.CouponScreenUI
+import com.example.m_commerce_admin.features.coupons.presentation.component.AddCouponFormUI
 import com.example.m_commerce_admin.features.home.presentation.HomeScreenUI
 import com.example.m_commerce_admin.features.home.presentation.orders.OrdersScreenUI
 import com.example.m_commerce_admin.features.inventory.InventoryScreenUI
@@ -62,7 +63,12 @@ fun NavSetup(
         composable<AppRoutes.CouponScreen> {
             showBottomNavbar.value = true
 
-            CouponScreenUI()
+            CouponScreenUI(navController = navController)
+        }
+        composable<AppRoutes.AddCouponForm> {
+            showBottomNavbar.value = false
+
+            AddCouponFormUI(navController = navController)
         }
         composable<AppRoutes.SplashScreen> {
             showBottomNavbar.value = false

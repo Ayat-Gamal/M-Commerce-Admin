@@ -72,6 +72,7 @@ android {
 
 dependencies {
 
+    implementation(libs.androidx.espresso.core)
     val room_version = "2.6.1"
     val nav_version = "2.8.8"
 

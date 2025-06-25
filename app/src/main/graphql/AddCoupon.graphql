@@ -1,0 +1,64 @@
+mutation AddCoupon($basicCodeDiscount: DiscountCodeBasicInput!) {
+  discountCodeBasicCreate(basicCodeDiscount: $basicCodeDiscount) {
+    codeDiscountNode {
+      id
+      codeDiscount {
+        ... on DiscountCodeBasic {
+          title
+          summary
+
+          codes(first: 10) {
+            edges {
+              node {
+                code
+                asyncUsageCount
+              }
+            }
+          }
+          startsAt
+          endsAt
+          status
+          usageLimit
+          createdAt
+          updatedAt
+
+          customerGets {
+
+
+            value {
+
+              ... on DiscountPercentage {
+                percentage
+
+              }
+
+              ... on DiscountAmount {
+
+                amount {
+
+                  amount
+                  currencyCode
+
+                }
+              }
+            }
+          }
+
+          customerSelection {
+            ... on DiscountCustomerSegments {
+              segments {
+                id
+              }
+            }
+          }
+        }
+
+      }
+
+    }
+    userErrors {
+      field
+      message
+    }
+  }
+}

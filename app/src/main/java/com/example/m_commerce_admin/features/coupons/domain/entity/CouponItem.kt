@@ -11,6 +11,6 @@ data class CouponItem(
     val usageLimit: Int?,
     val createdAt: String?,
     val updatedAt: String?,
-    val amount: Double?,
+    val amount: Double,
     val currencyCode: String?
 )

@@ -1,7 +1,6 @@
 package com.example.m_commerce_admin.features.coupons.presentation.component
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -25,7 +24,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.DarkGray
-import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,8 +35,6 @@ import com.example.m_commerce_admin.config.theme.White
 import com.example.m_commerce_admin.config.theme.lightRed
 import com.example.m_commerce_admin.core.helpers.formatIsoDate
 import com.example.m_commerce_admin.features.coupons.domain.entity.CouponItem
-import java.text.SimpleDateFormat
-import java.util.*
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -90,8 +86,7 @@ fun CouponCard(
                 )
             }
 
-            // Summary
-            coupon.summary?.let {
+             coupon.summary?.let {
                 Text(
                     text = it,
                     fontSize = 13.sp,
@@ -109,7 +104,7 @@ fun CouponCard(
                 color = DarkGray
             )
 
-            if (coupon.amount != null && coupon.currencyCode != null) {
+            if (coupon.currencyCode != null) {
                 Text(
                     text = "Amount: ${coupon.amount} ${coupon.currencyCode}",
                     fontSize = 14.sp,
