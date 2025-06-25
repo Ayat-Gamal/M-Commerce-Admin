@@ -58,12 +58,18 @@ object NetworkModule {
             .baseUrl("https://mad45-alex-and02.myshopify.com/admin/api/2024-04/")
             .addConverterFactory(GsonConverterFactory.create())
             .client(
-                OkHttpClient.Builder().addInterceptor { chain ->
-                    val request = chain.request().newBuilder()
-                        .addHeader("X-Shopify-Access-Token", BuildConfig.adminToken)
-                        .build()
-                    chain.proceed(request)
-                }.build()
+                OkHttpClient.Builder()
+                    .connectTimeout(30, TimeUnit.SECONDS)
+                    .readTimeout(60, TimeUnit.SECONDS)
+                    .writeTimeout(60, TimeUnit.SECONDS)
+                    .addInterceptor { chain ->
+                        val request = chain.request().newBuilder()
+                            .addHeader("X-Shopify-Access-Token", BuildConfig.adminToken)
+                            .addHeader("Content-Type", "application/json")
+                            .build()
+                        chain.proceed(request)
+                    }
+                    .build()
             )
             .build()
             .create(ShopifyCouponApi::class.java)

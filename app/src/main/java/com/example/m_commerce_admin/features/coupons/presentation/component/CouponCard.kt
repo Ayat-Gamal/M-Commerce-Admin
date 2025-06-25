@@ -40,7 +40,7 @@ import com.example.m_commerce_admin.features.coupons.domain.entity.CouponItem
 @Composable
 fun CouponCard(
     coupon: CouponItem,
-    onEditClick: () -> Unit = {},
+    onEditClick: () -> Unit  ,
     onDeleteClick: () -> Unit = {}
 ) {
     Card(

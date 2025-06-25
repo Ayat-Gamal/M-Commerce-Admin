@@ -1,6 +1,8 @@
 package com.example.m_commerce_admin.features.coupons.domain.entity
 
 data class CouponInput(
+    val id: String? = null,
+
     val title: String?,
     val summary: String?,
     val code: String?,

@@ -15,4 +15,12 @@ class CouponRepositoryImpl @Inject constructor(
     override suspend fun addCoupon(couponInput: CouponInput): Result<Unit> {
         return remoteDataSource.addCoupon(couponInput)
     }
+
+    override suspend fun updateCoupon(couponInput: CouponInput): Result<Unit> {
+        return remoteDataSource.updateCoupon(couponInput)
+    }
+
+    override suspend fun deleteCoupon(couponCode: String): Result<Unit> {
+        return remoteDataSource.deleteCoupon(couponCode)
+    }
 } 

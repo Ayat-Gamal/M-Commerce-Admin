@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import com.example.m_commerce_admin.core.helpers.navigateAndClear
 import com.example.m_commerce_admin.features.coupons.presentation.CouponScreenUI
 import com.example.m_commerce_admin.features.coupons.presentation.component.AddCouponFormUI
@@ -67,8 +68,8 @@ fun NavSetup(
         }
         composable<AppRoutes.AddCouponForm> {
             showBottomNavbar.value = false
-
-            AddCouponFormUI(navController = navController)
+            val data = it.toRoute<AppRoutes.AddCouponForm>()
+            AddCouponFormUI(navController = navController, couponId = data.id)
         }
         composable<AppRoutes.SplashScreen> {
             showBottomNavbar.value = false

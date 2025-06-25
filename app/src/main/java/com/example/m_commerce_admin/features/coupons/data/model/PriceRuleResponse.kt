@@ -7,6 +7,11 @@ data class PriceRuleResponse(
     val price_rule: PriceRuleResult
 )
 
+data class PriceRulesListResponse(
+    @SerializedName("price_rules")
+    val price_rules: List<PriceRuleResult>
+)
+
 data class PriceRuleResult(
     val id: Long,
     val title: String,

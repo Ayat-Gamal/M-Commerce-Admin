@@ -7,4 +7,6 @@ import kotlinx.coroutines.flow.Flow
 interface CouponRemoteDataSource {
     fun getCoupons(): Flow<List<CouponItem>>
     suspend fun addCoupon(coupon: CouponInput): Result<Unit>
+    suspend fun updateCoupon(couponInput: CouponInput): Result<Unit>
+    suspend fun deleteCoupon(couponCode: String): Result<Unit>
 } 

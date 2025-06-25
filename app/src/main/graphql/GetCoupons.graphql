@@ -2,6 +2,7 @@ query GetCoupons($first: Int!) {
   discountNodes(first: $first) {
     edges {
       node {
+        id
         discount {
           ... on DiscountCodeBasic {
             title

@@ -4,7 +4,9 @@ import com.google.gson.annotations.SerializedName
 
 data class DiscountCodeResponse(
     @SerializedName("discount_code")
-    val discount_code: DiscountCodeResult
+    val discount_code: DiscountCodeResult? = null,
+    @SerializedName("discount_codes")
+    val discount_codes: List<DiscountCodeResult>? = null
 )
 
 data class DiscountCodeResult(

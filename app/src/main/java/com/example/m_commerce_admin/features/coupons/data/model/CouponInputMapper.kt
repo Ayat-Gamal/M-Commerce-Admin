@@ -12,10 +12,12 @@ fun CouponInput.toGraphQL(): DiscountCodeBasicInput {
         }
         DiscountType.FIXED_AMOUNT -> {
             DiscountCustomerGetsValueInput(
-
-                 discountAmount = Optional.present(DiscountAmountInput(amount = Optional.present(this.discountValue))),
-                  )
-
+                discountAmount = Optional.present(
+                    DiscountAmountInput(
+                        amount = Optional.present(this.discountValue)
+                    )
+                ),
+            )
         }
     }
 
@@ -28,15 +30,16 @@ fun CouponInput.toGraphQL(): DiscountCodeBasicInput {
         customerSegments = Optional.absent()
     )
 
-    return DiscountCodeBasicInput(
+    val result = DiscountCodeBasicInput(
         title = Optional.presentIfNotNull(this.title),
-         code = Optional.presentIfNotNull(this.code),
+        code = Optional.presentIfNotNull(this.code),
         startsAt = Optional.presentIfNotNull(this.startsAt),
         endsAt = Optional.presentIfNotNull(this.endsAt),
         usageLimit = Optional.presentIfNotNull(this.usageLimit?.toInt()),
         appliesOncePerCustomer = Optional.presentIfNotNull(this.appliesOncePerCustomer),
         customerGets = Optional.present(customerGetsInput),
         customerSelection = Optional.present(customerSelectionInput)
-
     )
+    
+    return result
 }

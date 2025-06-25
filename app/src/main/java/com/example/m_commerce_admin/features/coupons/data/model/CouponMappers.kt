@@ -22,6 +22,7 @@ fun GetCouponsQuery.Data.toCouponItems(): List<CouponItem> {
 
         if (code != null) {
             CouponItem(
+                id = edge.node.id,
                 code = code,
                 value = value,
                 usedCount = usedCount,
