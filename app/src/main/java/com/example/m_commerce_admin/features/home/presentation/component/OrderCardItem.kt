@@ -31,12 +31,13 @@ import com.example.m_commerce_admin.features.home.domain.entity.Order
 fun OrderItemCard(order: Order) {
 
     Card(
+        elevation = CardDefaults.cardElevation(4.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = White),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = White)
+            .padding(horizontal = 8.dp, vertical = 8.dp)
+            .background(color = White)
     ) {
         Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)) {
 
@@ -79,14 +80,14 @@ fun OrderItemCard(order: Order) {
                 color = Black
             )
 
-            Text(
-                text = "Status: ${order.status}",
-                color = Black,
-                modifier = Modifier
-                    .background(color = LightTeal)
-                    .background(LightTeal, RoundedCornerShape(8.dp))
-                    .padding(4.dp),
-            )
+//            Text(
+//                text = "Status: ${order.status}",
+//                color = Black,
+//                modifier = Modifier
+//                    .background(color = LightTeal)
+//                    .background(LightTeal, RoundedCornerShape(8.dp))
+//                    .padding(4.dp),
+//            )
         }
 
     }

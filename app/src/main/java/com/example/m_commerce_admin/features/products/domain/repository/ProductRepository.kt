@@ -2,6 +2,7 @@ package com.example.m_commerce_admin.features.products.domain.repository
 
 import android.content.Context
 import android.net.Uri
+import com.example.m_commerce_admin.features.products.data.retrofitRemote.ProductDto
 import com.example.m_commerce_admin.features.products.domain.entity.DomainProductInput
 import com.example.m_commerce_admin.features.products.presentation.states.GetProductState
 import com.example.m_commerce_admin.type.ProductInput
@@ -17,5 +18,6 @@ interface ProductRepository {
         context: Context
     ): Result<Unit>
     suspend fun deleteProduct(productId: String): Result<Unit>
+
 
 }

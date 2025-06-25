@@ -47,13 +47,13 @@ fun ProductCard(
     onDelete: () -> Unit
 ) {
     Card(
-        colors = CardDefaults.cardColors(containerColor = LightTeal),
-        elevation = CardDefaults.cardElevation(6.dp),
+        elevation = CardDefaults.cardElevation(4.dp),
         shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = White),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 8.dp)
-            .border(BorderStroke(1.dp, Teal), RoundedCornerShape(16.dp))
+            .padding(horizontal = 8.dp, vertical = 8.dp)
+            .background(color = White)
     ) {
         Column(
             modifier = Modifier

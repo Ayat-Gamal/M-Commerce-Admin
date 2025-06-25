@@ -7,6 +7,7 @@ import com.apollographql.apollo.api.Optional
 import com.example.m_commerce_admin.features.products.data.mapper.toGraphQL
 import com.example.m_commerce_admin.features.products.domain.entity.StagedUploadTarget
 import com.example.m_commerce_admin.features.products.data.remote.ProductRemoteDataSource
+import com.example.m_commerce_admin.features.products.data.retrofitRemote.ProductDto
 import com.example.m_commerce_admin.features.products.domain.entity.DomainProductInput
 import com.example.m_commerce_admin.features.products.domain.repository.ProductRepository
 import com.example.m_commerce_admin.features.products.presentation.states.GetProductState
@@ -14,6 +15,7 @@ import com.example.m_commerce_admin.type.CreateMediaInput
 import com.example.m_commerce_admin.type.MediaContentType
 import com.example.m_commerce_admin.type.ProductInput
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class ProductRepositoryImpl @Inject constructor(
@@ -23,6 +25,7 @@ class ProductRepositoryImpl @Inject constructor(
     override fun getProducts(first: Int, after: String?): Flow<GetProductState> {
         return remoteDataSource.getProducts(first, after)
     }
+
 
     override suspend fun addProduct(product: ProductInput): Result<Unit> {
         return remoteDataSource.addProduct(product)

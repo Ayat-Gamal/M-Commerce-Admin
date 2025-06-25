@@ -49,18 +49,13 @@ fun LastOrdersCard(
     val recentOrder = orders.first()
 
     Card(
-        colors = CardDefaults.cardColors(
-            containerColor = LightTeal
-        ),
         elevation = CardDefaults.cardElevation(4.dp),
-        shape = CardDefaults.elevatedShape,
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = White),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
-            .border(
-                border = BorderStroke(width = 1.dp, color = Teal),
-                shape = RoundedCornerShape(16.dp)
-            ).background(color = White)
+            .padding(horizontal = 8.dp, vertical = 8.dp)
+            .background(color = White)
 
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -115,12 +110,12 @@ fun LastOrdersCard(
             )
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text(
-                text = "Status:${recentOrder.status}",
-                color = Black,
-                modifier = Modifier
-                    .background(LightTeal, RoundedCornerShape(8.dp))
-            )
+//            Text(
+//                text = "Status:${recentOrder.status}",
+//                color = Black,
+//                modifier = Modifier
+//                    .background(LightTeal, RoundedCornerShape(8.dp))
+//            )
 
             Spacer(modifier = Modifier.height(10.dp))
             Row(

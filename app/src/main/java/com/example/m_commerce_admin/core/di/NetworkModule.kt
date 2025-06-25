@@ -3,6 +3,7 @@ package com.example.m_commerce_admin.core.di
 import com.apollographql.apollo.ApolloClient
 import com.example.m_commerce_admin.BuildConfig
 import com.example.m_commerce_admin.features.coupons.data.remote.service.ShopifyCouponApi
+import com.example.m_commerce_admin.features.inventory.data.remote.service.ShopifyInventoryApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -73,5 +74,29 @@ object NetworkModule {
             )
             .build()
             .create(ShopifyCouponApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideShopifyInventoryApi(): ShopifyInventoryApi {
+        return Retrofit.Builder()
+            .baseUrl("https://mad45-alex-and02.myshopify.com/admin/api/2024-04/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(
+                OkHttpClient.Builder()
+                    .connectTimeout(30, TimeUnit.SECONDS)
+                    .readTimeout(60, TimeUnit.SECONDS)
+                    .writeTimeout(60, TimeUnit.SECONDS)
+                    .addInterceptor { chain ->
+                        val request = chain.request().newBuilder()
+                            .addHeader("X-Shopify-Access-Token", BuildConfig.adminToken)
+                            .addHeader("Content-Type", "application/json")
+                            .build()
+                        chain.proceed(request)
+                    }
+                    .build()
+            )
+            .build()
+            .create(ShopifyInventoryApi::class.java)
     }
 }

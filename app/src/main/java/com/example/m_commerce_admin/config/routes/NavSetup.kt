@@ -18,7 +18,7 @@ import com.example.m_commerce_admin.features.coupons.presentation.component.AddC
 import com.example.m_commerce_admin.features.coupons.presentation.component.AddForm
 import com.example.m_commerce_admin.features.home.presentation.HomeScreenUI
 import com.example.m_commerce_admin.features.home.presentation.orders.OrdersScreenUI
-import com.example.m_commerce_admin.features.inventory.InventoryScreenUI
+import com.example.m_commerce_admin.features.inventory.presentation.InventoryScreenUI
 import com.example.m_commerce_admin.features.login.presentation.LoginScreenUI
 import com.example.m_commerce_admin.features.products.ProductScreenUI
 import com.example.m_commerce_admin.features.products.presentation.component.ProductFormUI
