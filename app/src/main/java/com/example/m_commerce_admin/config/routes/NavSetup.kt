@@ -15,6 +15,7 @@ import androidx.navigation.toRoute
 import com.example.m_commerce_admin.core.helpers.navigateAndClear
 import com.example.m_commerce_admin.features.coupons.presentation.CouponScreenUI
 import com.example.m_commerce_admin.features.coupons.presentation.component.AddCouponFormUI
+import com.example.m_commerce_admin.features.coupons.presentation.component.AddForm
 import com.example.m_commerce_admin.features.home.presentation.HomeScreenUI
 import com.example.m_commerce_admin.features.home.presentation.orders.OrdersScreenUI
 import com.example.m_commerce_admin.features.inventory.InventoryScreenUI
@@ -42,12 +43,8 @@ fun NavSetup(
     ) {
         composable<AppRoutes.HomeScreen> {
             showBottomNavbar.value = true
-
             HomeScreenUI(
-                navController = navController,
-
-                )
-
+                navController = navController,)
         }
 
         composable<AppRoutes.ProductScreen> {
@@ -66,10 +63,14 @@ fun NavSetup(
 
             CouponScreenUI(navController = navController)
         }
+        composable<AppRoutes.UpdateCouponForm> {
+            showBottomNavbar.value = false
+            val data = it.toRoute<AppRoutes.UpdateCouponForm>()
+            AddCouponFormUI(navController = navController, couponId = data.id)
+        }
         composable<AppRoutes.AddCouponForm> {
             showBottomNavbar.value = false
-            val data = it.toRoute<AppRoutes.AddCouponForm>()
-            AddCouponFormUI(navController = navController, couponId = data.id)
+             AddForm(navController = navController)
         }
         composable<AppRoutes.SplashScreen> {
             showBottomNavbar.value = false

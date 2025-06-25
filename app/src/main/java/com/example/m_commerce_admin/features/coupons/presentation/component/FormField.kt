@@ -19,9 +19,11 @@ fun FormField(
     placeholder: String,
     isError: Boolean,
     singleLine: Boolean = true,
-    keyboardType: KeyboardType = KeyboardType.Text
+    keyboardType: KeyboardType = KeyboardType.Text,
+    isEnabled: Boolean = true
 ) {
     OutlinedTextField(
+        enabled = isEnabled,
         value = value,
         onValueChange = onValueChange,
         label = { Text(label) },

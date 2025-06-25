@@ -39,9 +39,3 @@ fun FAB(onClick: () -> Unit, screen: String) {
 
     )
 }
-
-@Preview(showBackground = true)
-@Composable
-fun TestFAB() {
-    FAB(onClick = {}, "Product")
-}

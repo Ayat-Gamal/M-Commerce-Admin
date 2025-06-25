@@ -41,7 +41,7 @@ import com.example.m_commerce_admin.features.coupons.domain.entity.CouponItem
 fun CouponCard(
     coupon: CouponItem,
     onEditClick: () -> Unit  ,
-    onDeleteClick: () -> Unit = {}
+    onDeleteClick: () -> Unit
 ) {
     Card(
         colors = CardDefaults.cardColors(containerColor = LightTeal),

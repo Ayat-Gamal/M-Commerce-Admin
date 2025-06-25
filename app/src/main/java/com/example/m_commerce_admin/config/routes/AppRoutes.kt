@@ -18,7 +18,9 @@ sealed class AppRoutes {
     object CouponScreen : AppRoutes()
 
     @Serializable
-    data class AddCouponForm(val id:String?) : AppRoutes()
+    data class UpdateCouponForm(val id:String?) : AppRoutes()
+    @Serializable
+   object AddCouponForm : AppRoutes()
 
     @Serializable
     object LoginScreen : AppRoutes()

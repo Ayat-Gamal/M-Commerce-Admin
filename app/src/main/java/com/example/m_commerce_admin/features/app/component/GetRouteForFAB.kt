@@ -22,7 +22,7 @@ fun getFABForRouteWithAction(
         }
 
         isRouteSelected(AppRoutes.CouponScreen, currentDestination) -> {
-            { FAB(onClick = {navController.navigate(AppRoutes.AddCouponForm(id = ""))  }, screen = "Coupon") }
+            { FAB(onClick = {navController.navigate(AppRoutes.AddCouponForm)  }, screen = "Coupon") }
         }
 
         else -> null

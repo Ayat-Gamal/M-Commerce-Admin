@@ -1,11 +1,13 @@
 package com.example.m_commerce_admin.features.app
 
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
@@ -54,6 +56,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Main(showBottomNavbar: MutableState<Boolean>) {
     val navController = rememberNavController()
