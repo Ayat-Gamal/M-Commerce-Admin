@@ -1,8 +1,6 @@
 package com.example.m_commerce_admin.features.home.presentation.component
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,14 +25,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.m_commerce_admin.R
 import com.example.m_commerce_admin.config.theme.Black
+import com.example.m_commerce_admin.config.theme.DarkestGray
 import com.example.m_commerce_admin.config.theme.Gray
-import com.example.m_commerce_admin.config.theme.LightTeal
 import com.example.m_commerce_admin.config.theme.Teal
 import com.example.m_commerce_admin.config.theme.White
 import com.example.m_commerce_admin.core.shared.components.SvgImage
 import com.example.m_commerce_admin.core.shared.components.states.Empty
 import com.example.m_commerce_admin.features.home.domain.entity.Order
-import com.example.m_commerce_admin.features.home.presentation.CardObject
 
 @Composable
 fun LastOrdersCard(
@@ -42,7 +39,7 @@ fun LastOrdersCard(
     onViewAllClick: () -> Unit
 ) {
     if (orders.isEmpty()) {
-       Empty("Cant Retrieve Data!")
+        Empty("Cant Retrieve Data!")
         return
     }
 
@@ -108,42 +105,38 @@ fun LastOrdersCard(
                 style = MaterialTheme.typography.bodyMedium,
                 color = Black
             )
-            Spacer(modifier = Modifier.height(8.dp))
 
-//            Text(
-//                text = "Status:${recentOrder.status}",
-//                color = Black,
-//                modifier = Modifier
-//                    .background(LightTeal, RoundedCornerShape(8.dp))
-//            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
+            Column(
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.Start,
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth()
             ) {
-
-
-                Text(
-                    text = "+${orders.size - 1} more",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = Black
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
 
                 Button(
                     onClick = onViewAllClick,
-                    modifier = Modifier.padding(8.dp), colors = ButtonColors(
+                    modifier = Modifier, colors = ButtonColors(
                         contentColor = White,
                         containerColor = Teal,
                         disabledContainerColor = Gray,
                         disabledContentColor = White
                     )
                 ) {
-                    Text("View All")
+
+                    Text(
+                        "View All"
+                    )
                 }
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    modifier = Modifier.padding(horizontal = 4.dp),
+                    text = "+${orders.size - 1} more",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = DarkestGray,
+                    fontSize = 12.sp
+                )
+
 
             }
         }

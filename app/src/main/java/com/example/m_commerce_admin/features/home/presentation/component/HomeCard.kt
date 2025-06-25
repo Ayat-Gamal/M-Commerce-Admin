@@ -21,10 +21,9 @@ import com.example.m_commerce_admin.config.theme.LightTeal
 import com.example.m_commerce_admin.config.theme.Teal
 import com.example.m_commerce_admin.config.theme.White
 import com.example.m_commerce_admin.core.shared.components.SvgImage
-import com.example.m_commerce_admin.features.home.presentation.CardObject
-
+ /*
 @Composable
-fun HomeCard(data: CardObject) {
+fun HomeCard() {
     Card(
         colors = CardDefaults.cardColors(
             containerColor = LightTeal
@@ -61,4 +60,4 @@ fun HomeCard(data: CardObject) {
             CardDetails(data.value, data.description)
         }
     }
-}
+}*/

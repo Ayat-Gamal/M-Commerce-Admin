@@ -13,12 +13,17 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class HomeViewModel  @Inject constructor(private val getLastOrderUseCase :GetLastOrdersUseCase):ViewModel() {
+class HomeViewModel @Inject constructor(
+    private val getLastOrderUseCase: GetLastOrdersUseCase
+
+) : ViewModel() {
     private val _orderState = MutableStateFlow<HomeState<List<Order>>>(HomeState.Loading)
     val orderState: StateFlow<HomeState<List<Order>>> = _orderState
-init {
-    fetchOrders()
-}
+
+    init {
+        fetchOrders()
+
+    }
 
     fun fetchOrders() {
         viewModelScope.launch {
