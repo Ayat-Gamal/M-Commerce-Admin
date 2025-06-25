@@ -43,6 +43,7 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         lateinit var showBottomNavbar: MutableState<Boolean>
         super.onCreate(savedInstanceState)

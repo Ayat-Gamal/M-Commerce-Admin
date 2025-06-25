@@ -1,5 +1,6 @@
 package com.example.m_commerce_admin.features.inventory.data.remote
 
+import com.example.m_commerce_admin.features.inventory.data.dto.InventoryAdjustmentRequest
 import com.example.m_commerce_admin.features.inventory.data.remote.service.ShopifyInventoryApi
 import com.example.m_commerce_admin.features.inventory.domain.entity.InventoryLevel
 import com.example.m_commerce_admin.features.inventory.domain.entity.toDomain
@@ -24,5 +25,19 @@ class InventoryRemoteDataSourceImpl @Inject constructor(
             }
 
         }
+    }
+
+
+
+
+    override suspend fun adjustInventoryLevel(
+        inventoryItemId: Long,
+        locationId: Long,
+        availableAdjustment: Int
+    ): InventoryLevel {
+        val response = api.adjustInventoryLevel(
+            InventoryAdjustmentRequest(inventoryItemId,  locationId = 82774655225 , availableAdjustment)
+        )
+        return response.level.toDomain()
     }
 }

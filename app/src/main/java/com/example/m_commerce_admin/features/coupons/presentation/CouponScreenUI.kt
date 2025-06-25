@@ -31,6 +31,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.m_commerce_admin.config.routes.AppRoutes
 import com.example.m_commerce_admin.core.shared.components.states.Empty
+import com.example.m_commerce_admin.core.shared.components.states.NoNetwork
 import com.example.m_commerce_admin.features.coupons.presentation.component.CouponCard
 import com.example.m_commerce_admin.features.coupons.presentation.states.DeleteCouponState
 import com.example.m_commerce_admin.features.coupons.presentation.viewModel.CouponsViewModel
@@ -72,19 +73,20 @@ fun CouponScreenUI(
             }
 
             else -> {
-
-            }
+             }
         }
     }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
+
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -105,7 +107,8 @@ fun CouponScreenUI(
                 }
 
                 items(coupons) { coupon ->
-                     if(coupons.isEmpty()) Empty("No Coupons yet!")
+                    if(coupons.isEmpty()) Empty("No Data!")
+
                     CouponCard(
                         coupon = coupon,
                         onEditClick = { navController?.navigate(AppRoutes.UpdateCouponForm(coupon.id)) },

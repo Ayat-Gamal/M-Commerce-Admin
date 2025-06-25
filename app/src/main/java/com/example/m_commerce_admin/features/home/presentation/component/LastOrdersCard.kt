@@ -42,7 +42,7 @@ fun LastOrdersCard(
     onViewAllClick: () -> Unit
 ) {
     if (orders.isEmpty()) {
-       Empty("No Recent Orders.")
+       Empty("Cant Retrieve Data!")
         return
     }
 

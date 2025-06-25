@@ -36,8 +36,7 @@ class CouponsViewModel @Inject constructor(
     private val _deleteCouponState = MutableStateFlow<DeleteCouponState>(DeleteCouponState.Idle)
     val deleteCouponState: StateFlow<DeleteCouponState> = _deleteCouponState.asStateFlow()
 
-    // Store last input for retry functionality
-    private var lastCouponInput: CouponInput? = null
+     private var lastCouponInput: CouponInput? = null
     private var isLastOperationUpdate = false
     private var lastDeleteCode: String? = null
 
@@ -56,7 +55,6 @@ class CouponsViewModel @Inject constructor(
                 )
                 _couponFormState.value = CouponFormState.Loading
 
-                // Store for retry
                 lastCouponInput = coupon
                 isLastOperationUpdate = false
 

@@ -17,4 +17,14 @@ class InventoryRepositoryImpl @Inject constructor(
     override suspend fun getInventoryLevels(): Flow<Result<List<InventoryLevel>>> = flow {
         emit(remote.getInventoryLevels())
     }.flowOn(Dispatchers.IO)
-} 
+
+    override suspend fun adjustInventoryLevel(
+        inventoryItemId: Long,
+        availableAdjustment: Int
+    ): InventoryLevel {
+        return remote.adjustInventoryLevel(inventoryItemId, locationId = 82774655225, availableAdjustment)
+    }
+
+}
+
+

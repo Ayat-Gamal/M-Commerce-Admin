@@ -16,15 +16,9 @@ fun getFABForRouteWithAction(
             { FAB(onClick = { navController.navigate(AppRoutes.ProductForm)}, screen = "Product") }
 
         }
-
-        isRouteSelected(AppRoutes.InventoryScreen, currentDestination) -> {
-            { FAB(onClick = {/*TODO(Add Coupon screen)*/  }, screen = "Inventory") }
-        }
-
         isRouteSelected(AppRoutes.CouponScreen, currentDestination) -> {
             { FAB(onClick = {navController.navigate(AppRoutes.AddCouponForm)  }, screen = "Coupon") }
         }
-
         else -> null
     }
 }

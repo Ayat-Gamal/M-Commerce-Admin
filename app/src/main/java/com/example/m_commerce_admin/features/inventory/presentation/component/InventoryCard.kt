@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -29,9 +28,7 @@ import com.example.m_commerce_admin.config.theme.DarkestGray
 import com.example.m_commerce_admin.config.theme.LightGreen
 import com.example.m_commerce_admin.config.theme.Teal
 import com.example.m_commerce_admin.config.theme.White
-import com.example.m_commerce_admin.config.theme.lightRed
 import com.example.m_commerce_admin.core.helpers.formatIsoDate
-import com.example.m_commerce_admin.features.inventory.domain.entity.InventoryItem
 import com.example.m_commerce_admin.features.inventory.domain.entity.InventoryLevel
 
 
@@ -39,8 +36,7 @@ import com.example.m_commerce_admin.features.inventory.domain.entity.InventoryLe
 @Composable
 fun InventoryCard(
     data: InventoryLevel,
-    onEdit: (InventoryItem) -> Unit = {},
-    onDelete: (InventoryItem) -> Unit = {}
+    onEdit: (Long) -> Unit,
 ) {
     Card(
         modifier = Modifier
@@ -64,11 +60,8 @@ fun InventoryCard(
                     color = DarkestGray
                 )
                 Row {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = { onEdit(data.inventoryItemId) }) {
                         Icon(Icons.Default.Edit, contentDescription = "Edit", tint = Teal)
-                    }
-                    IconButton(onClick = { }) {
-                        Icon(Icons.Default.Delete, contentDescription = "Delete", tint = lightRed)
                     }
                 }
             }

@@ -5,6 +5,12 @@ import kotlinx.coroutines.flow.Flow
 
 interface InventoryRepository {
 
-    // fun getInventoryItems(ids: List<Long>): Flow<List<InventoryItem>>
+    suspend fun adjustInventoryLevel(
+        inventoryItemId: Long,
+        availableAdjustment: Int
+    ): InventoryLevel
     suspend fun getInventoryLevels(): Flow<Result<List<InventoryLevel>>>
+
+
+
 } 

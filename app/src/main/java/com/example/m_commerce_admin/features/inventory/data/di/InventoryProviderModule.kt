@@ -4,6 +4,7 @@ import com.example.m_commerce_admin.features.inventory.data.remote.InventoryRemo
 import com.example.m_commerce_admin.features.inventory.data.remote.InventoryRemoteDataSourceImpl
 import com.example.m_commerce_admin.features.inventory.data.remote.service.ShopifyInventoryApi
 import com.example.m_commerce_admin.features.inventory.domain.repository.InventoryRepository
+import com.example.m_commerce_admin.features.inventory.domain.usecase.AdjustInventoryUseCase
 import com.example.m_commerce_admin.features.inventory.domain.usecase.GetInventoryLevelsUseCase
 import dagger.Module
 import dagger.Provides
@@ -19,6 +20,12 @@ object InventoryProviderModule {
     @Singleton
     fun provideGetInventoryLevelsUseCase(repository: InventoryRepository): GetInventoryLevelsUseCase {
         return GetInventoryLevelsUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetAdjustInventoryUseCase(repository: InventoryRepository): AdjustInventoryUseCase {
+        return AdjustInventoryUseCase(repository)
     }
 
     @Provides

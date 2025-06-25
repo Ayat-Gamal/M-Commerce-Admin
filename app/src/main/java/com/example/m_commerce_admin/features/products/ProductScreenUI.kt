@@ -1,7 +1,6 @@
 package com.example.m_commerce_admin.features.products
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -100,7 +99,7 @@ fun ProductScreenUI(
                 is GetProductState.Error -> {
                     val msg = (state as GetProductState.Error).message
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Failed(msg)
+                        Failed("Something Went Wrong! \n $msg")
                     }
                 }
 
@@ -138,7 +137,6 @@ fun ProductScreenUI(
                                     )
                                     IconButton(
                                         onClick = {
-                                            Log.d("ProductScreenUI", "🔄 Manual refresh triggered")
                                             viewModel.refreshProducts()
                                         }
                                     ) {

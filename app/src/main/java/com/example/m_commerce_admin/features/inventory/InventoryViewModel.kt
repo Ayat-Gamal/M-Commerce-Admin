@@ -2,6 +2,8 @@ package com.example.m_commerce_admin.features.inventory
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.m_commerce_admin.features.inventory.domain.entity.InventoryLevel
+import com.example.m_commerce_admin.features.inventory.domain.usecase.AdjustInventoryUseCase
 import com.example.m_commerce_admin.features.inventory.domain.usecase.GetInventoryLevelsUseCase
 import com.example.m_commerce_admin.features.inventory.presentation.state.InventoryLevelsState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,16 +15,31 @@ import javax.inject.Inject
 
 @HiltViewModel
 class InventoryViewModel @Inject constructor(
-    private val getInventoryLevelsUseCase: GetInventoryLevelsUseCase
+    private val getInventoryLevelsUseCase: GetInventoryLevelsUseCase,
+    private val adjustInventoryUseCase: AdjustInventoryUseCase
+
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<InventoryLevelsState>(InventoryLevelsState.Loading)
     val uiState: StateFlow<InventoryLevelsState> = _uiState.asStateFlow()
+    private val _adjustState = MutableStateFlow<Result<InventoryLevel>?>(null)
+    val adjustState: StateFlow<Result<InventoryLevel>?> = _adjustState
 
     init {
         loadInventoryData()
     }
 
+    fun adjustInventoryLevel(inventoryItemId: Long, adjustment: Int ) {
+        viewModelScope.launch {
+            try {
+                val level = adjustInventoryUseCase(inventoryItemId, adjustment)
+                _adjustState.value = Result.success(level)
+                refreshInventoryData()
+            } catch (e: Exception) {
+                _adjustState.value = Result.failure(e)
+            }
+        }
+    }
     fun loadInventoryData() {
         viewModelScope.launch {
             _uiState.value = InventoryLevelsState.Loading
