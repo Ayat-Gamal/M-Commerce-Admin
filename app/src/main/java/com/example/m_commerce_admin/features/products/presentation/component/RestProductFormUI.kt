@@ -28,6 +28,7 @@ import com.example.m_commerce_admin.features.products.domain.entity.RestProductI
 import com.example.m_commerce_admin.features.products.domain.entity.RestProductVariantInput
 import com.example.m_commerce_admin.features.products.presentation.viewModel.AddRestProductState
 import com.example.m_commerce_admin.features.products.presentation.viewModel.RestProductsViewModel
+import com.example.m_commerce_admin.features.products.presentation.viewModel.UpdateRestProductState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -35,24 +36,50 @@ import kotlinx.coroutines.launch
 @Composable
 fun RestProductFormUI(
     viewModel: RestProductsViewModel = hiltViewModel(),
-    navController: NavController? = null
+    navController: NavController? = null,
+    // Edit mode parameters
+    isEditMode: Boolean = false,
+    productToEdit: com.example.m_commerce_admin.features.products.domain.entity.RestProduct? = null,
+    onBackPressed: (() -> Unit)? = null
 ) {
-    var title by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    var productType by remember { mutableStateOf("") }
-    var vendor by remember { mutableStateOf("") }
-    var price by remember { mutableStateOf("") }
-    var sku by remember { mutableStateOf("") }
-    var stockQuantity by remember { mutableStateOf("0") }
-    var selectedStatus by remember { mutableStateOf("draft") }
+    // Initialize form fields based on mode
+    var title by remember { 
+        mutableStateOf(if (isEditMode && productToEdit != null) productToEdit.title else "") 
+    }
+    var description by remember { 
+        mutableStateOf(if (isEditMode && productToEdit != null) productToEdit.descriptionHtml ?: "" else "") 
+    }
+    var productType by remember { 
+        mutableStateOf(if (isEditMode && productToEdit != null) productToEdit.productType ?: "" else "") 
+    }
+    var vendor by remember { 
+        mutableStateOf(if (isEditMode && productToEdit != null) productToEdit.vendor ?: "" else "") 
+    }
+    var price by remember { 
+        mutableStateOf(if (isEditMode && productToEdit != null) productToEdit.variants.firstOrNull()?.price ?: "" else "") 
+    }
+    var sku by remember { 
+        mutableStateOf(if (isEditMode && productToEdit != null) productToEdit.variants.firstOrNull()?.sku ?: "" else "") 
+    }
+    var stockQuantity by remember { 
+        mutableStateOf(if (isEditMode && productToEdit != null) productToEdit.variants.firstOrNull()?.quantity?.toString() ?: "0" else "0") 
+    }
+    var selectedStatus by remember { 
+        mutableStateOf(if (isEditMode && productToEdit != null) productToEdit.status ?: "draft" else "draft") 
+    }
     var selectedImages by remember { mutableStateOf(listOf<Uri>()) }
     var isFormValid by remember { mutableStateOf(false) }
 
     val addProductState by viewModel.addProductState.collectAsState()
+    val updateProductState by viewModel.updateProductState.collectAsState()
     val scrollState = rememberScrollState()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+
+    // Determine current state based on mode
+    val currentState = if (isEditMode) updateProductState else addProductState
+    val isLoading = currentState is AddRestProductState.Loading || currentState is UpdateRestProductState.Loading
 
     LaunchedEffect(title, description, productType, vendor, price) {
         val isPriceValid = price.toDoubleOrNull()?.let { it > 0 } ?: false
@@ -78,7 +105,11 @@ fun RestProductFormUI(
                 scope.launch {
                     snackbarHostState.showSnackbar("Product added successfully!")
                     delay(1500)
-                    navController?.popBackStack()
+                    if (isEditMode) {
+                        onBackPressed?.invoke()
+                    } else {
+                        navController?.popBackStack()
+                    }
                 }
                 viewModel.resetAddProductState()
             }
@@ -91,12 +122,40 @@ fun RestProductFormUI(
         }
     }
 
+    LaunchedEffect(updateProductState) {
+        when (updateProductState) {
+            is UpdateRestProductState.Success -> {
+                scope.launch {
+                    snackbarHostState.showSnackbar("Product updated successfully!")
+                    delay(1500)
+                    if (isEditMode) {
+                        onBackPressed?.invoke()
+                    } else {
+                        navController?.popBackStack()
+                    }
+                }
+                viewModel.resetUpdateProductState()
+            }
+            is UpdateRestProductState.Error -> {
+                scope.launch {
+                    snackbarHostState.showSnackbar("Error: ${(updateProductState as UpdateRestProductState.Error).message}")
+                }
+            }
+            else -> {}
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Add New Product", fontWeight = FontWeight.Bold) },
+                title = { 
+                    Text(
+                        if (isEditMode) "Edit Product" else "Add New Product", 
+                        fontWeight = FontWeight.Bold
+                    ) 
+                },
                 navigationIcon = {
-                    IconButton(onClick = { navController?.popBackStack() }) {
+                    IconButton(onClick = { onBackPressed?.invoke() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 },
@@ -286,34 +345,53 @@ fun RestProductFormUI(
                         inventoryQuantity = stockQuantity.toIntOrNull() ?: 0
                     )
                     
-                    val productInput = RestProductInput(
-                        title = title,
-                        descriptionHtml = description,
-                        productType = productType,
-                        vendor = vendor,
-                        status = selectedStatus,
-                        variants = listOf(variantInput)
-                    )
-                    
-                    viewModel.addProduct(productInput, selectedImages, context)
+                    if (isEditMode && productToEdit != null) {
+                        // Update mode
+                        val updateInput = com.example.m_commerce_admin.features.products.domain.entity.RestProductUpdateInput(
+                            title = title,
+                            descriptionHtml = description,
+                            productType = productType,
+                            vendor = vendor,
+                            status = selectedStatus,
+                            variants = listOf(
+                                com.example.m_commerce_admin.features.products.domain.entity.RestProductVariantUpdateInput(
+                                    id = productToEdit.variants.firstOrNull()?.id ?: 0,
+                                    price = price,
+                                    sku = sku.takeIf { it.isNotBlank() }
+                                )
+                            )
+                        )
+                        viewModel.updateProduct(productToEdit.id, updateInput)
+                    } else {
+                        // Add mode
+                        val productInput = RestProductInput(
+                            title = title,
+                            descriptionHtml = description,
+                            productType = productType,
+                            vendor = vendor,
+                            status = selectedStatus,
+                            variants = listOf(variantInput)
+                        )
+                        viewModel.addProduct(productInput, selectedImages, context)
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-                enabled = isFormValid && addProductState !is AddRestProductState.Loading,
+                enabled = isFormValid && !isLoading,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Teal,
                     disabledContainerColor = Teal.copy(alpha = 0.6f)
                 )
             ) {
-                if (addProductState is AddRestProductState.Loading) {
+                if (isLoading) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(24.dp),
                         color = Color.White
                     )
                 } else {
                     Text(
-                        "Add Product",
+                        if (isEditMode) "Update Product" else "Add Product",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White

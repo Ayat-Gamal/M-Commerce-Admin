@@ -23,13 +23,16 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -41,6 +44,7 @@ import com.example.m_commerce_admin.core.shared.components.states.Empty
 import com.example.m_commerce_admin.core.shared.components.states.Failed
 import com.example.m_commerce_admin.features.products.presentation.component.ProductCard
 import com.example.m_commerce_admin.features.products.presentation.component.ProductSearchBar
+import com.example.m_commerce_admin.features.products.presentation.component.RestProductFormUI
 import com.example.m_commerce_admin.features.products.presentation.viewModel.RestProductsState
 import com.example.m_commerce_admin.features.products.presentation.viewModel.RestProductsViewModel
 import com.example.m_commerce_admin.features.products.presentation.viewModel.DeleteRestProductState
@@ -58,6 +62,10 @@ fun ProductScreenUI(
     val listState = rememberLazyListState()
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
+    
+    // State for edit mode
+    var showEditForm by remember { mutableStateOf(false) }
+    var productToEdit by remember { mutableStateOf<com.example.m_commerce_admin.features.products.domain.entity.RestProduct?>(null) }
 
     val shouldLoadMore by remember {
         derivedStateOf {
@@ -93,123 +101,136 @@ fun ProductScreenUI(
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { pad ->
-        Column(
-            modifier = Modifier
-                .padding(pad)
-                .fillMaxSize()
-        ) {
-            // Search and Filter Bar
-            ProductSearchBar(
-                searchQuery = searchQuery,
-                onSearchQueryChange = { viewModel.updateSearchQuery(it) },
-                selectedStatus = selectedStatus,
-                onStatusChange = { viewModel.updateStatusFilter(it) }
+        if (showEditForm && productToEdit != null) {
+            // Show edit form in full screen
+            RestProductFormUI(
+                viewModel = viewModel,
+                navController = null,
+                isEditMode = true,
+                productToEdit = productToEdit,
+                onBackPressed = {
+                    showEditForm = false
+                    productToEdit = null
+                }
             )
+        } else {
+            // Show main product list
+            Column(
+                modifier = Modifier
+                    .padding(pad)
+                    .fillMaxSize()
+            ) {
+                // Search and Filter Bar
+                ProductSearchBar(
+                    searchQuery = searchQuery,
+                    onSearchQueryChange = { viewModel.updateSearchQuery(it) },
+                    selectedStatus = selectedStatus,
+                    onStatusChange = { viewModel.updateStatusFilter(it) }
+                )
 
-            // Main Content
-            Box(modifier = Modifier.fillMaxSize()) {
-                when (state) {
-                    is RestProductsState.Loading -> {
-                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator(color = Teal)
-                        }
-                    }
-
-                    is RestProductsState.Error -> {
-                        val msg = (state as RestProductsState.Error).message
-                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            Failed("Something Went Wrong! \n $msg")
-                        }
-                    }
-
-                    is RestProductsState.Success -> {
-                        val products = (state as RestProductsState.Success).products
-
-                        if (products.isEmpty()) {
+                // Main Content
+                Box(modifier = Modifier.fillMaxSize()) {
+                    when (state) {
+                        is RestProductsState.Loading -> {
                             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                Empty("No products found")
+                                CircularProgressIndicator(color = Teal)
                             }
-                        } else {
-                            LazyColumn(
-                                state = listState,
-                                modifier = Modifier.fillMaxSize(),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                // Header with product count and refresh button
-                                item {
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(16.dp),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Column {
-                                            Text(
-                                                text = "Products (${products.size})",
-                                                color = Teal,
-                                                fontSize = 18.sp,
-                                                fontWeight = FontWeight.Bold
-                                            )
-                                            if (searchQuery.isNotEmpty() || selectedStatus != null) {
-                                                Text(
-                                                    text = "Filtered results",
-                                                    fontSize = 12.sp,
-                                                    color = Teal.copy(alpha = 0.7f)
-                                                )
-                                            }
-                                        }
-                                        IconButton(
-                                            onClick = { viewModel.refreshProducts() }
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Default.Refresh,
-                                                contentDescription = "Refresh",
-                                                tint = Teal
-                                            )
-                                        }
-                                    }
-                                }
+                        }
 
-                                // Product items
-                                items(products) { product ->
-                                    ProductCard(
-                                        product = product,
-                                        onEdit = {
-                                            // TODO: Navigate to edit product screen
-                                            coroutineScope.launch {
-                                                snackbarHostState.showSnackbar("Edit product functionality coming soon!")
-                                            }
-                                        },
-                                        onDelete = {
-                                            viewModel.deleteProduct(product.id)
-                                        }
-                                    )
-                                }
+                        is RestProductsState.Error -> {
+                            val msg = (state as RestProductsState.Error).message
+                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                Failed("Something Went Wrong! \n $msg")
+                            }
+                        }
 
-                                // Loading indicator for pagination
-                                item {
-                                    if (products.isNotEmpty()) {
-                                        Box(
+                        is RestProductsState.Success -> {
+                            val products = (state as RestProductsState.Success).products
+
+                            if (products.isEmpty()) {
+                                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                    Empty("No products found")
+                                }
+                            } else {
+                                LazyColumn(
+                                    state = listState,
+                                    modifier = Modifier.fillMaxSize(),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    // Header with product count and refresh button
+                                    item {
+                                        Row(
                                             modifier = Modifier
                                                 .fillMaxWidth()
                                                 .padding(16.dp),
-                                            contentAlignment = Alignment.Center
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
                                         ) {
-                                            CircularProgressIndicator(
-                                                color = Teal,
-                                                modifier = Modifier.padding(8.dp)
-                                            )
+                                            Column {
+                                                Text(
+                                                    text = "Products (${products.size})",
+                                                    color = Teal,
+                                                    fontSize = 18.sp,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                                if (searchQuery.isNotEmpty() || selectedStatus != null) {
+                                                    Text(
+                                                        text = "Filtered results",
+                                                        fontSize = 12.sp,
+                                                        color = Teal.copy(alpha = 0.7f)
+                                                    )
+                                                }
+                                            }
+                                            IconButton(
+                                                onClick = { viewModel.refreshProducts() }
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Refresh,
+                                                    contentDescription = "Refresh",
+                                                    tint = Teal
+                                                )
+                                            }
+                                        }
+                                    }
+
+                                    // Product items
+                                    items(products) { product ->
+                                        ProductCard(
+                                            product = product,
+                                            onEdit = {
+                                                productToEdit = product
+                                                showEditForm = true
+                                            },
+                                            onDelete = {
+                                                viewModel.deleteProduct(product.id)
+                                            }
+                                        )
+                                    }
+
+                                    // Loading indicator for pagination
+                                    item {
+                                        if (products.isNotEmpty()) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(16.dp),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                CircularProgressIndicator(
+                                                    color = Teal,
+                                                    modifier = Modifier.padding(8.dp)
+                                                )
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                    }
 
-                    RestProductsState.Idle -> {
-                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            Empty("Loading products...")
+                        RestProductsState.Idle -> {
+                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                Empty("Loading products...")
+                            }
                         }
                     }
                 }

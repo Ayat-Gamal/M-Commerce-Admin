@@ -12,6 +12,7 @@ import com.example.m_commerce_admin.features.products.domain.usecase.GetAllRestP
 import com.example.m_commerce_admin.features.products.domain.usecase.GetAllRestProductsUseCase
 import com.example.m_commerce_admin.features.products.domain.usecase.AddRestProductWithImagesParams
 import com.example.m_commerce_admin.features.products.domain.usecase.AddRestProductWithImagesUseCase
+import com.example.m_commerce_admin.features.products.domain.usecase.UpdateRestProductUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,7 +26,8 @@ class RestProductsViewModel @Inject constructor(
     private val getAllRestProductsUseCase: GetAllRestProductsUseCase,
     private val createRestProductUseCase: CreateRestProductUseCase,
     private val addRestProductWithImagesUseCase: AddRestProductWithImagesUseCase,
-    private val deleteRestProductUseCase: DeleteRestProductUseCase
+    private val deleteRestProductUseCase: DeleteRestProductUseCase,
+    private val updateRestProductUseCase: UpdateRestProductUseCase
 ) : ViewModel() {
 
     private val _productsState = MutableStateFlow<RestProductsState>(RestProductsState.Idle)
@@ -48,6 +50,9 @@ class RestProductsViewModel @Inject constructor(
 
     private var currentPageInfo: String? = null
     private var isLoadingMore = false
+
+    private val _updateProductState = MutableStateFlow<UpdateRestProductState>(UpdateRestProductState.Idle)
+    val updateProductState: StateFlow<UpdateRestProductState> = _updateProductState.asStateFlow()
 
     init {
         getAllProducts()
@@ -215,6 +220,28 @@ class RestProductsViewModel @Inject constructor(
         _selectedStatus.value = null
         applyFilters()
     }
+
+    fun updateProduct(productId: Long, updateInput: com.example.m_commerce_admin.features.products.domain.entity.RestProductUpdateInput) {
+        _updateProductState.value = UpdateRestProductState.Loading
+        viewModelScope.launch {
+            val result = updateRestProductUseCase(
+                com.example.m_commerce_admin.features.products.domain.usecase.UpdateRestProductParams(productId, updateInput)
+            )
+            result.fold(
+                onSuccess = { product ->
+                    _updateProductState.value = UpdateRestProductState.Success(product)
+                    getAllProducts(status = _selectedStatus.value)
+                },
+                onFailure = { error ->
+                    _updateProductState.value = UpdateRestProductState.Error(error.message ?: "Failed to update product")
+                }
+            )
+        }
+    }
+
+    fun resetUpdateProductState() {
+        _updateProductState.value = UpdateRestProductState.Idle
+    }
 }
 
 sealed class RestProductsState {
@@ -236,4 +263,11 @@ sealed class DeleteRestProductState {
     object Loading : DeleteRestProductState()
     data class Success(val product: RestProduct) : DeleteRestProductState()
     data class Error(val message: String) : DeleteRestProductState()
+}
+
+sealed class UpdateRestProductState {
+    object Idle : UpdateRestProductState()
+    object Loading : UpdateRestProductState()
+    data class Success(val product: com.example.m_commerce_admin.features.products.domain.entity.RestProduct) : UpdateRestProductState()
+    data class Error(val message: String) : UpdateRestProductState()
 } 
