@@ -5,6 +5,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,13 +27,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.m_commerce_admin.config.routes.AppRoutes
+import com.example.m_commerce_admin.config.theme.DarkestGray
 import com.example.m_commerce_admin.core.shared.components.states.Empty
 import com.example.m_commerce_admin.core.shared.components.states.NoNetwork
 import com.example.m_commerce_admin.features.coupons.presentation.component.CouponCard
+import com.example.m_commerce_admin.features.coupons.presentation.component.CouponSearchBar
 import com.example.m_commerce_admin.features.coupons.presentation.states.DeleteCouponState
 import com.example.m_commerce_admin.features.coupons.presentation.viewModel.CouponsViewModel
 import kotlinx.coroutines.launch
@@ -45,7 +50,9 @@ fun CouponScreenUI(
     navController: NavController? = null
 ) {
     val coupons = viewModel.coupons.collectAsState().value
-     val deleteCouponState = viewModel.deleteCouponState.collectAsState().value
+    val searchQuery = viewModel.searchQuery.collectAsState().value
+    val selectedFilter = viewModel.selectedFilter.collectAsState().value
+    val deleteCouponState = viewModel.deleteCouponState.collectAsState().value
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
@@ -73,7 +80,8 @@ fun CouponScreenUI(
             }
 
             else -> {
-             }
+                // Do nothing for Loading and Idle states
+            }
         }
     }
 
@@ -81,66 +89,94 @@ fun CouponScreenUI(
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
 
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
+            // Search and Filter Bar
+            CouponSearchBar(
+                searchQuery = searchQuery,
+                selectedFilter = selectedFilter,
+                onSearchQueryChange = { viewModel.updateSearchQuery(it) },
+                onFilterChange = { viewModel.updateFilter(it) },
+                onClearFilters = { viewModel.clearFilters() }
+            )
 
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                item {
-                    Spacer(modifier = modifier.padding(top = 8.dp))
-                    Row(
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp, vertical = 8.dp)
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        // TODO: Add a search field or Add button
-                    }
-                }
-
-                items(coupons) { coupon ->
-                    if(coupons.isEmpty()) Empty("No Data!")
-
-                    CouponCard(
-                        coupon = coupon,
-                        onEditClick = { navController?.navigate(AppRoutes.UpdateCouponForm(coupon.id)) },
-                        onDeleteClick = {
-                            viewModel.deleteCoupon(coupon.code)
-                        }
+            // Results Summary
+            if (searchQuery.isNotEmpty() || selectedFilter != com.example.m_commerce_admin.features.coupons.presentation.viewModel.CouponFilter.ALL) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "${coupons.size} coupon${if (coupons.size != 1) "s" else ""} found",
+                        fontSize = 14.sp,
+                        color = DarkestGray,
+                        fontWeight = FontWeight.Medium
                     )
                 }
             }
 
-             if (deleteCouponState is DeleteCouponState.Loading) {
+            // Coupons List
+            if (coupons.isEmpty()) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.3f)),
+                        .padding(16.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    androidx.compose.material3.Card(
-                        modifier = Modifier.padding(16.dp),
-                        colors = cardColors(androidx.compose.ui.graphics.Color.White)
+                    if (searchQuery.isNotEmpty() || selectedFilter != com.example.m_commerce_admin.features.coupons.presentation.viewModel.CouponFilter.ALL) {
+                        Empty("No coupons match your search criteria")
+                    } else {
+                        Empty("No coupons available")
+                    }
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    items(coupons) { coupon ->
+                        CouponCard(
+                            coupon = coupon,
+                            onEditClick = { navController?.navigate(AppRoutes.UpdateCouponForm(coupon.id)) },
+                            onDeleteClick = {
+                                viewModel.deleteCoupon(coupon.code)
+                            }
+                        )
+                    }
+                }
+            }
+        }
+
+        // Delete Loading Overlay
+        if (deleteCouponState is DeleteCouponState.Loading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.3f)),
+                contentAlignment = Alignment.Center
+            ) {
+                androidx.compose.material3.Card(
+                    modifier = Modifier.padding(16.dp),
+                    colors = cardColors(androidx.compose.ui.graphics.Color.White)
+                ) {
+                    androidx.compose.foundation.layout.Column(
+                        modifier = Modifier.padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        androidx.compose.foundation.layout.Column(
-                            modifier = Modifier.padding(24.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            CircularProgressIndicator()
-                            Spacer(modifier = Modifier.padding(16.dp))
-                            Text(
-                                text = "Deleting coupon...",
-                                style = androidx.compose.material3.MaterialTheme.typography.bodyMedium
-                            )
-                        }
+                        CircularProgressIndicator()
+                        Spacer(modifier = Modifier.padding(16.dp))
+                        Text(
+                            text = "Deleting coupon...",
+                            style = androidx.compose.material3.MaterialTheme.typography.bodyMedium
+                        )
                     }
                 }
             }

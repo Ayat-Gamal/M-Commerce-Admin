@@ -32,6 +32,8 @@ import com.example.m_commerce_admin.config.theme.White
 import com.example.m_commerce_admin.config.theme.lightRed
 import com.example.m_commerce_admin.core.helpers.formatIsoDate
 import com.example.m_commerce_admin.features.coupons.domain.entity.CouponItem
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -40,6 +42,14 @@ fun CouponCard(
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
+    val status = getCouponStatus(coupon)
+    val statusColor = when (status) {
+        "Active" -> LightGreen
+        "Expired" -> lightRed
+        "Not Started" -> Teal
+        else -> DarkGray
+    }
+
     Card(
         elevation = CardDefaults.cardElevation(4.dp),
         shape = RoundedCornerShape(16.dp),
@@ -56,12 +66,27 @@ fun CouponCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "Code: ${coupon.code}",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
-                    color = DarkestGray
-                )
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Code: ${coupon.code}",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
+                        color = DarkestGray
+                    )
+                    
+                    // Status badge
+                    Text(
+                        text = status,
+                        fontSize = 12.sp,
+                        color = White,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier
+                            .padding(top = 4.dp)
+                            .background(color = statusColor, shape = RoundedCornerShape(6.dp))
+                            .padding(horizontal = 8.dp, vertical = 2.dp)
+                    )
+                }
+                
                 Row {
                     IconButton(onClick = onEditClick) {
                         Icon(Icons.Default.Edit, contentDescription = "Edit", tint = Teal)
@@ -72,7 +97,7 @@ fun CouponCard(
                 }
             }
 
-            Spacer(modifier = Modifier.padding(4.dp))
+            Spacer(modifier = Modifier.padding(8.dp))
 
             coupon.title?.let {
                 Text(
@@ -92,36 +117,82 @@ fun CouponCard(
                 )
             }
 
-            Spacer(modifier = Modifier.padding(4.dp))
+            Spacer(modifier = Modifier.padding(8.dp))
 
-            Text(
-                text =
-                if (coupon.value == null) "Fixed Amount Coupon" else "Discount: ${
-                    coupon.value?.times(
-                        100
-                    )?.toInt()
-                }%",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                color = DarkGray
-            )
+            // Discount information
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text(
+                        text = if (coupon.value != null) {
+                            "Discount: ${coupon.value?.times(100)?.toInt()}%"
+                        } else {
+                            "Fixed Amount: ${coupon.amount} ${coupon.currencyCode}"
+                        },
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Teal
+                    )
+                    
+                    // Usage information
+                    Text(
+                        text = "Used: ${coupon.usedCount ?: 0}${coupon.usageLimit?.let { " / $it" } ?: ""}",
+                        fontSize = 12.sp,
+                        color = DarkGray
+                    )
+                }
+            }
 
-            Text(
-                text = if (coupon.amount.equals(0.0)) "Percentage Coupon" else "${coupon.amount} ${coupon.currencyCode}",
-                fontSize = 14.sp,
-                color = DarkGray
-            )
+            Spacer(modifier = Modifier.padding(8.dp))
 
-            Text(
-                text = "Start: ${formatIsoDate(coupon.startsAt ?: "00:00:00")}",
-                fontSize = 13.sp,
-                color = White,
-                modifier = Modifier
-                    .padding(top = 6.dp)
-                    .background(color = LightGreen, shape = RoundedCornerShape(8.dp))
-                    .padding(horizontal = 8.dp, vertical = 4.dp)
-            )
+            // Date information
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                coupon.startsAt?.let { startDate ->
+                    if (startDate != "null" && startDate.isNotEmpty()) {
+                        Text(
+                            text = "From: ${formatIsoDate(startDate)}",
+                            fontSize = 12.sp,
+                            color = DarkGray
+                        )
+                    }
+                }
+                
+                coupon.endsAt?.let { endDate ->
+                    if (endDate != "null" && endDate.isNotEmpty()) {
+                        Text(
+                            text = "To: ${formatIsoDate(endDate)}",
+                            fontSize = 12.sp,
+                            color = DarkGray
+                        )
+                    }
+                }
+            }
         }
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+private fun getCouponStatus(coupon: CouponItem): String {
+    val now = LocalDateTime.now()
+    val formatter = DateTimeFormatter.ISO_DATE_TIME
+    
+    val startsAt = coupon.startsAt?.let { 
+        try { LocalDateTime.parse(it, formatter) } catch (e: Exception) { null }
+    }
+    val endsAt = coupon.endsAt?.let { 
+        try { LocalDateTime.parse(it, formatter) } catch (e: Exception) { null }
+    }
+    
+    return when {
+        startsAt != null && now.isBefore(startsAt) -> "Not Started"
+        endsAt != null && now.isAfter(endsAt) -> "Expired"
+        else -> "Active"
     }
 }
 

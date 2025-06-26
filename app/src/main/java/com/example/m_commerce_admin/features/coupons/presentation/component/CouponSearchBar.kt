@@ -1,4 +1,4 @@
-package com.example.m_commerce_admin.features.inventory.presentation.component
+package com.example.m_commerce_admin.features.coupons.presentation.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
@@ -32,15 +31,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.m_commerce_admin.config.theme.DarkestGray
 import com.example.m_commerce_admin.config.theme.Teal
-import com.example.m_commerce_admin.features.inventory.presentation.viewModel.InventoryFilter
+import com.example.m_commerce_admin.features.coupons.presentation.viewModel.CouponFilter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InventorySearchBar(
+fun CouponSearchBar(
     searchQuery: String,
-    selectedFilter: InventoryFilter,
+    selectedFilter: CouponFilter,
     onSearchQueryChange: (String) -> Unit,
-    onFilterChange: (InventoryFilter) -> Unit,
+    onFilterChange: (CouponFilter) -> Unit,
     onClearFilters: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -55,7 +54,7 @@ fun InventorySearchBar(
         OutlinedTextField(
             value = searchQuery,
             onValueChange = onSearchQueryChange,
-            placeholder = { Text("Search inventory...") },
+            placeholder = { Text("Search for a coupon...") },
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Search,
@@ -103,7 +102,7 @@ fun InventorySearchBar(
                 expanded = showFilterDropdown,
                 onDismissRequest = { showFilterDropdown = false }
             ) {
-                InventoryFilter.values().forEach { filter ->
+                CouponFilter.values().forEach { filter ->
                     DropdownMenuItem(
                         text = { Text(filter.displayName) },
                         onClick = {
@@ -115,7 +114,7 @@ fun InventorySearchBar(
             }
             
             // Clear Filters Button
-            if (searchQuery.isNotEmpty() || selectedFilter != InventoryFilter.ALL) {
+            if (searchQuery.isNotEmpty() || selectedFilter != CouponFilter.ALL) {
                 TextButton(
                     onClick = onClearFilters
                 ) {

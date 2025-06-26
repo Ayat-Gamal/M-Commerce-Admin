@@ -34,7 +34,7 @@ fun ProductSearchBar(
             value = searchQuery,
             onValueChange = onSearchQueryChange,
             modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text("Search products by title, vendor, or type...") },
+            placeholder = { Text("Search for products...") },
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Search,
