@@ -4,6 +4,7 @@ query GetLastOrders {
             node {
                 id
                 name
+
                 totalPriceSet {
                     shopMoney {
                         amount

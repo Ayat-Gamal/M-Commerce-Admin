@@ -215,6 +215,9 @@ class ProductRemoteDataSourceImpl @Inject constructor(
         media: List<CreateMediaInput>
     ): Result<Unit> {
         return try {
+            Log.w("TAG", "addProductWithMedia: ${product.publishedAt}", )
+
+            Log.w("TAG", "addProductWithMedia: ${product.publishedAt}", )
             val response = apolloClient.mutation(
                 AddProductWithImagesMutation(
                     input = product,

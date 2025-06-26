@@ -8,6 +8,7 @@ query GetProducts($first: Int!, $after: String) {
                 status
                 totalInventory
                 createdAt
+                publishedAt
                 featuredImage {
                     url
                 }

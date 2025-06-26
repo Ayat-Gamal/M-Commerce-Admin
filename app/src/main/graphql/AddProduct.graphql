@@ -6,6 +6,7 @@ mutation AddProduct($input: ProductInput!) {
             status
             createdAt
             totalInventory
+            publishedAt
             featuredImage {
                 url
             }

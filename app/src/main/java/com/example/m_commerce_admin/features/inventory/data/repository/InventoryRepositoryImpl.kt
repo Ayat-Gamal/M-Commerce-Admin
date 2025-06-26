@@ -26,5 +26,3 @@ class InventoryRepositoryImpl @Inject constructor(
     }
 
 }
-
-

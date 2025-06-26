@@ -62,8 +62,7 @@ fun AddCouponFormUI(
         coupons.find { it.id == couponId }
     }
 
-    // UI States
-    val titleState = remember { mutableStateOf("") }
+     val titleState = remember { mutableStateOf("") }
     val summaryState = remember { mutableStateOf("") }
     val codeState = remember { mutableStateOf("") }
     val discountValueState = remember { mutableStateOf("") }
@@ -102,7 +101,6 @@ fun AddCouponFormUI(
                     )
                     navController?.popBackStack()
                     viewModel.resetCouponFormState()
-
                 }
             }
 

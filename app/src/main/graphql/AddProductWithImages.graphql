@@ -6,6 +6,7 @@ mutation AddProductWithImages($input: ProductInput!, $media: [CreateMediaInput!]
             status
             createdAt
             totalInventory
+            publishedAt
             featuredImage {
                 url
             }
