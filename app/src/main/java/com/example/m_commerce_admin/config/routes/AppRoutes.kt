@@ -35,4 +35,9 @@ sealed class AppRoutes {
     @Serializable
     object ProductForm : AppRoutes()
 
+    @Serializable
+    object RestProductForm : AppRoutes()
+
+
+
 }

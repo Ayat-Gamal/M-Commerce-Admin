@@ -1,0 +1,27 @@
+package com.example.m_commerce_admin.features.products.domain.usecase
+
+import android.content.Context
+import android.net.Uri
+import com.example.m_commerce_admin.core.shared.components.usecase.UseCase
+import com.example.m_commerce_admin.features.products.domain.entity.RestProductInput
+import com.example.m_commerce_admin.features.products.domain.repository.RestProductRepository
+import javax.inject.Inject
+
+class AddRestProductWithImagesUseCase @Inject constructor(
+    private val repository: RestProductRepository
+) : UseCase<AddRestProductWithImagesParams, Result<com.example.m_commerce_admin.features.products.domain.entity.RestProduct>> {
+
+    override suspend fun invoke(params: AddRestProductWithImagesParams): Result<com.example.m_commerce_admin.features.products.domain.entity.RestProduct> {
+        return repository.uploadImagesAndAddProduct(
+            product = params.product,
+            imageUris = params.imageUris,
+            context = params.context
+        )
+    }
+}
+
+data class AddRestProductWithImagesParams(
+    val product: RestProductInput,
+    val imageUris: List<Uri>,
+    val context: Context
+) 

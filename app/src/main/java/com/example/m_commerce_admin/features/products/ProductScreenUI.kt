@@ -4,6 +4,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,8 +13,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -29,31 +32,32 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.m_commerce_admin.config.theme.Teal
+import com.example.m_commerce_admin.core.shared.components.states.Empty
 import com.example.m_commerce_admin.core.shared.components.states.Failed
 import com.example.m_commerce_admin.features.products.presentation.component.ProductCard
-import com.example.m_commerce_admin.features.products.presentation.states.GetProductState
-import com.example.m_commerce_admin.features.products.presentation.viewModel.ProductsViewModel
+import com.example.m_commerce_admin.features.products.presentation.component.ProductSearchBar
+import com.example.m_commerce_admin.features.products.presentation.viewModel.RestProductsState
+import com.example.m_commerce_admin.features.products.presentation.viewModel.RestProductsViewModel
+import com.example.m_commerce_admin.features.products.presentation.viewModel.DeleteRestProductState
 import kotlinx.coroutines.launch
-
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ProductScreenUI(
-    viewModel: ProductsViewModel = hiltViewModel()
+    viewModel: RestProductsViewModel = hiltViewModel()
 ) {
     val state by viewModel.productsState.collectAsState()
-    val listState = rememberLazyListState()
     val deleteState by viewModel.deleteProductState.collectAsState()
+    val searchQuery by viewModel.searchQuery.collectAsState()
+    val selectedStatus by viewModel.selectedStatus.collectAsState()
+    val listState = rememberLazyListState()
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
-
-
-    LaunchedEffect(Unit) {
-        viewModel.refreshProducts()
-    }
 
     val shouldLoadMore by remember {
         derivedStateOf {
@@ -71,105 +75,141 @@ fun ProductScreenUI(
         }
     }
 
+    // Handle delete state
     LaunchedEffect(deleteState) {
-        if (deleteState != null && deleteState!!.isSuccess) {
-            coroutineScope.launch {
-                snackbarHostState.showSnackbar("Product deleted successfully")
+        when (deleteState) {
+            is DeleteRestProductState.Success -> {
+                snackbarHostState.showSnackbar("Product deleted successfully!")
+                viewModel.resetDeleteProductState()
             }
+            is DeleteRestProductState.Error -> {
+                snackbarHostState.showSnackbar("Failed to delete product: ${(deleteState as DeleteRestProductState.Error).message}")
+                viewModel.resetDeleteProductState()
+            }
+            else -> {}
         }
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { pad ->
-        Box(
+        Column(
             modifier = Modifier
                 .padding(pad)
                 .fillMaxSize()
         ) {
-            when (state) {
-                is GetProductState.Loading -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(color = Teal)
-                    }
-                }
+            // Search and Filter Bar
+            ProductSearchBar(
+                searchQuery = searchQuery,
+                onSearchQueryChange = { viewModel.updateSearchQuery(it) },
+                selectedStatus = selectedStatus,
+                onStatusChange = { viewModel.updateStatusFilter(it) }
+            )
 
-                is GetProductState.Error -> {
-                    val msg = (state as GetProductState.Error).message
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Failed("Something Went Wrong! \n $msg")
-                    }
-                }
-
-                is GetProductState.Success -> {
-                    val products = (state as GetProductState.Success).data
-                    val hasNext = (state as GetProductState.Success).hasNext
-
-
-                    LazyColumn(
-                        state = listState,
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        items(products) { product ->
-                            ProductCard(product = product,
-                                onDelete = { viewModel.deleteProduct(productId = product.id) },
-                                onEdit = {}
-                            )
-
-
+            // Main Content
+            Box(modifier = Modifier.fillMaxSize()) {
+                when (state) {
+                    is RestProductsState.Loading -> {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator(color = Teal)
                         }
+                    }
 
-                        if (hasNext) {
-                            item {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        text = "Products (${products.size})",
-                                        color = Teal
-                                    )
-                                    IconButton(
-                                        onClick = {
-                                            viewModel.refreshProducts()
-                                        }
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Refresh,
-                                            contentDescription = "Refresh",
-                                            tint = Teal
-                                        )
-                                    }
-                                }
+                    is RestProductsState.Error -> {
+                        val msg = (state as RestProductsState.Error).message
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Failed("Something Went Wrong! \n $msg")
+                        }
+                    }
+
+                    is RestProductsState.Success -> {
+                        val products = (state as RestProductsState.Success).products
+
+                        if (products.isEmpty()) {
+                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                Empty("No products found")
                             }
-
-                            items(products) { product ->
-                                ProductCard(
-                                    product = product,
-                                    onEdit = { /* TODO: Edit logic */ },
-                                    onDelete = {
-
-                                        viewModel.deleteProduct(product.id)
-                                    }
-                                )
-                            }
-
-                            if (hasNext) {
+                        } else {
+                            LazyColumn(
+                                state = listState,
+                                modifier = Modifier.fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                // Header with product count and refresh button
                                 item {
-                                    Box(
+                                    Row(
                                         modifier = Modifier
-                                            .fillMaxSize()
+                                            .fillMaxWidth()
                                             .padding(16.dp),
-                                        contentAlignment = Alignment.Center
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        CircularProgressIndicator(color = Teal)
+                                        Column {
+                                            Text(
+                                                text = "Products (${products.size})",
+                                                color = Teal,
+                                                fontSize = 18.sp,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                            if (searchQuery.isNotEmpty() || selectedStatus != null) {
+                                                Text(
+                                                    text = "Filtered results",
+                                                    fontSize = 12.sp,
+                                                    color = Teal.copy(alpha = 0.7f)
+                                                )
+                                            }
+                                        }
+                                        IconButton(
+                                            onClick = { viewModel.refreshProducts() }
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Refresh,
+                                                contentDescription = "Refresh",
+                                                tint = Teal
+                                            )
+                                        }
+                                    }
+                                }
+
+                                // Product items
+                                items(products) { product ->
+                                    ProductCard(
+                                        product = product,
+                                        onEdit = {
+                                            // TODO: Navigate to edit product screen
+                                            coroutineScope.launch {
+                                                snackbarHostState.showSnackbar("Edit product functionality coming soon!")
+                                            }
+                                        },
+                                        onDelete = {
+                                            viewModel.deleteProduct(product.id)
+                                        }
+                                    )
+                                }
+
+                                // Loading indicator for pagination
+                                item {
+                                    if (products.isNotEmpty()) {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(16.dp),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            CircularProgressIndicator(
+                                                color = Teal,
+                                                modifier = Modifier.padding(8.dp)
+                                            )
+                                        }
                                     }
                                 }
                             }
+                        }
+                    }
+
+                    RestProductsState.Idle -> {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Empty("Loading products...")
                         }
                     }
                 }
@@ -177,4 +217,7 @@ fun ProductScreenUI(
         }
     }
 }
+
+
+
 

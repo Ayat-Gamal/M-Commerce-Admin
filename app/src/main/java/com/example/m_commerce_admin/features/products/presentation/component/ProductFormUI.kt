@@ -186,7 +186,7 @@ fun ProductFormUI(
         }
     }
 }
-
+/*
 @Composable
 fun FormField(
     value: String,
@@ -213,3 +213,4 @@ fun FormField(
         shape = RoundedCornerShape(16.dp),
      )
 }
+*/

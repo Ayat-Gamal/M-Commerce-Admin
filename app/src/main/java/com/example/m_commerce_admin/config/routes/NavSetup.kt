@@ -22,6 +22,7 @@ import com.example.m_commerce_admin.features.inventory.presentation.InventoryScr
 import com.example.m_commerce_admin.features.login.presentation.LoginScreenUI
 import com.example.m_commerce_admin.features.products.ProductScreenUI
 import com.example.m_commerce_admin.features.products.presentation.component.ProductFormUI
+import com.example.m_commerce_admin.features.products.presentation.component.RestProductFormUI
 
 import com.example.m_commerce_admin.features.splash.SplashScreenUI
 
@@ -95,6 +96,12 @@ fun NavSetup(
             showBottomNavbar.value = false
 
             ProductFormUI(navController = navController)
+
+        }
+  composable<AppRoutes.RestProductForm> {
+            showBottomNavbar.value = false
+
+      RestProductFormUI(navController = navController)
 
         }
 
