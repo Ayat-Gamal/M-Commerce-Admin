@@ -5,8 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.m_commerce_admin.features.inventory.domain.entity.InventoryLevel
 import com.example.m_commerce_admin.features.inventory.domain.usecase.AdjustInventoryUseCase
 import com.example.m_commerce_admin.features.inventory.domain.usecase.GetInventoryLevelsUseCase
+import com.example.m_commerce_admin.features.inventory.domain.usecase.GetProductsForInventoryUseCase
+import com.example.m_commerce_admin.features.inventory.domain.usecase.GetProductsForInventoryParams
 import com.example.m_commerce_admin.features.inventory.presentation.state.InventoryLevelsState
-import com.example.m_commerce_admin.features.products.domain.repository.RestProductRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,7 +21,7 @@ import javax.inject.Inject
 class InventoryViewModel @Inject constructor(
     private val getInventoryLevelsUseCase: GetInventoryLevelsUseCase,
     private val adjustInventoryUseCase: AdjustInventoryUseCase,
-    private val productRepository: RestProductRepository
+    private val getProductsForInventoryUseCase: GetProductsForInventoryUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<InventoryLevelsState>(InventoryLevelsState.Loading)
@@ -167,7 +168,9 @@ class InventoryViewModel @Inject constructor(
 
     private suspend fun enhanceInventoryWithProductData(inventoryLevels: List<InventoryLevel>): List<InventoryLevel> {
         return try {
-            val productsResult = productRepository.getAllProducts(250, null, null).first()
+            val productsResult = getProductsForInventoryUseCase(
+                GetProductsForInventoryParams(limit = 250, pageInfo = null, status = null)
+            ).first()
             
             if (productsResult.isFailure) {
                 return inventoryLevels // Return original data if product fetch fails

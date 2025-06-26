@@ -6,6 +6,7 @@ import com.example.m_commerce_admin.features.inventory.data.remote.service.Shopi
 import com.example.m_commerce_admin.features.inventory.domain.repository.InventoryRepository
 import com.example.m_commerce_admin.features.inventory.domain.usecase.AdjustInventoryUseCase
 import com.example.m_commerce_admin.features.inventory.domain.usecase.GetInventoryLevelsUseCase
+import com.example.m_commerce_admin.features.inventory.domain.usecase.GetProductsForInventoryUseCase
 import com.example.m_commerce_admin.features.products.domain.repository.RestProductRepository
 import dagger.Module
 import dagger.Provides
@@ -27,6 +28,12 @@ object InventoryProviderModule {
     @Singleton
     fun provideGetAdjustInventoryUseCase(repository: InventoryRepository): AdjustInventoryUseCase {
         return AdjustInventoryUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetProductsForInventoryUseCase(productRepository: RestProductRepository): GetProductsForInventoryUseCase {
+        return GetProductsForInventoryUseCase(productRepository)
     }
 
     @Provides
