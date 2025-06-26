@@ -15,7 +15,7 @@ class InventoryRepositoryImpl @Inject constructor(
 ) : InventoryRepository {
 
     override suspend fun getInventoryLevels(): Flow<Result<List<InventoryLevel>>> = flow {
-        emit(remote.getInventoryLevels())
+        emit(remote.getInventoryWithProductDetails())
     }.flowOn(Dispatchers.IO)
 
     override suspend fun adjustInventoryLevel(

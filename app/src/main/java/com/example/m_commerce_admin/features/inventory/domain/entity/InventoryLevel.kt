@@ -7,7 +7,11 @@ data class InventoryLevel(
     val locationId: Long,
     val available: Int,
     val updatedAt: String,
-    val graphqlApiId: String
+    val graphqlApiId: String,
+    val productTitle: String? = null,
+    val productImage: String? = null,
+    val productPrice: String? = null,
+    val productSku: String? = null
 )
 
 fun InventoryLevelDto.toDomain(): InventoryLevel {

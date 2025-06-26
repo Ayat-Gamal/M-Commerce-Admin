@@ -12,23 +12,31 @@ class InventoryRemoteDataSourceImpl @Inject constructor(
     private val api: ShopifyInventoryApi
 ) : InventoryRemoteDataSource {
 
-
     override suspend fun getInventoryLevels(): Result<List<InventoryLevel>> {
         return runCatching {
             val response = api.getInventoryLevels()
             response.inventoryLevels.map { it.toDomain() }
         }.onFailure { e ->
             when (e) {
-                is HttpException -> println("HTTP Error: ${e.code()} - ${e.message()}")
+                is HttpException -> println("HTTP Error: ${e.code()} - ${e.message}")
                 is IOException -> println("Network Error: ${e.message}")
                 else -> println("Unknown Error: ${e.message}")
             }
-
         }
     }
 
-
-
+    override suspend fun getInventoryWithProductDetails(): Result<List<InventoryLevel>> {
+        return runCatching {
+            val response = api.getInventoryLevels()
+            response.inventoryLevels.map { it.toDomain() }
+        }.onFailure { e ->
+            when (e) {
+                is HttpException -> println("HTTP Error: ${e.code()} - ${e.message}")
+                is IOException -> println("Network Error: ${e.message}")
+                else -> println("Unknown Error: ${e.message}")
+            }
+        }
+    }
 
     override suspend fun adjustInventoryLevel(
         inventoryItemId: Long,
@@ -36,7 +44,7 @@ class InventoryRemoteDataSourceImpl @Inject constructor(
         availableAdjustment: Int
     ): InventoryLevel {
         val response = api.adjustInventoryLevel(
-            InventoryAdjustmentRequest(inventoryItemId,  locationId = 82774655225 , availableAdjustment)
+            InventoryAdjustmentRequest(inventoryItemId, locationId = 82774655225, availableAdjustment)
         )
         return response.level.toDomain()
     }

@@ -4,6 +4,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -27,7 +28,9 @@ import com.example.m_commerce_admin.core.shared.components.states.Empty
 import com.example.m_commerce_admin.core.shared.components.states.Failed
 import com.example.m_commerce_admin.features.inventory.presentation.component.AdjustInventorySheet
 import com.example.m_commerce_admin.features.inventory.presentation.component.InventoryCard
+import com.example.m_commerce_admin.features.inventory.presentation.component.InventorySearchBar
 import com.example.m_commerce_admin.features.inventory.presentation.state.InventoryLevelsState
+import com.example.m_commerce_admin.features.inventory.presentation.viewModel.InventoryFilter
 import com.example.m_commerce_admin.features.inventory.presentation.viewModel.InventoryViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -37,6 +40,8 @@ fun InventoryScreenUI(
     viewModel: InventoryViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val searchQuery by viewModel.searchQuery.collectAsState()
+    val selectedFilter by viewModel.selectedFilter.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     var selectedItemId by remember { mutableStateOf<Long?>(null) }
     var isSheetVisible by remember { mutableStateOf(false) }
@@ -56,45 +61,81 @@ fun InventoryScreenUI(
 
 
      Scaffold { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding)) {
-            when (uiState) {
-                InventoryLevelsState.Loading -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(color = Teal)
-                    }
-                }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            // Search and Filter Bar
+            InventorySearchBar(
+                searchQuery = searchQuery,
+                selectedFilter = selectedFilter,
+                onSearchQueryChange = { viewModel.updateSearchQuery(it) },
+                onFilterChange = { viewModel.updateFilter(it) },
+                onClearFilters = { viewModel.clearFilters() }
+            )
 
-                is InventoryLevelsState.Success -> {
-                    val inventoryList = (uiState as InventoryLevelsState.Success).inventoryLevels
-
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        items(inventoryList) { item ->
-                            InventoryCard(
-                                data = item,
-                                onEdit = {
-                                    selectedItemId = it
-                                    isSheetVisible = true
-                                },
-
-                            )
+            // Content
+            Box(modifier = Modifier.fillMaxSize()) {
+                when (uiState) {
+                    InventoryLevelsState.Loading -> {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(color = Teal)
                         }
                     }
-                }
 
-                is InventoryLevelsState.Error -> {
-                    Failed("Something Went Wrong!")
-                }
+                    is InventoryLevelsState.Success -> {
+                        val inventoryList = (uiState as InventoryLevelsState.Success).inventoryLevels
 
-                InventoryLevelsState.Empty -> {
-                    Empty("No inventory levels found for the specified locations.")
+                        if (inventoryList.isEmpty()) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Empty(
+                                    if (searchQuery.isNotEmpty() || selectedFilter != InventoryFilter.ALL) {
+                                        "No items match your search criteria."
+                                    } else {
+                                        "No inventory items found."
+                                    }
+                                )
+                            }
+                        } else {
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(horizontal = 16.dp),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                items(inventoryList) { item ->
+                                    InventoryCard(
+                                        data = item,
+                                        onEdit = {
+                                            selectedItemId = it
+                                            isSheetVisible = true
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    is InventoryLevelsState.Error -> {
+                        Failed("Something Went Wrong!")
+                    }
+
+                    InventoryLevelsState.Empty -> {
+                        Empty(
+                            if (searchQuery.isNotEmpty() || selectedFilter != InventoryFilter.ALL) {
+                                "No items match your search criteria."
+                            } else {
+                                "No inventory levels found for the specified locations."
+                            }
+                        )
+                    }
                 }
             }
         }
