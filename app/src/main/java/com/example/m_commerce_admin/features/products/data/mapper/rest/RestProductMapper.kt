@@ -1,4 +1,4 @@
-package com.example.m_commerce_admin.features.products.data.mapper
+package com.example.m_commerce_admin.features.products.data.mapper.rest
 
 import com.example.m_commerce_admin.features.products.data.retrofitRemote.*
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProduct
@@ -12,7 +12,7 @@ import com.example.m_commerce_admin.features.products.domain.entity.rest.RestPro
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductVariantInput
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductVariantUpdateInput
 
-// DTO to Domain mappers
+
 fun ProductDto.toRestProduct(): RestProduct {
     return RestProduct(
         id = id,
@@ -36,7 +36,7 @@ fun ProductDto.toRestProduct(): RestProduct {
 fun VariantDto.toRestProductVariant(): RestProductVariant {
     return RestProductVariant(
         id = id,
-        sku = sku,
+        sku = sku ?: "MY-SKU-001",
         price = price,
         inventoryItemId = inventoryItemId,
         quantity = quantity,
@@ -103,6 +103,7 @@ fun RestProductUpdateInput.toProductUpdateDto(): ProductUpdateDto {
 
 fun RestProductVariantInput.toVariantCreateDto(): VariantCreateDto {
     return VariantCreateDto(
+        option1 = option1 ?: "Size",
         price = price,
         sku = sku,
         title = title,

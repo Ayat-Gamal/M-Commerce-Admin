@@ -10,7 +10,7 @@ fun GetProductsQuery.Node.toDomain(): Product {
     val imageUrls: List<String> = this.images.edges.mapNotNull { edge ->
         edge.node.url.toString()
     }
-    
+
     val product = Product(
         id = this.id,
         title = this.title,
@@ -25,15 +25,5 @@ fun GetProductsQuery.Node.toDomain(): Product {
         inventoryQuantity = firstVariant?.inventoryQuantity ?: 0,
         images = imageUrls
     )
-    
-    Log.d("ProductMapper", "📦 Mapped product: ${product.title}")
-    Log.d("ProductMapper", "📊 Status: ${product.status}")
-    Log.d("ProductMapper", "💰 Price: ${product.price}")
-    Log.d("ProductMapper", "📦 Stock: ${product.inventoryQuantity}")
-    Log.d("ProductMapper", "🏷️ SKU: ${product.sku}")
-    Log.d("ProductMapper", "🖼️ Featured Image: ${product.featuredImage}")
-    Log.d("ProductMapper", "🖼️ Total Images: ${product.images.size}")
-    Log.d("ProductMapper", "🖼️ Image URLs: ${product.images}")
-    
     return product
 }

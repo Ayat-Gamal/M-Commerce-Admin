@@ -10,6 +10,11 @@ import com.example.m_commerce_admin.features.products.data.retrofitRemote.Shopif
 import com.example.m_commerce_admin.features.products.domain.repository.ProductRepository
 import com.example.m_commerce_admin.features.products.domain.repository.RestProductRepository
 import com.example.m_commerce_admin.features.products.domain.usecase.*
+import com.example.m_commerce_admin.features.products.domain.usecase.rest.AddRestProductWithImagesUseCase
+import com.example.m_commerce_admin.features.products.domain.usecase.rest.CreateRestProductUseCase
+import com.example.m_commerce_admin.features.products.domain.usecase.rest.DeleteRestProductUseCase
+import com.example.m_commerce_admin.features.products.domain.usecase.rest.GetAllRestProductsUseCase
+import com.example.m_commerce_admin.features.products.domain.usecase.rest.UpdateRestProductUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

@@ -1,4 +1,4 @@
-package com.example.m_commerce_admin.features.products.domain.usecase
+package com.example.m_commerce_admin.features.products.domain.usecase.rest
 
 import com.example.m_commerce_admin.core.shared.components.usecase.UseCase
 import com.example.m_commerce_admin.features.products.domain.repository.RestProductRepository

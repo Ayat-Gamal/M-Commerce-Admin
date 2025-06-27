@@ -2,22 +2,20 @@ package com.example.m_commerce_admin.features.products.presentation.viewModel
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.m_commerce_admin.features.products.data.remote.ProductRemoteDataSource
-import com.example.m_commerce_admin.features.products.data.remote.ProductRemoteDataSourceImpl
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProduct
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductInput
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductUpdateInput
-import com.example.m_commerce_admin.features.products.domain.usecase.CreateRestProductUseCase
-import com.example.m_commerce_admin.features.products.domain.usecase.DeleteRestProductUseCase
-import com.example.m_commerce_admin.features.products.domain.usecase.GetAllRestProductsParams
-import com.example.m_commerce_admin.features.products.domain.usecase.GetAllRestProductsUseCase
-import com.example.m_commerce_admin.features.products.domain.usecase.AddRestProductWithImagesParams
-import com.example.m_commerce_admin.features.products.domain.usecase.AddRestProductWithImagesUseCase
+import com.example.m_commerce_admin.features.products.domain.usecase.rest.CreateRestProductUseCase
+import com.example.m_commerce_admin.features.products.domain.usecase.rest.DeleteRestProductUseCase
+import com.example.m_commerce_admin.features.products.domain.usecase.rest.GetAllRestProductsParams
+import com.example.m_commerce_admin.features.products.domain.usecase.rest.GetAllRestProductsUseCase
+import com.example.m_commerce_admin.features.products.domain.usecase.rest.AddRestProductWithImagesParams
+import com.example.m_commerce_admin.features.products.domain.usecase.rest.AddRestProductWithImagesUseCase
 import com.example.m_commerce_admin.features.products.domain.usecase.PublishProductUseCase
-import com.example.m_commerce_admin.features.products.domain.usecase.UpdateRestProductUseCase
+import com.example.m_commerce_admin.features.products.domain.usecase.rest.UpdateRestProductParams
+import com.example.m_commerce_admin.features.products.domain.usecase.rest.UpdateRestProductUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -33,9 +31,8 @@ class RestProductsViewModel @Inject constructor(
     private val addRestProductWithImagesUseCase: AddRestProductWithImagesUseCase,
     private val deleteRestProductUseCase: DeleteRestProductUseCase,
     private val updateRestProductUseCase: UpdateRestProductUseCase,
- private val publishProductUseCase: PublishProductUseCase
+    private val publishProductUseCase: PublishProductUseCase
 ) : ViewModel() {
-
 
      private val _productsState = MutableStateFlow<RestProductsState>(RestProductsState.Idle)
     val productsState: StateFlow<RestProductsState> = _productsState.asStateFlow()
@@ -78,11 +75,11 @@ class RestProductsViewModel @Inject constructor(
                 result.fold(
                     onSuccess = { products ->
                         if (pageInfo == null) {
-                            // First load or refresh
+
                             _allProducts.value = products
-                            currentPageInfo = null // Reset pagination
+                            currentPageInfo = null
                         } else {
-                            // Load more
+
                             _allProducts.value = _allProducts.value + products
                         }
                         
@@ -107,7 +104,6 @@ class RestProductsViewModel @Inject constructor(
 
         viewModelScope.launch {
             val result = if (imageUris.isNotEmpty() && context != null) {
-                println("🚀 Using staged upload approach for ${imageUris.size} images")
                 addRestProductWithImagesUseCase(
                     AddRestProductWithImagesParams(
                         product = productInput,
@@ -116,23 +112,18 @@ class RestProductsViewModel @Inject constructor(
                     )
                 )
             } else {
-                println("🛠 Creating product without images")
                 createRestProductUseCase(productInput)
             }
 
             result.fold(
                 onSuccess = { product ->
-                    println("✅ Product created successfully: ${product.title}")
+
                     _addProductState.value = AddRestProductState.Success(product)
-
-                    // Optional: trigger refresh
                     getAllProducts(status = _selectedStatus.value)
-
-                    // Optional: auto-publish
                     publishProductUseCase.invoke(product.id)
+
                 },
                 onFailure = { error ->
-                    println("❌ Product creation failed: ${error.message}")
                     _addProductState.value = AddRestProductState.Error(
                         error.message ?: "An unexpected error occurred"
                     )
@@ -202,7 +193,6 @@ class RestProductsViewModel @Inject constructor(
 
     fun updateStatusFilter(status: String?) {
         _selectedStatus.value = status
-        // Refresh with new status filter
         getAllProducts(status = status)
     }
 
@@ -236,7 +226,7 @@ class RestProductsViewModel @Inject constructor(
         _updateProductState.value = UpdateRestProductState.Loading
         viewModelScope.launch {
             val result = updateRestProductUseCase(
-                com.example.m_commerce_admin.features.products.domain.usecase.UpdateRestProductParams(productId, updateInput)
+                UpdateRestProductParams(productId, updateInput)
             )
             result.fold(
                 onSuccess = { product ->

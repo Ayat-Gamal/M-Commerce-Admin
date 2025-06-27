@@ -1,7 +1,6 @@
 package com.example.m_commerce_admin.features.products.presentation.component
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -21,6 +20,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.DarkGray
@@ -36,7 +36,6 @@ import com.example.m_commerce_admin.config.theme.White
 import com.example.m_commerce_admin.config.theme.lightRed
 import com.example.m_commerce_admin.core.helpers.formatIsoDate
 import com.example.m_commerce_admin.core.shared.components.NetworkImage
-import com.example.m_commerce_admin.features.products.domain.entity.Product
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProduct
 
 private fun String.capitalize(): String {
@@ -49,32 +48,39 @@ private fun String.capitalize(): String {
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ProductCard(
+fun RestProductCard(
     product: RestProduct,
     onEdit: () -> Unit,
     onDelete: () -> Unit
 ) {
+    val firstVariant = remember(product) { product.variants}
+    val firstImage = remember(product) { product.images?.firstOrNull() }
+    val imageCount = product.images?.size ?: 0
+    val createdDate = product.createdAt?.let { formatIsoDate(it) } ?: "Unknown"
+    val status = product.status?.replaceFirstChar { it.uppercase() } ?: "Unknown"
+    val statusColor = when (product.status?.lowercase()) {
+        "active" -> LightGreen
+        "draft" -> LightTeal
+        "archived" -> lightRed
+        else -> DarkGray
+    }
+
     Card(
-        elevation = CardDefaults.cardElevation(4.dp),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = White),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 8.dp)
-            .background(color = White)
+            .padding(8.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = White),
+        elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            // Product Image
-            val firstImage = product.images?.firstOrNull()
-            Log.d("TAG", "ProductCard: $firstImage")
-            Log.d("TAG", "ProductCard: $product.images")
+            // Image
             if (firstImage == null) {
-                // Show placeholder when no image is available
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -82,16 +88,12 @@ fun ProductCard(
                         .background(LightTeal, RoundedCornerShape(12.dp)),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = "No Image",
-                        color = DarkGray,
-                        fontSize = 14.sp
-                    )
+                    Text("No Image", color = DarkGray, fontSize = 14.sp)
                 }
             } else {
                 NetworkImage(
                     url = firstImage.src,
-                    contentDescription = firstImage.alt ?: "Product image",
+                    contentDescription = firstImage.alt ?: "Product Image",
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(180.dp)
@@ -100,232 +102,65 @@ fun ProductCard(
                 )
             }
 
-            Column(
-                verticalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
-                // Product Title
-                Text(
-                    text = product.title, 
-                    fontWeight = FontWeight.Bold, 
-                    fontSize = 18.sp,
-                    color = DarkestGray
-                )
+            // Title
+            Text(product.title, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = DarkestGray)
 
-                // Product Type and Vendor
-                if (!product.productType.isNullOrBlank()) {
-                    Text(
-                        text = "Type: ${product.productType}",
-                        fontSize = 12.sp,
-                        color = DarkGray
-                    )
-                }
-                
-                if (!product.vendor.isNullOrBlank()) {
-                    Text(
-                        text = "Vendor: ${product.vendor}",
-                        fontSize = 12.sp,
-                        color = DarkGray
-                    )
-                }
-
-                // Essential admin information
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Column {
-                        // Price and inventory from first variant
-                        val firstVariant = product.variants.firstOrNull()
-                        if (firstVariant != null) {
-                            Text(
-                                text = "EGP ${firstVariant.price}", 
-                                fontSize = 14.sp, 
-                                color = Teal, 
-                                fontWeight = FontWeight.Medium
-                            )
-                            Text(
-                                text = "Stock: ${firstVariant.quantity}", 
-                                fontSize = 13.sp, 
-                                color = DarkGray
-                            )
-                        }
-                    }
-                    
-                    Column(horizontalAlignment = Alignment.End) {
-                        // Status badge
-                        val statusColor = when (product.status?.lowercase()) {
-                            "active" -> LightGreen
-                            "draft" -> LightTeal
-                            "archived" -> lightRed
-                            else -> DarkGray
-                        }
-                        Text(
-                            text = product.status?.capitalize() ?: "Unknown",
-                            color = White,
-                            fontSize = 12.sp,
-                            modifier = Modifier
-                                .background(statusColor, RoundedCornerShape(6.dp))
-                                .padding(horizontal = 8.dp, vertical = 2.dp)
-                        )
-                        
-                        // Image count
-                        val imageCount = product.images?.size ?: 0
-                        if (imageCount > 0) {
-                            Text(
-                                text = "$imageCount image${if (imageCount > 1) "s" else ""}", 
-                                fontSize = 11.sp, 
-                                color = DarkGray
-                            )
-                        }
-                    }
-                }
-
-                // Variant information
-                if (product.variants.size > 1) {
-                    Text(
-                        text = "${product.variants.size} variants", 
-                        fontSize = 12.sp, 
-                        color = DarkGray
-                    )
-                }
-
-                // SKU from first variant
-                val firstVariant = product.variants.firstOrNull()
-                if (firstVariant?.sku?.isNotBlank() == true) {
-                    Text(
-                        text = "SKU: ${firstVariant.sku}", 
-                        fontSize = 12.sp, 
-                        color = DarkGray
-                    )
-                }
-
-                // Created date
-                val createdDate = product.createdAt?.let { formatIsoDate(it) } ?: "Unknown"
-                Text(
-                    text = "Created: $createdDate", 
-                    fontSize = 12.sp, 
-                    color = DarkestGray
-                )
+            // Type + Vendor
+            if (!product.productType.isNullOrBlank()) {
+                Text("Type: ${product.productType}", fontSize = 12.sp, color = DarkGray)
+            }
+            if (!product.vendor.isNullOrBlank()) {
+                Text("Vendor: ${product.vendor}", fontSize = 12.sp, color = DarkGray)
             }
 
-            // Action Buttons Row
+            // Price, Stock, Status
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                IconButton(onClick = onEdit) {
-                    Icon(Icons.Default.Edit, contentDescription = "Edit", tint = Teal)
-                }
-                IconButton(onClick = onDelete) {
-                    Icon(Icons.Default.Delete, contentDescription = "Delete", tint = lightRed)
-                }
-            }
-        }
-    }
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-fun ProductCard(
-    product: Product,
-    onEdit: () -> Unit,
-    onDelete: () -> Unit
-) {
-    Card(
-        elevation = CardDefaults.cardElevation(4.dp),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = White),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 8.dp)
-            .background(color = White)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            // Larger Image on Top
-            val imageUrl = product.featuredImage ?: product.images.firstOrNull()
-
-            if (imageUrl.isNullOrEmpty()) {
-                // Show placeholder when no image is available
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(180.dp)
-                        .background(White, RoundedCornerShape(12.dp)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "No Image",
-                        color = DarkGray,
-                        fontSize = 14.sp
-                    )
-                }
-            } else {
-                NetworkImage(
-                    url = imageUrl,
-                    contentDescription = "Product image",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(180.dp)
-                        .background(White, RoundedCornerShape(12.dp)),
-                    contentScale = ContentScale.Crop
-                )
-            }
-
-            Column(
-                verticalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
-                Text(product.title, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-
-                // Essential admin information
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Column {
-                        // Price and inventory - critical for admin
-                        if (product.price != "0.00") {
-                            Text("EGP ${product.price}", fontSize = 14.sp, color = DarkGray, fontWeight = FontWeight.Medium)
-                        }
-                        Text("Stock: ${product.inventoryQuantity}", fontSize = 13.sp, color = DarkGray)
-                    }
-
-                    Column(horizontalAlignment = Alignment.End) {
-                        // Status and image count
-                        val statusColor = if (product.status.equals("Active", true)) LightGreen else lightRed
+                Column {
+                    if (firstVariant != null) {
                         Text(
-                            text = product.status,
-                            color = White,
-                            fontSize = 12.sp,
-                            modifier = Modifier
-                                .background(statusColor, RoundedCornerShape(6.dp))
-                                .padding(horizontal = 8.dp, vertical = 2.dp)
+                            "EGP ${firstVariant.first().price}",
+                            fontSize = 14.sp,
+                            color = Teal,
+                            fontWeight = FontWeight.Medium
                         )
-
-                        if (product.images.size > 1) {
-                            Text("${product.images.size} images", fontSize = 11.sp, color = DarkGray)
-                        }
+                        Text("Stock: ${firstVariant.first().quantity}", fontSize = 13.sp, color = DarkGray)
                     }
                 }
-
-                // Additional admin details
-                if (product.sku.isNotBlank()) {
-                    Text("SKU: ${product.sku}", fontSize = 12.sp, color = DarkGray)
+                Column(horizontalAlignment = Alignment.End) {
+                    Text(
+                        status,
+                        color = White,
+                        fontSize = 12.sp,
+                        modifier = Modifier
+                            .background(statusColor, RoundedCornerShape(6.dp))
+                            .padding(horizontal = 8.dp, vertical = 2.dp)
+                    )
+                    if (imageCount > 0) {
+                        Text(
+                            "$imageCount image${if (imageCount > 1) "s" else ""}",
+                            fontSize = 11.sp,
+                            color = DarkGray
+                        )
+                    }
                 }
-
-                val createdDate = formatIsoDate(product.createdAt)
-                Text("Created: $createdDate", fontSize = 12.sp, color = DarkestGray)
             }
 
-            // Action Buttons Row
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start
-            ) {
+            // Variant and SKU info
+            if (product.variants.size > 1) {
+                Text("${product.variants.size} variants", fontSize = 12.sp, color = DarkGray)
+            }
+            if (firstVariant.first().sku.isNotBlank()) {
+                Text("SKU: ${firstVariant!!.first().sku}", fontSize = 12.sp, color = DarkGray)
+            }
+
+            // Created Date
+            Text("Created: $createdDate", fontSize = 12.sp, color = DarkestGray)
+
+            // Action buttons
+            Row(modifier = Modifier.fillMaxWidth()) {
                 IconButton(onClick = onEdit) {
                     Icon(Icons.Default.Edit, contentDescription = "Edit", tint = Teal)
                 }

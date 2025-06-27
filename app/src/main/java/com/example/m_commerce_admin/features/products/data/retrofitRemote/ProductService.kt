@@ -181,6 +181,8 @@ data class ProductUpdateDto(
 )
 
 data class VariantCreateDto(
+    @SerializedName("option1") val option1: String,
+
     @SerializedName("price") val price: String,
     @SerializedName("sku") val sku: String? = null,
     @SerializedName("title") val title: String? = null,

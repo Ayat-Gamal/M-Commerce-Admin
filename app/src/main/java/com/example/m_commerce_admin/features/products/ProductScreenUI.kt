@@ -40,12 +40,12 @@ import com.example.m_commerce_admin.config.theme.Teal
 import com.example.m_commerce_admin.core.shared.components.states.Empty
 import com.example.m_commerce_admin.core.shared.components.states.Failed
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProduct
-import com.example.m_commerce_admin.features.products.presentation.component.ProductCard
 import com.example.m_commerce_admin.features.products.presentation.component.ProductSearchBar
+import com.example.m_commerce_admin.features.products.presentation.component.RestProductCard
 import com.example.m_commerce_admin.features.products.presentation.component.RestProductFormUI
+import com.example.m_commerce_admin.features.products.presentation.viewModel.DeleteRestProductState
 import com.example.m_commerce_admin.features.products.presentation.viewModel.RestProductsState
 import com.example.m_commerce_admin.features.products.presentation.viewModel.RestProductsViewModel
-import com.example.m_commerce_admin.features.products.presentation.viewModel.DeleteRestProductState
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -59,7 +59,7 @@ fun ProductScreenUI(
     val listState = rememberLazyListState()
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
-    
+
     // State for edit mode
     var showEditForm by remember { mutableStateOf(false) }
     var productToEdit by remember { mutableStateOf<RestProduct?>(null) }
@@ -87,10 +87,12 @@ fun ProductScreenUI(
                 snackbarHostState.showSnackbar("Product deleted successfully!")
                 viewModel.resetDeleteProductState()
             }
+
             is DeleteRestProductState.Error -> {
                 snackbarHostState.showSnackbar("Failed to delete product: ${(deleteState as DeleteRestProductState.Error).message}")
                 viewModel.resetDeleteProductState()
             }
+
             else -> {}
         }
     }
@@ -111,7 +113,7 @@ fun ProductScreenUI(
                 }
             )
         } else {
-            // Show main product list
+
             Column(
                 modifier = Modifier
                     .padding(pad)
@@ -129,14 +131,20 @@ fun ProductScreenUI(
                 Box(modifier = Modifier.fillMaxSize()) {
                     when (state) {
                         is RestProductsState.Loading -> {
-                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
                                 CircularProgressIndicator(color = Teal)
                             }
                         }
 
                         is RestProductsState.Error -> {
                             val msg = (state as RestProductsState.Error).message
-                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
                                 Failed("Something Went Wrong! \n $msg")
                             }
                         }
@@ -145,7 +153,10 @@ fun ProductScreenUI(
                             val products = (state as RestProductsState.Success).products
 
                             if (products.isEmpty()) {
-                                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
                                     Empty("No products found")
                                 }
                             } else {
@@ -192,7 +203,7 @@ fun ProductScreenUI(
 
                                     // Product items
                                     items(products) { product ->
-                                        ProductCard(
+                                        RestProductCard(
                                             product = product,
                                             onEdit = {
                                                 productToEdit = product
@@ -203,29 +214,15 @@ fun ProductScreenUI(
                                             }
                                         )
                                     }
-
-                                    // Loading indicator for pagination
-                                    item {
-                                        if (products.isNotEmpty()) {
-                                            Box(
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .padding(16.dp),
-                                                contentAlignment = Alignment.Center
-                                            ) {
-                                                CircularProgressIndicator(
-                                                    color = Teal,
-                                                    modifier = Modifier.padding(8.dp)
-                                                )
-                                            }
-                                        }
-                                    }
                                 }
                             }
                         }
 
                         RestProductsState.Idle -> {
-                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
                                 Empty("Loading products...")
                             }
                         }

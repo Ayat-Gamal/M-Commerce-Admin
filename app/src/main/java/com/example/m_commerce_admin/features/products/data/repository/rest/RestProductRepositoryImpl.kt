@@ -4,23 +4,16 @@ import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
 import android.util.Base64
-import android.util.Log
-import com.apollographql.apollo.api.Optional
-import com.example.m_commerce_admin.config.constant.ShopifyConfig
-import com.example.m_commerce_admin.features.products.data.mapper.toGraphQL
-import com.example.m_commerce_admin.features.products.data.mapper.toProductCreateDto
-import com.example.m_commerce_admin.features.products.data.mapper.toProductUpdateDto
-import com.example.m_commerce_admin.features.products.data.mapper.toRestProduct
+import com.example.m_commerce_admin.features.products.data.mapper.rest.toProductCreateDto
+import com.example.m_commerce_admin.features.products.data.mapper.rest.toProductUpdateDto
+import com.example.m_commerce_admin.features.products.data.mapper.rest.toRestProduct
 import com.example.m_commerce_admin.features.products.data.retrofitRemote.*
-import com.example.m_commerce_admin.features.products.domain.entity.DomainProductInput
 import com.example.m_commerce_admin.features.products.domain.entity.StagedUploadTarget
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProduct
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductImageInput
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductInput
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductUpdateInput
 import com.example.m_commerce_admin.features.products.domain.repository.RestProductRepository
-import com.example.m_commerce_admin.type.CreateMediaInput
-import com.example.m_commerce_admin.type.MediaContentType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -28,7 +21,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import javax.inject.Inject
-import kotlin.math.log
 
 class RestProductRepositoryImpl @Inject constructor(
     private val retrofitDataSource: RetrofitProductDataSource,
@@ -83,7 +75,6 @@ class RestProductRepositoryImpl @Inject constructor(
 
         val createdProduct = createResult.getOrThrow()
 
-        // Step 2: Prepare staged uploads
         if (imageUris.isNotEmpty()) {
             val inputs = retrofitDataSource.prepareStagedUploadInputs(context, imageUris)
             val targets = retrofitDataSource.requestStagedUploads(inputs)

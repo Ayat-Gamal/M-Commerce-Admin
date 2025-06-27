@@ -20,7 +20,7 @@ data class RestProduct(
 
 data class RestProductVariant(
     val id: Long,
-    val sku: String?,
+    val sku: String = "MY-SKU-121",
     val price: String,
     val inventoryItemId: Long,
     val quantity: Int,
@@ -65,6 +65,7 @@ data class RestProductInput(
 )
 
 data class RestProductVariantInput(
+    val option1: String?,
     val price: String,
     val sku: String? = null,
     val title: String? = null,

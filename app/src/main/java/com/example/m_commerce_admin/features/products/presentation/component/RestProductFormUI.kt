@@ -1,6 +1,7 @@
 package com.example.m_commerce_admin.features.products.presentation.component
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -39,11 +40,13 @@ import kotlinx.coroutines.launch
 fun RestProductFormUI(
     viewModel: RestProductsViewModel = hiltViewModel(),
     navController: NavController? = null,
-    // Edit mode parameters
     isEditMode: Boolean = false,
     productToEdit: RestProduct? = null,
     onBackPressed: (() -> Unit)? = null
 ) {
+
+
+
     // Initialize form fields based on mode
     var title by remember { 
         mutableStateOf(if (isEditMode && productToEdit != null) productToEdit.title else "") 
@@ -57,15 +60,27 @@ fun RestProductFormUI(
     var vendor by remember { 
         mutableStateOf(if (isEditMode && productToEdit != null) productToEdit.vendor ?: "" else "") 
     }
-    var price by remember { 
-        mutableStateOf(if (isEditMode && productToEdit != null) productToEdit.variants.firstOrNull()?.price ?: "" else "") 
+
+    var variantList by remember {
+        mutableStateOf(
+            if (isEditMode && productToEdit != null) {
+                productToEdit.variants.map {
+                    RestProductVariantInput(
+                        option1 = "Size",
+                        price = it.price,
+                        sku = it.sku,
+                        inventoryQuantity = it.quantity
+                    )
+                }
+            } else {
+                listOf(RestProductVariantInput(option1 = "Size",price = ""))
+            }
+        )
     }
-    var sku by remember { 
-        mutableStateOf(if (isEditMode && productToEdit != null) productToEdit.variants.firstOrNull()?.sku ?: "" else "") 
-    }
-    var stockQuantity by remember { 
-        mutableStateOf(if (isEditMode && productToEdit != null) productToEdit.variants.firstOrNull()?.quantity?.toString() ?: "0" else "0") 
-    }
+
+
+
+
     var selectedStatus by remember { 
         mutableStateOf(if (isEditMode && productToEdit != null) productToEdit.status ?: "draft" else "draft") 
     }
@@ -83,12 +98,12 @@ fun RestProductFormUI(
     val currentState = if (isEditMode) updateProductState else addProductState
     val isLoading = currentState is AddRestProductState.Loading || currentState is UpdateRestProductState.Loading
 
-    LaunchedEffect(title, description, productType, vendor, price) {
-        val isPriceValid = price.toDoubleOrNull()?.let { it > 0 } ?: false
-        isFormValid = title.isNotBlank() && description.isNotBlank() && 
-                productType.isNotBlank() && vendor.isNotBlank() && 
-                price.isNotBlank() && isPriceValid
+    LaunchedEffect(title, description, productType, vendor, variantList) {
+        val allVariantsValid = variantList.all { it.price.toDoubleOrNull()?.let { p -> p > 0 } ?: false }
+        isFormValid = title.isNotBlank() && description.isNotBlank() &&
+                productType.isNotBlank() && vendor.isNotBlank() && allVariantsValid
     }
+
 
     LaunchedEffect(addProductState) {
         when (addProductState) {
@@ -98,9 +113,6 @@ fun RestProductFormUI(
                 description = ""
                 productType = ""
                 vendor = ""
-                price = ""
-                sku = ""
-                stockQuantity = "0"
                 selectedStatus = "draft"
                 selectedImages = emptyList()
                 
@@ -228,50 +240,34 @@ fun RestProductFormUI(
                 }
             }
 
-            // Pricing and Inventory
+            // Variants Section
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(Color(0xFFF8F9FA))
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        "Pricing & Inventory",
+                        "Product Variants",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    
-                    FormField(
-                        value = price,
-                        onValueChange = {
-                            if (it.isEmpty() || it.matches(Regex("^\\d*\\.?\\d*$"))) price = it
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    VariantListSection(
+                        variants = variantList,
+                        onUpdateVariant = { index, updated ->
+                            variantList = variantList.toMutableList().also { it[index] = updated }
                         },
-                        label = "Price",
-                        placeholder = "0.00",
-                        isError = price.isBlank() || price.toDoubleOrNull()?.let { it <= 0 } ?: true,
-                        keyboardType = KeyboardType.Decimal
-                    )
-                    
-                    FormField(
-                        value = stockQuantity,
-                        onValueChange = {
-                            if (it.isEmpty() || it.matches(Regex("^\\d*$"))) stockQuantity = it
+                        onAddVariant = {
+                            variantList = variantList + RestProductVariantInput(option1 = "Size",price = "")
                         },
-                        label = "Stock Quantity",
-                        placeholder = "0",
-                        isError = false,
-                        keyboardType = KeyboardType.Number
-                    )
-                    
-                    FormField(
-                        value = sku,
-                        onValueChange = { sku = it },
-                        label = "SKU (Optional)",
-                        placeholder = "Stock keeping unit",
-                        isError = false
+                        onRemoveVariant = { index ->
+                            variantList = variantList.toMutableList().also { it.removeAt(index) }
+                        }
                     )
                 }
             }
+
 
             // Product Status
             Card(
@@ -340,44 +336,46 @@ fun RestProductFormUI(
             // Submit Button
             Button(
                 onClick = {
-                    val variantInput = RestProductVariantInput(
-                        price = price,
-                        sku = sku.takeIf { it.isNotBlank() },
-                        inventoryQuantity = stockQuantity.toIntOrNull() ?: 0
-                    )
-                    
                     if (isEditMode && productToEdit != null) {
-                        // Update mode
                         val updateInput = RestProductUpdateInput(
                             title = title,
                             descriptionHtml = description,
                             productType = productType,
                             vendor = vendor,
                             status = selectedStatus,
-                            variants = listOf(
-                              RestProductVariantUpdateInput(
-                                    id = productToEdit.variants.firstOrNull()?.id ?: 0,
-                                    price = price,
-                                    sku = sku.takeIf { it.isNotBlank() }
-                                )
-                            )
+                            variants = productToEdit.variants.mapIndexedNotNull { index, existing ->
+                                variantList.getOrNull(index)?.let {
+                                    RestProductVariantUpdateInput(
+                                        id = existing.id,
+                                        price = it.price,
+                                        sku = it.sku,
+                                        title = it.title,
+                                        inventoryManagement = it.inventoryManagement,
+                                        inventoryPolicy = it.inventoryPolicy,
+                                        fulfillmentService = it.fulfillmentService,
+                                        weight = it.weight,
+                                        weightUnit = it.weightUnit,
+                                        barcode = it.barcode,
+                                        taxable = it.taxable,
+                                        requiresShipping = it.requiresShipping
+                                    )
+                                }
+                            }
                         )
                         viewModel.updateProduct(productToEdit.id, updateInput)
                     } else {
-
                         val productInput = RestProductInput(
                             title = title,
                             descriptionHtml = description,
                             productType = productType,
                             vendor = vendor,
                             status = selectedStatus,
-                            variants = listOf(variantInput),
-
-
+                            variants = variantList
                         )
                         viewModel.addProduct(productInput, selectedImages, context)
                     }
-                },
+                }
+                ,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
