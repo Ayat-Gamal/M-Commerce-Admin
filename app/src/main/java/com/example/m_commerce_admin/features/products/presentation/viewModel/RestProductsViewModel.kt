@@ -2,16 +2,21 @@ package com.example.m_commerce_admin.features.products.presentation.viewModel
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.m_commerce_admin.features.products.domain.entity.RestProduct
-import com.example.m_commerce_admin.features.products.domain.entity.RestProductInput
+import com.example.m_commerce_admin.features.products.data.remote.ProductRemoteDataSource
+import com.example.m_commerce_admin.features.products.data.remote.ProductRemoteDataSourceImpl
+import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProduct
+import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductInput
+import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductUpdateInput
 import com.example.m_commerce_admin.features.products.domain.usecase.CreateRestProductUseCase
 import com.example.m_commerce_admin.features.products.domain.usecase.DeleteRestProductUseCase
 import com.example.m_commerce_admin.features.products.domain.usecase.GetAllRestProductsParams
 import com.example.m_commerce_admin.features.products.domain.usecase.GetAllRestProductsUseCase
 import com.example.m_commerce_admin.features.products.domain.usecase.AddRestProductWithImagesParams
 import com.example.m_commerce_admin.features.products.domain.usecase.AddRestProductWithImagesUseCase
+import com.example.m_commerce_admin.features.products.domain.usecase.PublishProductUseCase
 import com.example.m_commerce_admin.features.products.domain.usecase.UpdateRestProductUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,10 +32,12 @@ class RestProductsViewModel @Inject constructor(
     private val createRestProductUseCase: CreateRestProductUseCase,
     private val addRestProductWithImagesUseCase: AddRestProductWithImagesUseCase,
     private val deleteRestProductUseCase: DeleteRestProductUseCase,
-    private val updateRestProductUseCase: UpdateRestProductUseCase
+    private val updateRestProductUseCase: UpdateRestProductUseCase,
+ private val publishProductUseCase: PublishProductUseCase
 ) : ViewModel() {
 
-    private val _productsState = MutableStateFlow<RestProductsState>(RestProductsState.Idle)
+
+     private val _productsState = MutableStateFlow<RestProductsState>(RestProductsState.Idle)
     val productsState: StateFlow<RestProductsState> = _productsState.asStateFlow()
 
     private val _addProductState = MutableStateFlow<AddRestProductState>(AddRestProductState.Idle)
@@ -91,45 +98,49 @@ class RestProductsViewModel @Inject constructor(
             }
         }
     }
-
-    fun addProduct(productInput: RestProductInput, imageUris: List<Uri> = emptyList(), context: Context? = null) {
+    fun addProduct(
+        productInput: RestProductInput,
+        imageUris: List<Uri> = emptyList(),
+        context: Context? = null
+    ) {
         _addProductState.value = AddRestProductState.Loading
+
         viewModelScope.launch {
-            if (imageUris.isNotEmpty() && context != null) {
-                // Use staged upload approach (like GraphQL)
-                println("Using staged upload approach for ${imageUris.size} images")
-                val result = addRestProductWithImagesUseCase(
-                    AddRestProductWithImagesParams(productInput, imageUris, context)
-                )
-                result.fold(
-                    onSuccess = { product ->
-                        println("Product created successfully with images using staged upload")
-                        _addProductState.value = AddRestProductState.Success(product)
-                        getAllProducts(status = _selectedStatus.value)
-                    },
-                    onFailure = { error ->
-                        println("Product creation with images failed: ${error.message}")
-                        _addProductState.value = AddRestProductState.Error(error.message ?: "Failed to add product with images")
-                    }
+            val result = if (imageUris.isNotEmpty() && context != null) {
+                println("🚀 Using staged upload approach for ${imageUris.size} images")
+                addRestProductWithImagesUseCase(
+                    AddRestProductWithImagesParams(
+                        product = productInput,
+                        imageUris = imageUris,
+                        context = context
+                    )
                 )
             } else {
-                // Create product without images
-                println("Creating product without images")
-                val result = createRestProductUseCase(productInput)
-                result.fold(
-                    onSuccess = { product ->
-                        println("Product created successfully without images")
-                        _addProductState.value = AddRestProductState.Success(product)
-                        getAllProducts(status = _selectedStatus.value)
-                    },
-                    onFailure = { error ->
-                        println("Product creation failed: ${error.message}")
-                        _addProductState.value = AddRestProductState.Error(error.message ?: "Failed to add product")
-                    }
-                )
+                println("🛠 Creating product without images")
+                createRestProductUseCase(productInput)
             }
+
+            result.fold(
+                onSuccess = { product ->
+                    println("✅ Product created successfully: ${product.title}")
+                    _addProductState.value = AddRestProductState.Success(product)
+
+                    // Optional: trigger refresh
+                    getAllProducts(status = _selectedStatus.value)
+
+                    // Optional: auto-publish
+                    publishProductUseCase.invoke(product.id)
+                },
+                onFailure = { error ->
+                    println("❌ Product creation failed: ${error.message}")
+                    _addProductState.value = AddRestProductState.Error(
+                        error.message ?: "An unexpected error occurred"
+                    )
+                }
+            )
         }
     }
+
 
     fun resetAddProductState() {
         _addProductState.value = AddRestProductState.Idle
@@ -221,7 +232,7 @@ class RestProductsViewModel @Inject constructor(
         applyFilters()
     }
 
-    fun updateProduct(productId: Long, updateInput: com.example.m_commerce_admin.features.products.domain.entity.RestProductUpdateInput) {
+    fun updateProduct(productId: Long, updateInput: RestProductUpdateInput) {
         _updateProductState.value = UpdateRestProductState.Loading
         viewModelScope.launch {
             val result = updateRestProductUseCase(
@@ -268,6 +279,6 @@ sealed class DeleteRestProductState {
 sealed class UpdateRestProductState {
     object Idle : UpdateRestProductState()
     object Loading : UpdateRestProductState()
-    data class Success(val product: com.example.m_commerce_admin.features.products.domain.entity.RestProduct) : UpdateRestProductState()
+    data class Success(val product: RestProduct) : UpdateRestProductState()
     data class Error(val message: String) : UpdateRestProductState()
 } 

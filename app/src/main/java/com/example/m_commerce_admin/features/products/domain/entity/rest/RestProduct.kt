@@ -1,4 +1,4 @@
-package com.example.m_commerce_admin.features.products.domain.entity
+package com.example.m_commerce_admin.features.products.domain.entity.rest
 
 data class RestProduct(
     val id: Long,

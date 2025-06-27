@@ -1,19 +1,26 @@
-package com.example.m_commerce_admin.features.products.data.repository
+package com.example.m_commerce_admin.features.products.data.repository.rest
 
 import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
 import android.util.Base64
+import android.util.Log
+import com.apollographql.apollo.api.Optional
 import com.example.m_commerce_admin.config.constant.ShopifyConfig
+import com.example.m_commerce_admin.features.products.data.mapper.toGraphQL
 import com.example.m_commerce_admin.features.products.data.mapper.toProductCreateDto
 import com.example.m_commerce_admin.features.products.data.mapper.toProductUpdateDto
 import com.example.m_commerce_admin.features.products.data.mapper.toRestProduct
 import com.example.m_commerce_admin.features.products.data.retrofitRemote.*
-import com.example.m_commerce_admin.features.products.domain.entity.RestProduct
-import com.example.m_commerce_admin.features.products.domain.entity.RestProductImageInput
-import com.example.m_commerce_admin.features.products.domain.entity.RestProductInput
-import com.example.m_commerce_admin.features.products.domain.entity.RestProductUpdateInput
+import com.example.m_commerce_admin.features.products.domain.entity.DomainProductInput
+import com.example.m_commerce_admin.features.products.domain.entity.StagedUploadTarget
+import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProduct
+import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductImageInput
+import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductInput
+import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductUpdateInput
 import com.example.m_commerce_admin.features.products.domain.repository.RestProductRepository
+import com.example.m_commerce_admin.type.CreateMediaInput
+import com.example.m_commerce_admin.type.MediaContentType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -21,11 +28,12 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import javax.inject.Inject
+import kotlin.math.log
 
 class RestProductRepositoryImpl @Inject constructor(
     private val retrofitDataSource: RetrofitProductDataSource,
-    private val okHttpClient: OkHttpClient
-) : RestProductRepository {
+    private val okHttpClient: OkHttpClient,
+ ) : RestProductRepository {
 
     override fun getAllProducts(
         limit: Int,
@@ -49,6 +57,7 @@ class RestProductRepositoryImpl @Inject constructor(
     override suspend fun createProduct(product: RestProductInput): Result<RestProduct> {
         return retrofitDataSource.createProduct(product.toProductCreateDto())
             .map { it.toRestProduct() }
+
     }
 
     override suspend fun updateProduct(
@@ -59,53 +68,55 @@ class RestProductRepositoryImpl @Inject constructor(
             .map { it.toRestProduct() }
     }
 
-    override suspend fun deleteProduct(productId: Long): Result<Unit> {
-        return retrofitDataSource.deleteProduct(productId)
-    }
+
 
     override suspend fun uploadImagesAndAddProduct(
         product: RestProductInput,
         imageUris: List<Uri>,
         context: Context
     ): Result<RestProduct> = runCatching {
-        // Create product first
+        // Step 1: Create product via REST (no images)
         val productWithoutImages = product.copy(images = null)
         val createResult = createProduct(productWithoutImages)
-        
-        if (createResult.isFailure) {
-            throw createResult.exceptionOrNull() ?: Exception("Failed to create product")
-        }
+        if (createResult.isFailure) throw createResult.exceptionOrNull()
+            ?: Exception("Product creation failed")
 
         val createdProduct = createResult.getOrThrow()
-        
-        // Upload images to assets and add them to the product
+
+        // Step 2: Prepare staged uploads
         if (imageUris.isNotEmpty()) {
-            val imageUrls = mutableListOf<String>()
-            
-            // Use configured theme ID
-            val themeId = ShopifyConfig.DEFAULT_THEME_ID
-            
-            for (uri in imageUris) {
-                val uploadResult = uploadImageToAssets(themeId, uri, context)
-                if (uploadResult.isSuccess) {
-                    imageUrls.add(uploadResult.getOrThrow())
-                }
+            val inputs = retrofitDataSource.prepareStagedUploadInputs(context, imageUris)
+            val targets = retrofitDataSource.requestStagedUploads(inputs)
+
+            // Step 3: Upload images to Shopify CDN
+            imageUris.zip(targets).forEach { (uri, target) ->
+                val uploadSuccess =
+                    retrofitDataSource.uploadImageToStagedTarget(context, uri, target)
+                if (!uploadSuccess) throw Exception("Failed to upload image: ${uri.lastPathSegment}")
             }
-            
-            // Add images to the product
-            if (imageUrls.isNotEmpty()) {
-                val addImagesResult = addImagesToProduct(createdProduct.id, imageUrls)
-                if (addImagesResult.isSuccess) {
-                    return@runCatching addImagesResult.getOrThrow()
-                }
-            }
+
+            // Step 4: Attach CDN images to product via REST
+            val imageUrls = targets.map { it.resourceUrl }
+
+            val addImagesResult = addImagesToProduct(createdProduct.id, imageUrls)
+            if (addImagesResult.isFailure) throw addImagesResult.exceptionOrNull()
+                ?: Exception("Failed to add images to product")
         }
-        
+
         createdProduct
     }.fold(
         onSuccess = { Result.success(it) },
         onFailure = { Result.failure(it) }
     )
+
+    private suspend fun uploadFileToTarget(
+        context: Context,
+        uri: Uri,
+        target: StagedUploadTarget
+    ): Boolean {
+        return retrofitDataSource.uploadImageToStagedTarget(context, uri, target)
+    }
+
 
     override suspend fun uploadImageToAssets(
         themeId: Long,
@@ -158,6 +169,13 @@ class RestProductRepositoryImpl @Inject constructor(
         }
     }
 
+    private fun getFileName(context: Context, uri: Uri): String {
+        return context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+            val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            cursor.moveToFirst()
+            cursor.getString(nameIndex)
+        } ?: uri.lastPathSegment ?: "image_${System.currentTimeMillis()}.jpg"
+    }
     override suspend fun addImagesToProduct(
         productId: Long,
         imageUrls: List<String>
@@ -183,19 +201,17 @@ class RestProductRepositoryImpl @Inject constructor(
         available: Int
     ): Result<Unit> {
         return try {
-            // This would need to be implemented in the data source
-            // For now, return success as inventory is set during product creation
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
-
-    private fun getFileName(context: Context, uri: Uri): String {
-        return context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
-            val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-            cursor.moveToFirst()
-            cursor.getString(nameIndex)
-        } ?: uri.lastPathSegment ?: "image_${System.currentTimeMillis()}.jpg"
+    override suspend fun deleteProduct(productId: Long): Result<Unit> {
+        return retrofitDataSource.deleteProduct(productId)
     }
+    override suspend fun publishProduct(productId: Long) {
+        retrofitDataSource.publishProduct(productId)
+    }
+
+
 } 

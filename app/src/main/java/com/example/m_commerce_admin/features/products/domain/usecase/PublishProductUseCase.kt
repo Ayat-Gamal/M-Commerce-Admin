@@ -2,15 +2,14 @@ package com.example.m_commerce_admin.features.products.domain.usecase
 
 import com.example.m_commerce_admin.core.shared.components.usecase.UseCase
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProduct
-import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductInput
 import com.example.m_commerce_admin.features.products.domain.repository.RestProductRepository
 import javax.inject.Inject
 
-class CreateRestProductUseCase @Inject constructor(
+class PublishProductUseCase @Inject constructor(
     private val repository: RestProductRepository
-) : UseCase<RestProductInput, Result<RestProduct>> {
+) : UseCase<Long, Unit> {
 
-    override suspend fun invoke(params: RestProductInput): Result<RestProduct> {
-        return repository.createProduct(params)
+    override suspend fun invoke(params: Long) {
+        return repository.publishProduct(params)
     }
-} 
+}

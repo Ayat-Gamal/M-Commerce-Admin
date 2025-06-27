@@ -1,7 +1,16 @@
 package com.example.m_commerce_admin.features.products.data.mapper
 
 import com.example.m_commerce_admin.features.products.data.retrofitRemote.*
-import com.example.m_commerce_admin.features.products.domain.entity.*
+import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProduct
+import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductImage
+import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductImageInput
+import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductInput
+import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductOption
+import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductOptionInput
+import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductUpdateInput
+import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductVariant
+import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductVariantInput
+import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductVariantUpdateInput
 
 // DTO to Domain mappers
 fun ProductDto.toRestProduct(): RestProduct {

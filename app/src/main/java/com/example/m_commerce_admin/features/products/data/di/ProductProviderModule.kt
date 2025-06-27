@@ -3,9 +3,10 @@ package com.example.m_commerce_admin.features.products.data.di
 import com.apollographql.apollo.ApolloClient
 import com.example.m_commerce_admin.features.products.data.remote.ProductRemoteDataSource
 import com.example.m_commerce_admin.features.products.data.remote.ProductRemoteDataSourceImpl
-import com.example.m_commerce_admin.features.products.data.repository.RestProductRepositoryImpl
+import com.example.m_commerce_admin.features.products.data.repository.rest.RestProductRepositoryImpl
 import com.example.m_commerce_admin.features.products.data.retrofitRemote.RetrofitProductDataSource
 import com.example.m_commerce_admin.features.products.data.retrofitRemote.RetrofitProductDataSourceImpl
+import com.example.m_commerce_admin.features.products.data.retrofitRemote.ShopifyProductApi
 import com.example.m_commerce_admin.features.products.domain.repository.ProductRepository
 import com.example.m_commerce_admin.features.products.domain.repository.RestProductRepository
 import com.example.m_commerce_admin.features.products.domain.usecase.*
@@ -30,8 +31,8 @@ object ProductProviderModule {
     // REST API Data Source
     @Provides
     @Singleton
-    fun provideRetrofitProductDataSource(api: com.example.m_commerce_admin.features.products.data.retrofitRemote.ShopifyProductApi): RetrofitProductDataSource {
-        return RetrofitProductDataSourceImpl(api)
+    fun provideRetrofitProductDataSource(api: ShopifyProductApi, graph:ApolloClient): RetrofitProductDataSource {
+        return RetrofitProductDataSourceImpl(api,graph)
     }
 
     // REST API Repository
@@ -95,5 +96,11 @@ object ProductProviderModule {
     @Singleton
     fun provideAddRestProductWithImagesUseCase(repo: RestProductRepository): AddRestProductWithImagesUseCase {
         return AddRestProductWithImagesUseCase(repo)
+    }
+
+    @Provides
+    @Singleton
+    fun providePublishProductUseCase(repo: RestProductRepository): PublishProductUseCase {
+        return PublishProductUseCase(repo)
     }
 }

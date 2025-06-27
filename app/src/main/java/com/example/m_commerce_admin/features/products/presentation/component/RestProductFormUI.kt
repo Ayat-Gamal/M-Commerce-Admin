@@ -10,7 +10,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -24,8 +23,11 @@ import androidx.navigation.NavController
 import com.example.m_commerce_admin.config.theme.DarkestGray
 import com.example.m_commerce_admin.config.theme.Teal
 import com.example.m_commerce_admin.core.shared.components.ImagePicker
-import com.example.m_commerce_admin.features.products.domain.entity.RestProductInput
-import com.example.m_commerce_admin.features.products.domain.entity.RestProductVariantInput
+import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProduct
+import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductInput
+import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductUpdateInput
+import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductVariantInput
+import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductVariantUpdateInput
 import com.example.m_commerce_admin.features.products.presentation.viewModel.AddRestProductState
 import com.example.m_commerce_admin.features.products.presentation.viewModel.RestProductsViewModel
 import com.example.m_commerce_admin.features.products.presentation.viewModel.UpdateRestProductState
@@ -39,7 +41,7 @@ fun RestProductFormUI(
     navController: NavController? = null,
     // Edit mode parameters
     isEditMode: Boolean = false,
-    productToEdit: com.example.m_commerce_admin.features.products.domain.entity.RestProduct? = null,
+    productToEdit: RestProduct? = null,
     onBackPressed: (() -> Unit)? = null
 ) {
     // Initialize form fields based on mode
@@ -338,7 +340,6 @@ fun RestProductFormUI(
             // Submit Button
             Button(
                 onClick = {
-                    println("Submitting product with ${selectedImages.size} images")
                     val variantInput = RestProductVariantInput(
                         price = price,
                         sku = sku.takeIf { it.isNotBlank() },
@@ -347,14 +348,14 @@ fun RestProductFormUI(
                     
                     if (isEditMode && productToEdit != null) {
                         // Update mode
-                        val updateInput = com.example.m_commerce_admin.features.products.domain.entity.RestProductUpdateInput(
+                        val updateInput = RestProductUpdateInput(
                             title = title,
                             descriptionHtml = description,
                             productType = productType,
                             vendor = vendor,
                             status = selectedStatus,
                             variants = listOf(
-                                com.example.m_commerce_admin.features.products.domain.entity.RestProductVariantUpdateInput(
+                              RestProductVariantUpdateInput(
                                     id = productToEdit.variants.firstOrNull()?.id ?: 0,
                                     price = price,
                                     sku = sku.takeIf { it.isNotBlank() }
@@ -363,14 +364,16 @@ fun RestProductFormUI(
                         )
                         viewModel.updateProduct(productToEdit.id, updateInput)
                     } else {
-                        // Add mode
+
                         val productInput = RestProductInput(
                             title = title,
                             descriptionHtml = description,
                             productType = productType,
                             vendor = vendor,
                             status = selectedStatus,
-                            variants = listOf(variantInput)
+                            variants = listOf(variantInput),
+
+
                         )
                         viewModel.addProduct(productInput, selectedImages, context)
                     }

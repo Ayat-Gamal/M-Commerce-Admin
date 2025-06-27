@@ -11,6 +11,7 @@ import com.example.m_commerce_admin.AddProductMutation
 import com.example.m_commerce_admin.AddProductWithImagesMutation
 import com.example.m_commerce_admin.DeleteProductMutation
 import com.example.m_commerce_admin.GetProductsQuery
+import com.example.m_commerce_admin.PublishProductMutation
 import com.example.m_commerce_admin.StagedUploadsCreateMutation
 import com.example.m_commerce_admin.features.products.data.mapper.toDomain
 import com.example.m_commerce_admin.features.products.data.mapper.toGraphQL
@@ -20,9 +21,12 @@ import com.example.m_commerce_admin.features.products.presentation.states.GetPro
 import com.example.m_commerce_admin.type.CreateMediaInput
 import com.example.m_commerce_admin.type.ProductInput
 import com.example.m_commerce_admin.type.StagedUploadTargetGenerateUploadResource
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
@@ -35,6 +39,9 @@ class ProductRemoteDataSourceImpl @Inject constructor(
     private val okHttpClient: OkHttpClient
 
 ) : ProductRemoteDataSource {
+
+
+
 
     override fun getProducts(first: Int, after: String?): Flow<GetProductState> = flow {
         try {
@@ -233,7 +240,7 @@ class ProductRemoteDataSourceImpl @Inject constructor(
 
             response.data?.productCreate?.userErrors?.let { errors ->
                 if (errors.isNotEmpty()) {
-                    return Result.failure(Exception(errors.first().message))
+                  //  return Result.failure(Exception(errors.first().message))
                 }
             }
 
@@ -256,6 +263,8 @@ class ProductRemoteDataSourceImpl @Inject constructor(
             Result.failure(e)
         }
     }
+
+
 }
 
 

@@ -3,9 +3,7 @@ package com.example.m_commerce_admin.features.products.presentation.component
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,7 +37,7 @@ import com.example.m_commerce_admin.config.theme.lightRed
 import com.example.m_commerce_admin.core.helpers.formatIsoDate
 import com.example.m_commerce_admin.core.shared.components.NetworkImage
 import com.example.m_commerce_admin.features.products.domain.entity.Product
-import com.example.m_commerce_admin.features.products.domain.entity.RestProduct
+import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProduct
 
 private fun String.capitalize(): String {
     return if (this.isNotEmpty()) {

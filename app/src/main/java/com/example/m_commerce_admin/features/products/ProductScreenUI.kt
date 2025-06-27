@@ -13,17 +13,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -42,13 +39,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.m_commerce_admin.config.theme.Teal
 import com.example.m_commerce_admin.core.shared.components.states.Empty
 import com.example.m_commerce_admin.core.shared.components.states.Failed
+import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProduct
 import com.example.m_commerce_admin.features.products.presentation.component.ProductCard
 import com.example.m_commerce_admin.features.products.presentation.component.ProductSearchBar
 import com.example.m_commerce_admin.features.products.presentation.component.RestProductFormUI
 import com.example.m_commerce_admin.features.products.presentation.viewModel.RestProductsState
 import com.example.m_commerce_admin.features.products.presentation.viewModel.RestProductsViewModel
 import com.example.m_commerce_admin.features.products.presentation.viewModel.DeleteRestProductState
-import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -65,7 +62,7 @@ fun ProductScreenUI(
     
     // State for edit mode
     var showEditForm by remember { mutableStateOf(false) }
-    var productToEdit by remember { mutableStateOf<com.example.m_commerce_admin.features.products.domain.entity.RestProduct?>(null) }
+    var productToEdit by remember { mutableStateOf<RestProduct?>(null) }
 
     val shouldLoadMore by remember {
         derivedStateOf {

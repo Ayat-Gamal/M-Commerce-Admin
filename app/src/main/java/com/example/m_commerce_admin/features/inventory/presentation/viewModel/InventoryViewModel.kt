@@ -8,12 +8,14 @@ import com.example.m_commerce_admin.features.inventory.domain.usecase.GetInvento
 import com.example.m_commerce_admin.features.inventory.domain.usecase.GetProductsForInventoryUseCase
 import com.example.m_commerce_admin.features.inventory.domain.usecase.GetProductsForInventoryParams
 import com.example.m_commerce_admin.features.inventory.presentation.state.InventoryLevelsState
+import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProduct
+import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductImage
+import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductVariant
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -179,7 +181,7 @@ class InventoryViewModel @Inject constructor(
             val products = productsResult.getOrThrow()
             
             // Build mapping
-            val variantMap = mutableMapOf<Long, Triple<com.example.m_commerce_admin.features.products.domain.entity.RestProduct, com.example.m_commerce_admin.features.products.domain.entity.RestProductVariant, com.example.m_commerce_admin.features.products.domain.entity.RestProductImage?>>()
+            val variantMap = mutableMapOf<Long, Triple<RestProduct, RestProductVariant, RestProductImage?>>()
             for (product in products) {
                 val image = product.images?.firstOrNull()
                 for (variant in product.variants) {

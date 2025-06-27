@@ -7,9 +7,11 @@ mutation AddProductWithImages($input: ProductInput!, $media: [CreateMediaInput!]
             createdAt
             totalInventory
             publishedAt
+            publishedOnCurrentPublication
             featuredImage {
                 url
             }
+
             images(first: 10) {
                 edges {
                     node {
