@@ -21,8 +21,7 @@ import com.example.m_commerce_admin.features.home.presentation.orders.OrdersScre
 import com.example.m_commerce_admin.features.inventory.presentation.InventoryScreenUI
 import com.example.m_commerce_admin.features.login.presentation.LoginScreenUI
 import com.example.m_commerce_admin.features.products.ProductScreenUI
-import com.example.m_commerce_admin.features.products.presentation.component.ProductFormUI
-import com.example.m_commerce_admin.features.products.presentation.component.RestProductFormUI
+ import com.example.m_commerce_admin.features.products.presentation.component.RestProductFormUI
 
 import com.example.m_commerce_admin.features.splash.SplashScreenUI
 
@@ -92,12 +91,7 @@ fun NavSetup(
                 navController.popBackStack()
             }
         }
-        composable<AppRoutes.ProductForm> {
-            showBottomNavbar.value = false
 
-            ProductFormUI(navController = navController)
-
-        }
   composable<AppRoutes.RestProductForm> {
             showBottomNavbar.value = false
 

@@ -29,7 +29,8 @@ fun ProductDto.toRestProduct(): RestProduct {
         tags = tags,
         variants = variants.map { it.toRestProductVariant() },
         images = images?.map { it.toRestProductImage() },
-        options = options?.map { it.toRestProductOption() }
+        options = options?.map { it.toRestProductOption() },
+
     )
 }
 
@@ -48,7 +49,8 @@ fun VariantDto.toRestProductVariant(): RestProductVariant {
         inventoryPolicy = inventoryPolicy,
         fulfillmentService = fulfillmentService,
         taxable = taxable,
-        requiresShipping = requiresShipping
+        requiresShipping = requiresShipping,
+
     )
 }
 

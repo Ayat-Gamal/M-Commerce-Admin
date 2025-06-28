@@ -7,12 +7,14 @@ import android.util.Log
 import com.apollographql.apollo.ApolloClient
 import com.example.m_commerce_admin.PublishProductMutation
 import com.example.m_commerce_admin.StagedUploadsCreateMutation
+import com.example.m_commerce_admin.features.inventory.data.dto.ConnectInventoryRequest
 import com.example.m_commerce_admin.features.products.data.mapper.toGraphQL
 import com.example.m_commerce_admin.features.products.domain.entity.StagedUploadInput
 import com.example.m_commerce_admin.features.products.domain.entity.StagedUploadTarget
 import com.example.m_commerce_admin.type.StagedUploadTargetGenerateUploadResource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -221,6 +223,40 @@ class RetrofitProductDataSourceImpl @Inject constructor(
             false
         }
     }
+
+
+    override suspend fun setInventoryLevel(
+        inventoryItemId: Long,
+        locationId: Long,
+        available: Int
+    ): Result<Unit> {
+        return try {
+            delay(2000) // Optional safety delay, keep if needed
+
+            val response = api.setInventoryLevel(
+                SetInventoryLevelRequest(
+                    available = available,
+                    locationId = locationId,
+                    inventoryItemId = inventoryItemId
+                )
+            )
+
+            // ✅ Fix: response is a data class, not a Response<T>
+            if (response == null) {
+                throw Exception("Set inventory failed: response.level is null")
+            }
+
+            Log.d("DEBUG", "setInventoryLevel: ")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+
+
+
+
 
     fun provideOkHttpClient(): OkHttpClient {
         return OkHttpClient.Builder()

@@ -60,7 +60,7 @@ fun InventoryScreenUI(
     )
 
 
-     Scaffold { innerPadding ->
+    Scaffold { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -88,7 +88,8 @@ fun InventoryScreenUI(
                     }
 
                     is InventoryLevelsState.Success -> {
-                        val inventoryList = (uiState as InventoryLevelsState.Success).inventoryLevels
+                        val inventoryList =
+                            (uiState as InventoryLevelsState.Success).inventoryLevels
 
                         if (inventoryList.isEmpty()) {
                             Box(

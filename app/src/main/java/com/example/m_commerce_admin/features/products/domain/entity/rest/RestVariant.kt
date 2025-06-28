@@ -19,7 +19,7 @@ data class RestProductVariant(
 )
 
 data class RestProductVariantInput(
-    val option1: String, // e.g., "Small"
+    val option1: String? = null, // e.g., "Small"
     val option2: String? = null, // e.g., "Red"
     val price: String,
     val sku: String? = null,
@@ -48,5 +48,7 @@ data class RestProductVariantUpdateInput(
     val inventoryPolicy: String? = null,
     val fulfillmentService: String? = null,
     val taxable: Boolean? = null,
-    val requiresShipping: Boolean? = null
+    val requiresShipping: Boolean? = null,
+    val inventoryQuantity: Int? = 0
+
 )

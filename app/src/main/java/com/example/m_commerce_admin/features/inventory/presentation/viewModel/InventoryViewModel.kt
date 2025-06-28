@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.m_commerce_admin.features.inventory.domain.entity.InventoryLevel
 import com.example.m_commerce_admin.features.inventory.domain.usecase.AdjustInventoryUseCase
 import com.example.m_commerce_admin.features.inventory.domain.usecase.GetInventoryLevelsUseCase
-import com.example.m_commerce_admin.features.inventory.domain.usecase.GetProductsForInventoryUseCase
 import com.example.m_commerce_admin.features.inventory.domain.usecase.GetProductsForInventoryParams
+import com.example.m_commerce_admin.features.inventory.domain.usecase.GetProductsForInventoryUseCase
 import com.example.m_commerce_admin.features.inventory.presentation.state.InventoryLevelsState
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProduct
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductImage
@@ -28,7 +28,7 @@ class InventoryViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow<InventoryLevelsState>(InventoryLevelsState.Loading)
     val uiState: StateFlow<InventoryLevelsState> = _uiState.asStateFlow()
-    
+
     private val _adjustState = MutableStateFlow<Result<InventoryLevel>?>(null)
     val adjustState: StateFlow<Result<InventoryLevel>?> = _adjustState
 
@@ -74,6 +74,7 @@ class InventoryViewModel @Inject constructor(
 
     fun adjustInventoryLevel(inventoryItemId: Long, adjustment: Int) {
         viewModelScope.launch {
+
             try {
                 val level = adjustInventoryUseCase(inventoryItemId, adjustment)
                 _adjustState.value = Result.success(level)
@@ -133,30 +134,32 @@ class InventoryViewModel @Inject constructor(
         val allItems = _allInventoryItems.value
 
         val filtered = allItems.filter { item ->
-            val matchesSearch = query.isEmpty() || 
-                (item.productTitle?.lowercase()?.contains(query) == true) ||
-                (item.productSku?.lowercase()?.contains(query) == true) ||
-                item.inventoryItemId.toString().contains(query)
-            
+            val matchesSearch = query.isEmpty() ||
+                    (item.productTitle?.lowercase()?.contains(query) == true) ||
+                    (item.productSku?.lowercase()?.contains(query) == true) ||
+                    item.inventoryItemId.toString().contains(query)
+
             val matchesFilter = when (filter) {
                 InventoryFilter.ALL -> true
                 InventoryFilter.LOW_STOCK -> item.available < 5
                 InventoryFilter.OUT_OF_STOCK -> item.available == 0
                 InventoryFilter.IN_STOCK -> item.available > 0
             }
-            
+
             matchesSearch && matchesFilter
         }
 
         _filteredInventoryItems.value = filtered
-        
+
         when {
             filtered.isEmpty() && query.isNotEmpty() -> {
                 _uiState.value = InventoryLevelsState.Empty
             }
+
             filtered.isEmpty() -> {
                 _uiState.value = InventoryLevelsState.Empty
             }
+
             else -> {
                 _uiState.value = InventoryLevelsState.Success(filtered)
             }
@@ -173,29 +176,30 @@ class InventoryViewModel @Inject constructor(
             val productsResult = getProductsForInventoryUseCase(
                 GetProductsForInventoryParams(limit = 250, pageInfo = null, status = null)
             ).first()
-            
+
             if (productsResult.isFailure) {
-                return inventoryLevels // Return original data if product fetch fails
+                return inventoryLevels
             }
-            
+
             val products = productsResult.getOrThrow()
-            
+
             // Build mapping
-            val variantMap = mutableMapOf<Long, Triple<RestProduct, RestProductVariant, RestProductImage?>>()
+            val variantMap =
+                mutableMapOf<Long, Triple<RestProduct, RestProductVariant, RestProductImage?>>()
             for (product in products) {
                 val image = product.images?.firstOrNull()
                 for (variant in product.variants) {
                     variantMap[variant.inventoryItemId] = Triple(product, variant, image)
                 }
             }
-            
+
             // Enhance inventory levels
             inventoryLevels.map { level ->
                 val triple = variantMap[level.inventoryItemId]
                 val product = triple?.first
                 val variant = triple?.second
                 val image = triple?.third
-                
+
                 InventoryLevel(
                     inventoryItemId = level.inventoryItemId,
                     locationId = level.locationId,
@@ -205,11 +209,12 @@ class InventoryViewModel @Inject constructor(
                     productTitle = product?.title ?: "Product ${level.inventoryItemId}",
                     productImage = image?.src,
                     productPrice = variant?.price ?: "0.00",
-                    productSku = variant?.sku ?: "SKU-${level.inventoryItemId}"
+                    productSku = variant?.sku ?: "SKU-${level.inventoryItemId}",
+
                 )
             }
         } catch (e: Exception) {
-            inventoryLevels // Return original data if enhancement fails
+            inventoryLevels
         }
     }
 }

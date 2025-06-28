@@ -15,6 +15,7 @@ import com.example.m_commerce_admin.features.products.domain.entity.rest.RestPro
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductUpdateInput
 import com.example.m_commerce_admin.features.products.domain.repository.RestProductRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -191,12 +192,9 @@ class RestProductRepositoryImpl @Inject constructor(
         inventoryItemId: Long,
         available: Int
     ): Result<Unit> {
-        return try {
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+        return  retrofitDataSource.setInventoryLevel(locationId,inventoryItemId,available)
     }
+
     override suspend fun deleteProduct(productId: Long): Result<Unit> {
         return retrofitDataSource.deleteProduct(productId)
     }

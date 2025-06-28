@@ -12,4 +12,7 @@ interface InventoryRemoteDataSource {
         locationId: Long,
         availableAdjustment: Int
     ): InventoryLevel
+
+
+
 }

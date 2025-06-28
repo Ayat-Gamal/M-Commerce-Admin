@@ -14,6 +14,7 @@ import com.example.m_commerce_admin.features.products.domain.usecase.rest.AddRes
 import com.example.m_commerce_admin.features.products.domain.usecase.rest.CreateRestProductUseCase
 import com.example.m_commerce_admin.features.products.domain.usecase.rest.DeleteRestProductUseCase
 import com.example.m_commerce_admin.features.products.domain.usecase.rest.GetAllRestProductsUseCase
+import com.example.m_commerce_admin.features.products.domain.usecase.rest.SetInventoryLevelUseCase
 import com.example.m_commerce_admin.features.products.domain.usecase.rest.UpdateRestProductUseCase
 import dagger.Module
 import dagger.Provides
@@ -107,5 +108,10 @@ object ProductProviderModule {
     @Singleton
     fun providePublishProductUseCase(repo: RestProductRepository): PublishProductUseCase {
         return PublishProductUseCase(repo)
+    }
+    @Provides
+    @Singleton
+    fun provideSetInventoryLevelUseCase (repo: RestProductRepository): SetInventoryLevelUseCase {
+        return SetInventoryLevelUseCase (repo)
     }
 }

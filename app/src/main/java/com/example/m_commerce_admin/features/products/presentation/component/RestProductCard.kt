@@ -38,14 +38,6 @@ import com.example.m_commerce_admin.core.helpers.formatIsoDate
 import com.example.m_commerce_admin.core.shared.components.NetworkImage
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProduct
 
-private fun String.capitalize(): String {
-    return if (this.isNotEmpty()) {
-        this[0].uppercase() + this.substring(1).lowercase()
-    } else {
-        this
-    }
-}
-
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun RestProductCard(
@@ -53,7 +45,7 @@ fun RestProductCard(
     onEdit: () -> Unit,
     onDelete: () -> Unit
 ) {
-    val firstVariant = remember(product) { product.variants}
+    val firstVariant = remember(product) { product.variants }
     val firstImage = remember(product) { product.images?.firstOrNull() }
     val imageCount = product.images?.size ?: 0
     val createdDate = product.createdAt?.let { formatIsoDate(it) } ?: "Unknown"
@@ -126,7 +118,11 @@ fun RestProductCard(
                             color = Teal,
                             fontWeight = FontWeight.Medium
                         )
-                        Text("Stock: ${firstVariant.first().quantity}", fontSize = 13.sp, color = DarkGray)
+                        Text(
+                            "Stock: ${firstVariant.first().quantity}",
+                            fontSize = 13.sp,
+                            color = DarkGray
+                        )
                     }
                 }
                 Column(horizontalAlignment = Alignment.End) {

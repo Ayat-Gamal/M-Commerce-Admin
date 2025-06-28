@@ -30,6 +30,7 @@ android {
     }
     val adminToken: String = localProperties.getProperty("ADMIN_TOKEN", "")
     val shopDomain: String = localProperties.getProperty("SHOP_DOMAIN", "")
+    val locationID: String = localProperties.getProperty("LOCATION_ID", "82774655225")
 
 
     defaultConfig {
@@ -43,6 +44,7 @@ android {
 
         buildConfigField("String", "adminToken", properties.getProperty("ADMIN_TOKEN"))
         buildConfigField("String", "shopDomain", shopDomain)
+        buildConfigField( "String", "locationID", locationID)
         resValue("string", "ADMIN_TOKEN", adminToken)
 
 

@@ -1,7 +1,6 @@
 package com.example.m_commerce_admin.features.products
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,7 +14,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -30,7 +28,6 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,6 +39,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.m_commerce_admin.config.theme.Teal
 import com.example.m_commerce_admin.core.shared.components.states.Empty
 import com.example.m_commerce_admin.core.shared.components.states.Failed
+import com.example.m_commerce_admin.features.inventory.presentation.viewModel.InventoryViewModel
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProduct
 import com.example.m_commerce_admin.features.products.presentation.component.ProductSearchBar
 import com.example.m_commerce_admin.features.products.presentation.component.RestProductCard
@@ -49,12 +47,12 @@ import com.example.m_commerce_admin.features.products.presentation.component.Res
 import com.example.m_commerce_admin.features.products.presentation.viewModel.DeleteRestProductState
 import com.example.m_commerce_admin.features.products.presentation.viewModel.RestProductsState
 import com.example.m_commerce_admin.features.products.presentation.viewModel.RestProductsViewModel
-import kotlin.math.log
+import kotlinx.coroutines.coroutineScope
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ProductScreenUI(
-    viewModel: RestProductsViewModel = hiltViewModel()
+    viewModel: RestProductsViewModel = hiltViewModel(),
 ) {
     val state by viewModel.productsState.collectAsState()
     val deleteState by viewModel.deleteProductState.collectAsState()
@@ -62,7 +60,7 @@ fun ProductScreenUI(
     val selectedStatus by viewModel.selectedStatus.collectAsState()
     val listState = rememberLazyListState()
     val snackbarHostState = remember { SnackbarHostState() }
-    val coroutineScope = rememberCoroutineScope()
+
 
     // State for edit mode
     var showEditForm by remember { mutableStateOf(false) }
@@ -78,8 +76,13 @@ fun ProductScreenUI(
         }
     }
     val context = LocalContext.current
-
-
+//
+//    LaunchedEffect(Unit) {
+//       coroutineScope {
+//
+//        viewModel.testAddProductWithVariants(context = context)
+//       }
+//    }
 
     LaunchedEffect(shouldLoadMore) {
         if (shouldLoadMore) {
@@ -133,11 +136,6 @@ fun ProductScreenUI(
                     selectedStatus = selectedStatus,
                     onStatusChange = { viewModel.updateStatusFilter(it) }
                 )
-                Button(onClick = {
-                    viewModel.testAddProductWithVariants(context)
-                }) {
-                    Text("Add Test Product with Variants")
-                }
 
                 // Main Content
                 Box(modifier = Modifier.fillMaxSize()) {
@@ -212,7 +210,6 @@ fun ProductScreenUI(
                                             }
                                         }
                                     }
-
                                     // Product items
                                     items(products) { product ->
                                         RestProductCard(

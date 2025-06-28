@@ -2,6 +2,7 @@ package com.example.m_commerce_admin.features.products.data.retrofitRemote
 
 import android.content.Context
 import android.net.Uri
+import com.example.m_commerce_admin.features.inventory.domain.entity.InventoryLevel
 import com.example.m_commerce_admin.features.products.data.retrofitRemote.*
 import com.example.m_commerce_admin.features.products.domain.entity.StagedUploadInput
 import com.example.m_commerce_admin.features.products.domain.entity.StagedUploadTarget
@@ -25,6 +26,10 @@ interface RetrofitProductDataSource {
     suspend fun prepareStagedUploadInputs(context: Context, imageUris: List<Uri>): List<StagedUploadInput>
     suspend fun requestStagedUploads(inputs: List<StagedUploadInput>): List<StagedUploadTarget>
     suspend fun uploadImageToStagedTarget(context: Context, uri: Uri, target: StagedUploadTarget): Boolean
-
+    suspend fun setInventoryLevel(
+        inventoryItemId: Long,
+        locationId: Long,
+        available: Int
+    ): Result<Unit>
 }
 

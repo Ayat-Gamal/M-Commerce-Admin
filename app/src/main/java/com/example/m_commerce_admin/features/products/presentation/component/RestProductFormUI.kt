@@ -2,29 +2,62 @@ package com.example.m_commerce_admin.features.products.presentation.component
 
 import android.net.Uri
 import android.util.Log
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.m_commerce_admin.config.theme.DarkestGray
+import com.example.m_commerce_admin.config.theme.LightGray80
 import com.example.m_commerce_admin.config.theme.Teal
 import com.example.m_commerce_admin.core.shared.components.ImagePicker
+import com.example.m_commerce_admin.features.inventory.presentation.viewModel.InventoryViewModel
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProduct
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductInput
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductOptionInput
@@ -41,44 +74,47 @@ import kotlinx.coroutines.launch
 @Composable
 fun RestProductFormUI(
     viewModel: RestProductsViewModel = hiltViewModel(),
+    inventoryViewModel: InventoryViewModel = hiltViewModel(),
     navController: NavController? = null,
     isEditMode: Boolean = false,
     productToEdit: RestProduct? = null,
     onBackPressed: (() -> Unit)? = null
 ) {
 
-
-
     // Initialize form fields based on mode
     var title by remember {
         mutableStateOf(if (isEditMode && productToEdit != null) productToEdit.title else "")
     }
     var description by remember {
-        mutableStateOf(if (isEditMode && productToEdit != null) productToEdit.descriptionHtml ?: "" else "")
+        mutableStateOf(
+            if (isEditMode && productToEdit != null) productToEdit.descriptionHtml ?: "" else ""
+        )
     }
     var productTypeOptions = listOf("T-SHIRTS", "SHOES", "ACCESSORIES", "Other")
-    var vendorOptions = listOf("NIKE", "ADIDAS", "VANS","PUMA","FLEX FIT","ASICS TIGER","LOCAL")
+    var vendorOptions =
+        listOf("NIKE", "ADIDAS", "VANS", "PUMA", "FLEX FIT", "ASICS TIGER", "LOCAL", "Other")
 
-    var selectedProductType by remember { mutableStateOf("") }
-    var customProductType by remember { mutableStateOf("") }
+    var selectedProductType by rememberSaveable { mutableStateOf("") }
+    var customProductType by rememberSaveable { mutableStateOf("") }
 
-    var selectedVendor by remember { mutableStateOf("") }
-    var customVendor by remember { mutableStateOf("") }
+    var selectedVendor by rememberSaveable { mutableStateOf("") }
+    var customVendor by rememberSaveable { mutableStateOf("") }
 
 
     var variantList by remember {
         mutableStateOf(
             if (isEditMode && productToEdit != null) {
+
                 productToEdit.variants.map {
                     RestProductVariantInput(
-                        option1 = "Size",
+                        option1 = it.title,
                         price = it.price,
                         sku = it.sku,
                         inventoryQuantity = it.quantity
                     )
                 }
             } else {
-                listOf(RestProductVariantInput(option1 = "Size",price = ""))
+                listOf(RestProductVariantInput(option1 = "Size", price = ""))
             }
         )
     }
@@ -88,9 +124,10 @@ fun RestProductFormUI(
     var singleProductQuantity by remember { mutableStateOf("") }
 
 
-
     var selectedStatus by remember {
-        mutableStateOf(if (isEditMode && productToEdit != null) productToEdit.status ?: "draft" else "draft")
+        mutableStateOf(
+            if (isEditMode && productToEdit != null) productToEdit.status ?: "draft" else "draft"
+        )
     }
     var selectedImages by remember { mutableStateOf(listOf<Uri>()) }
     var isFormValid by remember { mutableStateOf(false) }
@@ -103,7 +140,8 @@ fun RestProductFormUI(
     val context = LocalContext.current
     val hasOnlySize = variantList.all { !it.option1.isNullOrBlank() && it.option2.isNullOrBlank() }
     val hasOnlyColor = variantList.all { it.option1.isNullOrBlank() && !it.option2.isNullOrBlank() }
-    val hasSizeAndColor = variantList.all { !it.option1.isNullOrBlank() && !it.option2.isNullOrBlank() }
+    val hasSizeAndColor =
+        variantList.all { !it.option1.isNullOrBlank() && !it.option2.isNullOrBlank() }
 
     val normalizedVariants = variantList.map {
         val size = it.option1?.takeIf { it.isNotBlank() } ?: "Default"
@@ -133,12 +171,12 @@ fun RestProductFormUI(
 
     // Determine current state based on mode
     val currentState = if (isEditMode) updateProductState else addProductState
-    val isLoading = currentState is AddRestProductState.Loading || currentState is UpdateRestProductState.Loading
-    val finalProductType = if (selectedProductType == "Other") customProductType else selectedProductType
-    val finalVendor = if (selectedVendor == "Other") customVendor else selectedVendor
+    val isLoading =
+        currentState is AddRestProductState.Loading || currentState is UpdateRestProductState.Loading
 
     LaunchedEffect(title, description, productTypeOptions, vendorOptions, variantList) {
-        val allVariantsValid = variantList.all { it.price.toDoubleOrNull()?.let { p -> p > 0 } ?: false }
+        val allVariantsValid =
+            variantList.all { it.price.toDoubleOrNull()?.let { p -> p > 0 } ?: false }
         isFormValid = title.isNotBlank() && description.isNotBlank() &&
                 productTypeOptions.isNotEmpty() && vendorOptions.isNotEmpty() && allVariantsValid
     }
@@ -148,13 +186,6 @@ fun RestProductFormUI(
         when (addProductState) {
             is AddRestProductState.Success -> {
                 // Reset form
-                title = ""
-                description = ""
-                productTypeOptions = listOf(" ")
-                vendorOptions = listOf(" ")
-                selectedStatus = "draft"
-                selectedImages = emptyList()
-
                 scope.launch {
                     snackbarHostState.showSnackbar("Product added successfully!")
                     delay(1500)
@@ -165,12 +196,21 @@ fun RestProductFormUI(
                     }
                 }
                 viewModel.resetAddProductState()
+                title = ""
+                description = ""
+                productTypeOptions = listOf(" ")
+                vendorOptions = listOf(" ")
+                selectedStatus = "draft"
+                selectedImages = emptyList()
+
             }
+
             is AddRestProductState.Error -> {
                 scope.launch {
                     snackbarHostState.showSnackbar("Error: ${(addProductState as AddRestProductState.Error).message}")
                 }
             }
+
             else -> {}
         }
     }
@@ -178,6 +218,8 @@ fun RestProductFormUI(
     LaunchedEffect(updateProductState) {
         when (updateProductState) {
             is UpdateRestProductState.Success -> {
+
+
                 scope.launch {
                     snackbarHostState.showSnackbar("Product updated successfully!")
                     delay(1500)
@@ -189,11 +231,13 @@ fun RestProductFormUI(
                 }
                 viewModel.resetUpdateProductState()
             }
+
             is UpdateRestProductState.Error -> {
                 scope.launch {
                     snackbarHostState.showSnackbar("Error: ${(updateProductState as UpdateRestProductState.Error).message}")
                 }
             }
+
             else -> {}
         }
     }
@@ -265,7 +309,7 @@ fun RestProductFormUI(
                     DropdownWithCustomInput(
                         label = "Product Type",
                         options = productTypeOptions,
-                        selectedOption = selectedProductType,
+                        selectedOption = if( selectedProductType.isNotEmpty())  selectedProductType else customProductType  ,
                         onOptionSelected = { selectedProductType = it },
                         customInput = customProductType,
                         onCustomInputChange = { customProductType = it }
@@ -275,7 +319,7 @@ fun RestProductFormUI(
                     DropdownWithCustomInput(
                         label = "Vendor",
                         options = vendorOptions,
-                        selectedOption = selectedVendor,
+                        selectedOption =    if( selectedVendor.isNotEmpty())  selectedVendor else customVendor ,
                         onOptionSelected = { selectedVendor = it },
                         customInput = customVendor,
                         onCustomInputChange = { customVendor = it }
@@ -292,14 +336,17 @@ fun RestProductFormUI(
             ) {
                 Checkbox(
                     checked = hasVariants,
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = Teal
+                    ),
                     onCheckedChange = {
                         hasVariants = it
-                        if (!it) {
-                            variantList = listOf(RestProductVariantInput(option1 = "Default", price = ""))
+                        variantList = if (!it) {
+                            listOf(RestProductVariantInput(option1 = "Default", price = ""))
                         } else {
-                            variantList = listOf(
+                            listOf(
                                 RestProductVariantInput(option1 = "Size", price = ""),
-                                RestProductVariantInput(option1 = "Color", price = "")
+                                RestProductVariantInput(option2 = "Color", price = "")
                             )
                         }
                     }
@@ -320,34 +367,36 @@ fun RestProductFormUI(
                         )
                         Spacer(modifier = Modifier.height(8.dp))
 
-                        OutlinedTextField(
+                        FormField(
                             value = singleProductPrice,
                             onValueChange = { singleProductPrice = it },
-                            label = { Text("Price") },
-                            placeholder = { Text("e.g., 99.99") },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            modifier = Modifier.fillMaxWidth()
+                            label = "Price",
+                            placeholder = "e.g., 99.99",
+                            keyboardType = KeyboardType.Number,
+                            isError = singleProductPrice.isBlank()
                         )
 
                         Spacer(modifier = Modifier.height(8.dp))
 
-                        OutlinedTextField(
+
+                        FormField(
                             value = singleProductSku,
                             onValueChange = { singleProductSku = it },
-                            label = { Text("SKU (Optional)") },
-                            placeholder = { Text("e.g., SKU001") },
-                            modifier = Modifier.fillMaxWidth()
+                            label = "SKU (Optional)",
+                            placeholder = "e.g., SKU001",
+
+                            isError = false
                         )
 
                         Spacer(modifier = Modifier.height(8.dp))
 
-                        OutlinedTextField(
+                        FormField(
                             value = singleProductQuantity,
                             onValueChange = { singleProductQuantity = it },
-                            label = { Text("Inventory Quantity") },
-                            placeholder = { Text("e.g., 50") },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            modifier = Modifier.fillMaxWidth()
+                            label = "Inventory Quantity",
+                            placeholder = "e.g., 50",
+                            keyboardType = KeyboardType.Number,
+                            isError = false
                         )
                     }
                 }
@@ -369,26 +418,25 @@ fun RestProductFormUI(
                         VariantListSection(
                             variants = variantList,
                             onUpdateVariant = { index, updated ->
-                                variantList = variantList.toMutableList().also { it[index] = updated }
+                                variantList =
+                                    variantList.toMutableList().also { it[index] = updated }
                             },
                             onAddVariant = {
-                                variantList = variantList + RestProductVariantInput(option1 = "Size", price = "")
+                                variantList = variantList + RestProductVariantInput(
+                                    option1 = " ",
+                                    price = " "
+                                )
+
                             },
                             onRemoveVariant = { index ->
-                                variantList = variantList.toMutableList().also { it.removeAt(index) }
+                                variantList =
+                                    variantList.toMutableList().also { it.removeAt(index) }
                             }
                         )
                     }
                 }
-                Text(
-                    text = "Tip: You can fill Size only, Color only, or both. Leave one empty if not applicable.",
-                    fontSize = 12.sp,
-                    color = Color.Gray
-                )
 
             }
-
-
 
 
             // Product Status
@@ -427,20 +475,13 @@ fun RestProductFormUI(
             // Product Images
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(Color(0xFFF8F9FA))
+                colors = CardDefaults.cardColors(LightGray80)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        "Product Images",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
                     ImagePicker(
                         selectedImages = selectedImages,
                         onImagesSelected = {
                             selectedImages = it
-                            println("Selected ${it.size} images")
                         }
                     )
 
@@ -456,7 +497,6 @@ fun RestProductFormUI(
             }
             if (!hasVariants) {
                 val singleVariant = RestProductVariantInput(
-                    option1 = "Defalut",
                     price = singleProductPrice,
                     sku = singleProductSku,
                     inventoryQuantity = singleProductQuantity.toIntOrNull() ?: 0
@@ -470,9 +510,9 @@ fun RestProductFormUI(
                     if (isEditMode && productToEdit != null) {
                         val updateInput = RestProductUpdateInput(
                             title = title,
-                            productType = finalProductType,
-                            vendor = finalVendor,
-
+                            productType =  if( selectedProductType.isNotEmpty())  selectedProductType else customVendor ,
+                            vendor =  if( selectedVendor.isNotEmpty())  selectedVendor else customVendor ,
+                            options = options,
                             status = selectedStatus,
                             variants = productToEdit.variants.mapIndexedNotNull { index, existing ->
                                 variantList.getOrNull(index)?.let {
@@ -488,29 +528,33 @@ fun RestProductFormUI(
                                         weightUnit = it.weightUnit,
                                         barcode = it.barcode,
                                         taxable = it.taxable,
-                                        requiresShipping = it.requiresShipping
+                                        requiresShipping = it.requiresShipping,
+                                        inventoryQuantity = it.inventoryQuantity ?: 0,
                                     )
                                 }
                             }
                         )
+
                         viewModel.updateProduct(productToEdit.id, updateInput)
+
                     } else {
 
                         val productInput = RestProductInput(
+
                             title = title,
                             descriptionHtml = description,
-                            productType = finalProductType,
-                            vendor = finalVendor,
+                            productType = selectedProductType,
+                            vendor = selectedVendor,
                             status = selectedStatus,
                             variants = variantList,
                             options = options,
-
                             )
 
                         viewModel.addProduct(productInput, selectedImages, context)
+
+
                     }
-                }
-                ,
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
@@ -539,36 +583,7 @@ fun RestProductFormUI(
         }
     }
 }
-@Composable
-fun FormField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    label: String,
-    placeholder: String,
-    isError: Boolean,
-    singleLine: Boolean = true,
-    keyboardType: KeyboardType = KeyboardType.Text
-) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text(label, style = TextStyle(color = DarkestGray)) },
-        placeholder = { Text(placeholder, style = TextStyle(color = DarkestGray)) },
-        modifier = Modifier.fillMaxWidth(),
-        singleLine = singleLine,
-        isError = isError,
-        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-        supportingText = {
-            if (isError) Text("$label is required", color = Teal)
-        },
-        shape = RoundedCornerShape(16.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Teal,
-            unfocusedBorderColor = Color.Gray,
-            focusedLabelColor = Teal
-        )
-    )
-}
+
 
 private fun String.capitalize(): String {
     return if (this.isNotEmpty()) {

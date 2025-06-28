@@ -13,6 +13,7 @@ import com.example.m_commerce_admin.DeleteProductMutation
 import com.example.m_commerce_admin.GetProductsQuery
 import com.example.m_commerce_admin.PublishProductMutation
 import com.example.m_commerce_admin.StagedUploadsCreateMutation
+import com.example.m_commerce_admin.features.inventory.domain.entity.InventoryLevel
 import com.example.m_commerce_admin.features.products.data.mapper.toDomain
 import com.example.m_commerce_admin.features.products.data.mapper.toGraphQL
 import com.example.m_commerce_admin.features.products.domain.entity.StagedUploadInput
