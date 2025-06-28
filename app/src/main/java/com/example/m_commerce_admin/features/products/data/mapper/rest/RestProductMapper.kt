@@ -103,7 +103,8 @@ fun RestProductUpdateInput.toProductUpdateDto(): ProductUpdateDto {
 
 fun RestProductVariantInput.toVariantCreateDto(): VariantCreateDto {
     return VariantCreateDto(
-        option1 = option1 ?: "Size",
+        option1 = option1,
+        option2 = option2,
         price = price,
         sku = sku,
         title = title,

@@ -18,31 +18,7 @@ data class RestProduct(
     val options: List<RestProductOption>?
 )
 
-data class RestProductVariant(
-    val id: Long,
-    val sku: String = "MY-SKU-121",
-    val price: String,
-    val inventoryItemId: Long,
-    val quantity: Int,
-    val title: String?,
-    val weight: Double?,
-    val weightUnit: String?,
-    val barcode: String?,
-    val inventoryManagement: String?,
-    val inventoryPolicy: String?,
-    val fulfillmentService: String?,
-    val taxable: Boolean?,
-    val requiresShipping: Boolean?
-)
 
-data class RestProductImage(
-    val id: Long,
-    val src: String,
-    val alt: String?,
-    val width: Int?,
-    val height: Int?,
-    val position: Int?
-)
 
 data class RestProductOption(
     val id: Long,
@@ -64,27 +40,6 @@ data class RestProductInput(
     val options: List<RestProductOptionInput>? = null
 )
 
-data class RestProductVariantInput(
-    val option1: String?,
-    val price: String,
-    val sku: String? = null,
-    val title: String? = null,
-    val weight: Double? = null,
-    val weightUnit: String? = null,
-    val barcode: String? = null,
-    val inventoryManagement: String? = "shopify",
-    val inventoryPolicy: String? = "deny",
-    val fulfillmentService: String? = "manual",
-    val taxable: Boolean? = true,
-    val requiresShipping: Boolean? = true,
-    val inventoryQuantity: Int? = 0
-)
-
-data class RestProductImageInput(
-    val src: String,
-    val alt: String? = null,
-    val position: Int? = null
-)
 
 data class RestProductOptionInput(
     val name: String,
@@ -104,18 +59,3 @@ data class RestProductUpdateInput(
     val images: List<RestProductImageInput>? = null,
     val options: List<RestProductOptionInput>? = null
 )
-
-data class RestProductVariantUpdateInput(
-    val id: Long,
-    val price: String? = null,
-    val sku: String? = null,
-    val title: String? = null,
-    val weight: Double? = null,
-    val weightUnit: String? = null,
-    val barcode: String? = null,
-    val inventoryManagement: String? = null,
-    val inventoryPolicy: String? = null,
-    val fulfillmentService: String? = null,
-    val taxable: Boolean? = null,
-    val requiresShipping: Boolean? = null
-) 

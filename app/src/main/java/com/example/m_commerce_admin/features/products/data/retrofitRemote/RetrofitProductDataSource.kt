@@ -20,6 +20,7 @@ interface RetrofitProductDataSource {
     suspend fun uploadAsset(themeId: Long, asset: AssetCreateDto): Result<AssetDto>
     suspend fun getAssets(themeId: Long): Result<List<AssetDto>>
 
+    //related product functions
     suspend fun publishProduct(productId:Long)
     suspend fun prepareStagedUploadInputs(context: Context, imageUris: List<Uri>): List<StagedUploadInput>
     suspend fun requestStagedUploads(inputs: List<StagedUploadInput>): List<StagedUploadTarget>

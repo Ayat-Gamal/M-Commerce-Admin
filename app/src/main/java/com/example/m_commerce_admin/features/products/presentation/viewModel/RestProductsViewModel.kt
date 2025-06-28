@@ -2,11 +2,16 @@ package com.example.m_commerce_admin.features.products.presentation.viewModel
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProduct
+import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductImageInput
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductInput
+import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductOptionInput
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductUpdateInput
+import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductVariantInput
+import com.example.m_commerce_admin.features.products.domain.repository.RestProductRepository
 import com.example.m_commerce_admin.features.products.domain.usecase.rest.CreateRestProductUseCase
 import com.example.m_commerce_admin.features.products.domain.usecase.rest.DeleteRestProductUseCase
 import com.example.m_commerce_admin.features.products.domain.usecase.rest.GetAllRestProductsParams
@@ -31,8 +36,69 @@ class RestProductsViewModel @Inject constructor(
     private val addRestProductWithImagesUseCase: AddRestProductWithImagesUseCase,
     private val deleteRestProductUseCase: DeleteRestProductUseCase,
     private val updateRestProductUseCase: UpdateRestProductUseCase,
-    private val publishProductUseCase: PublishProductUseCase
+    private val publishProductUseCase: PublishProductUseCase,
+    private val restProductRepository: RestProductRepository
 ) : ViewModel() {
+    fun testAddProductWithVariants(context: Context) {
+        val options = listOf(
+            RestProductOptionInput(
+                name = "Size",
+                position = 1,
+                values = listOf("Small", "Medium", "Large")
+            ),
+            RestProductOptionInput(
+                name = "Color",
+                position = 2,
+                values = listOf("Red", "Blue")
+            )
+        )
+
+        val variants = listOf(
+            RestProductVariantInput(
+                option1 = "Small",
+                option2 = "Red",
+                price = "99.99",
+                sku = "S-RED",
+                inventoryQuantity = 10
+            ),
+            RestProductVariantInput(
+                option1 = "Medium",
+                option2 = "Red",
+                price = "109.99",
+                sku = "M-RED",
+                inventoryQuantity = 5
+            ),
+            RestProductVariantInput(
+                option1 = "Large",
+                option2 = "Blue",
+                price = "119.99",
+                sku = "L-BLUE",
+                inventoryQuantity = 7
+            )
+        )
+        val images = listOf(
+            RestProductImageInput(
+                src = "https://cdn.shopify.com/s/files/1/0755/0271/5129/collections/smart_collections_2.jpg?v=1749927992", // use any valid public URL
+                alt = "Test Image"
+            )
+        )
+        val productInput = RestProductInput(
+            title = "Static Test Product",
+            descriptionHtml = "This is a test product with predefined Size and Color variants.",
+            productType = "Clothing",
+            vendor = "TestVendor",
+            status = "active",
+            tags = "test,static",
+            options = options,
+            variants = variants,
+                    images = images // ✅ Add this
+
+        )
+
+
+        // Use empty list for images for now
+        addProduct(productInput, emptyList(), context)
+    }
 
      private val _productsState = MutableStateFlow<RestProductsState>(RestProductsState.Idle)
     val productsState: StateFlow<RestProductsState> = _productsState.asStateFlow()
@@ -101,6 +167,7 @@ class RestProductsViewModel @Inject constructor(
         context: Context? = null
     ) {
         _addProductState.value = AddRestProductState.Loading
+        Log.d("DEBUG", "Submitting product: $productInput")
 
         viewModelScope.launch {
             val result = if (imageUris.isNotEmpty() && context != null) {
@@ -111,6 +178,7 @@ class RestProductsViewModel @Inject constructor(
                         context = context
                     )
                 )
+
             } else {
                 createRestProductUseCase(productInput)
             }

@@ -22,7 +22,8 @@ fun VariantListSection(
     variants: List<RestProductVariantInput>,
     onUpdateVariant: (Int, RestProductVariantInput) -> Unit,
     onAddVariant: () -> Unit,
-    onRemoveVariant: (Int) -> Unit
+    onRemoveVariant: (Int) -> Unit,
+
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(text = "Variants", style = MaterialTheme.typography.titleMedium)
@@ -30,6 +31,7 @@ fun VariantListSection(
 
         variants.forEachIndexed { index, variant ->
             VariantInputRow(
+
                 variant = variant,
                 onVariantChange = { onUpdateVariant(index, it) },
                 onDeleteClick = { onRemoveVariant(index) }
