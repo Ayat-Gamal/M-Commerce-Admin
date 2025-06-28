@@ -8,12 +8,9 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Red
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.example.m_commerce_admin.config.theme.DarkestGray
 import com.example.m_commerce_admin.config.theme.Gray
 import com.example.m_commerce_admin.config.theme.Teal
 
@@ -44,7 +41,7 @@ fun FormField(
         shape = RoundedCornerShape(16.dp),
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = Teal,
-            unfocusedBorderColor =  Gray,
+            unfocusedBorderColor = Gray,
             focusedLabelColor = Teal,
             errorBorderColor = Teal,
         )

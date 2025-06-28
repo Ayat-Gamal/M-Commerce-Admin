@@ -1,23 +1,15 @@
 package com.example.m_commerce_admin.features.coupons.presentation.component
 
-import java.util.*
-import kotlin.random.Random
-import java.text.SimpleDateFormat
-
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -25,6 +17,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -43,16 +36,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.m_commerce_admin.config.theme.Teal
 import com.example.m_commerce_admin.features.coupons.domain.entity.CouponInput
-import com.example.m_commerce_admin.features.coupons.domain.entity.DiscountType.*
+import com.example.m_commerce_admin.features.coupons.domain.entity.DiscountType.PERCENTAGE
+import com.example.m_commerce_admin.features.coupons.presentation.states.CouponFormState
 import com.example.m_commerce_admin.features.coupons.presentation.viewModel.CouponsViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import androidx.compose.material3.SnackbarResult
-import androidx.compose.ui.unit.sp
-import com.example.m_commerce_admin.features.coupons.domain.entity.DiscountType
-import com.example.m_commerce_admin.features.coupons.presentation.states.CouponFormState
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -160,7 +150,6 @@ fun AddForm(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-
 
 
                 CouponForm(

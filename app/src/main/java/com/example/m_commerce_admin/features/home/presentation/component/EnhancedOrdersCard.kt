@@ -29,7 +29,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.m_commerce_admin.R
-import com.example.m_commerce_admin.config.theme.DarkestGray
 import com.example.m_commerce_admin.config.theme.Gray
 import com.example.m_commerce_admin.config.theme.Teal
 import com.example.m_commerce_admin.config.theme.White
@@ -48,7 +47,6 @@ fun EnhancedOrdersCard(
         return
     }
 
-    // Take up to 3 recent orders for display
     val recentOrders = orders.take(3)
     val remainingCount = orders.size - recentOrders.size
 
@@ -83,9 +81,9 @@ fun EnhancedOrdersCard(
                         fontWeight = FontWeight.Bold
                     ),
                 )
-                
+
                 Spacer(modifier = Modifier.weight(1f))
-                
+
                 // Orders count badge
                 Text(
                     text = "${orders.size} total",
@@ -110,7 +108,7 @@ fun EnhancedOrdersCard(
             // Show remaining count if there are more orders
             if (remainingCount > 0) {
                 Spacer(modifier = Modifier.height(12.dp))
-                
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center,
@@ -126,9 +124,9 @@ fun EnhancedOrdersCard(
             }
 
             Spacer(modifier = Modifier.height(16.dp))
-            
+
             Divider(color = Gray.copy(alpha = 0.3f))
-            
+
             Spacer(modifier = Modifier.height(12.dp))
 
             // View All Button
@@ -147,9 +145,9 @@ fun EnhancedOrdersCard(
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium
                 )
-                
+
                 Spacer(modifier = Modifier.padding(4.dp))
-                
+
                 Icon(
                     imageVector = Icons.Default.ArrowForward,
                     contentDescription = "View All",

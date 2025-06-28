@@ -73,7 +73,7 @@ fun CouponCard(
                         fontSize = 18.sp,
                         color = DarkestGray
                     )
-                    
+
                     // Status badge
                     Text(
                         text = status,
@@ -86,7 +86,7 @@ fun CouponCard(
                             .padding(horizontal = 8.dp, vertical = 2.dp)
                     )
                 }
-                
+
                 Row {
                     IconButton(onClick = onEditClick) {
                         Icon(Icons.Default.Edit, contentDescription = "Edit", tint = Teal)
@@ -136,7 +136,7 @@ fun CouponCard(
                         fontWeight = FontWeight.Medium,
                         color = Teal
                     )
-                    
+
                     // Usage information
                     Text(
                         text = "Used: ${coupon.usedCount ?: 0}${coupon.usageLimit?.let { " / $it" } ?: ""}",
@@ -162,7 +162,7 @@ fun CouponCard(
                         )
                     }
                 }
-                
+
                 coupon.endsAt?.let { endDate ->
                     if (endDate != "null" && endDate.isNotEmpty()) {
                         Text(
@@ -181,14 +181,22 @@ fun CouponCard(
 private fun getCouponStatus(coupon: CouponItem): String {
     val now = LocalDateTime.now()
     val formatter = DateTimeFormatter.ISO_DATE_TIME
-    
-    val startsAt = coupon.startsAt?.let { 
-        try { LocalDateTime.parse(it, formatter) } catch (e: Exception) { null }
+
+    val startsAt = coupon.startsAt?.let {
+        try {
+            LocalDateTime.parse(it, formatter)
+        } catch (e: Exception) {
+            null
+        }
     }
-    val endsAt = coupon.endsAt?.let { 
-        try { LocalDateTime.parse(it, formatter) } catch (e: Exception) { null }
+    val endsAt = coupon.endsAt?.let {
+        try {
+            LocalDateTime.parse(it, formatter)
+        } catch (e: Exception) {
+            null
+        }
     }
-    
+
     return when {
         startsAt != null && now.isBefore(startsAt) -> "Not Started"
         endsAt != null && now.isAfter(endsAt) -> "Expired"

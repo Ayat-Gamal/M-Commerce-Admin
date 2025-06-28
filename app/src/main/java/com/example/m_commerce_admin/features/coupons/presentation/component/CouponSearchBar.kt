@@ -44,7 +44,7 @@ fun CouponSearchBar(
     modifier: Modifier = Modifier
 ) {
     var showFilterDropdown by remember { mutableStateOf(false) }
-    
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -77,9 +77,9 @@ fun CouponSearchBar(
             shape = RoundedCornerShape(12.dp),
             singleLine = true
         )
-        
+
         Spacer(modifier = Modifier.height(12.dp))
-        
+
         // Filter Row
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -97,7 +97,7 @@ fun CouponSearchBar(
                     fontWeight = FontWeight.Medium
                 )
             }
-            
+
             DropdownMenu(
                 expanded = showFilterDropdown,
                 onDismissRequest = { showFilterDropdown = false }
@@ -112,7 +112,7 @@ fun CouponSearchBar(
                     )
                 }
             }
-            
+
             // Clear Filters Button
             if (searchQuery.isNotEmpty() || selectedFilter != CouponFilter.ALL) {
                 TextButton(

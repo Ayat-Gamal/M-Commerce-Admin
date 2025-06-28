@@ -79,14 +79,6 @@ fun OrderItemCard(order: Order) {
                 color = Black
             )
 
-//            Text(
-//                text = "Status: ${order.status}",
-//                color = Black,
-//                modifier = Modifier
-//                    .background(color = LightTeal)
-//                    .background(LightTeal, RoundedCornerShape(8.dp))
-//                    .padding(4.dp),
-//            )
         }
 
     }

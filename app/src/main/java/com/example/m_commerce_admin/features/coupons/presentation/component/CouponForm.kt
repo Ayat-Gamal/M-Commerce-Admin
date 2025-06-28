@@ -23,8 +23,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -59,7 +57,7 @@ fun CouponForm(
 ) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-     val isLoading =
+    val isLoading =
         state is CouponFormState.Loading
     Column(
         modifier = Modifier
@@ -178,7 +176,6 @@ fun CouponForm(
                     color = Color.White
                 )
             } else {
-
 
 
                 Text(
