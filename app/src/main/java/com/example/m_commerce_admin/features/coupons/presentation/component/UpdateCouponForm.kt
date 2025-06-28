@@ -178,7 +178,8 @@ fun AddCouponFormUI(
                         usageLimit = usageLimitState,
                         selectedDiscountType = selectedDiscountType,
                         isFormValid = isFormValid,
-                        isEditMode = isEditMode
+                        isEditMode = isEditMode,
+                        state = state
                     ) {
                         val input = CouponInput(
                             id = editCoupon?.id,

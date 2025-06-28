@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.m_commerce_admin.features.coupons.domain.entity.CouponInput
 import com.example.m_commerce_admin.features.coupons.domain.entity.CouponItem
 import com.example.m_commerce_admin.features.coupons.domain.entity.DiscountType
@@ -19,12 +18,16 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.Calendar
+import java.util.Locale
+import java.util.UUID
 import javax.inject.Inject
+import kotlin.random.Random
+
 @RequiresApi(Build.VERSION_CODES.O)
 @HiltViewModel
 class CouponsViewModel @Inject constructor(
@@ -33,10 +36,10 @@ class CouponsViewModel @Inject constructor(
     private val updateCouponUseCase: UpdateCouponUseCase,
     private val deleteCouponUseCase: DeleteCouponUseCase
 ) : ViewModel() {
-    
+
     // Original coupons data
     private val _allCoupons = MutableStateFlow<List<CouponItem>>(emptyList())
-    
+
     // Filtered coupons for UI
     private val _coupons = MutableStateFlow<List<CouponItem>>(emptyList())
     val coupons: StateFlow<List<CouponItem>> = _coupons.asStateFlow()
@@ -58,6 +61,42 @@ class CouponsViewModel @Inject constructor(
     private var isLastOperationUpdate = false
     private var lastDeleteCode: String? = null
 
+
+    private val _randomCoupon = MutableStateFlow(generateRandomCoupon())
+    val randomCoupon: StateFlow<CouponInput> = _randomCoupon
+
+    fun regenerateCoupon() {
+        _randomCoupon.value = generateRandomCoupon()
+    }
+
+
+    private fun generateRandomCoupon(): CouponInput {
+        val discountTypes = DiscountType.values()
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val now = Calendar.getInstance()
+
+        val startDate = now.clone() as Calendar
+        startDate.add(Calendar.DAY_OF_YEAR, Random.nextInt(0, 10))
+
+        val endDate = startDate.clone() as Calendar
+        endDate.add(Calendar.DAY_OF_YEAR, Random.nextInt(5, 15))
+
+        return CouponInput(
+            id = UUID.randomUUID().toString(),
+            title = "Special Offer ${Random.nextInt(1000, 9999)}",
+            summary = "Enjoy a limited-time discount!",
+            code = "DEAL${Random.nextInt(100, 999)}",
+            startsAt = dateFormat.format(startDate.time),
+            endsAt = dateFormat.format(endDate.time),
+            usageLimit = Random.nextInt(1, 100),
+            discountType = discountTypes.random(),
+            discountValue = Random.nextDouble(5.0, 50.0),
+            currencyCode = "USD",
+            appliesOncePerCustomer = Random.nextBoolean()
+        )
+    }
+
+
     fun fetchAllCoupons() {
         viewModelScope.launch {
             runCatching {
@@ -69,7 +108,7 @@ class CouponsViewModel @Inject constructor(
             }.onFailure { exception ->
                 Log.e("TAG", "Error fetching coupons", exception)
 
-             }
+            }
         }
     }
 
@@ -97,11 +136,11 @@ class CouponsViewModel @Inject constructor(
         val allItems = _allCoupons.value
 
         val filtered = allItems.filter { coupon ->
-            val matchesSearch = query.isEmpty() || 
-                coupon.code.lowercase().contains(query) ||
-                coupon.title?.lowercase()?.contains(query) == true ||
-                coupon.summary?.lowercase()?.contains(query) == true
-            
+            val matchesSearch = query.isEmpty() ||
+                    coupon.code.lowercase().contains(query) ||
+                    coupon.title?.lowercase()?.contains(query) == true ||
+                    coupon.summary?.lowercase()?.contains(query) == true
+
             val matchesFilter = when (filter) {
                 CouponFilter.ALL -> true
                 CouponFilter.ACTIVE -> isCouponActive(coupon)
@@ -111,7 +150,7 @@ class CouponsViewModel @Inject constructor(
                 CouponFilter.PERCENTAGE -> coupon.value != null && coupon.amount == 0.0
                 CouponFilter.FIXED_AMOUNT -> coupon.value == null && coupon.amount > 0
             }
-            
+
             matchesSearch && matchesFilter
         }
 
@@ -121,28 +160,40 @@ class CouponsViewModel @Inject constructor(
     private fun isCouponActive(coupon: CouponItem): Boolean {
         val now = LocalDateTime.now()
         val formatter = DateTimeFormatter.ISO_DATE_TIME
-        
-        val startsAt = coupon.startsAt?.let { 
-            try { LocalDateTime.parse(it, formatter) } catch (e: Exception) { null }
+
+        val startsAt = coupon.startsAt?.let {
+            try {
+                LocalDateTime.parse(it, formatter)
+            } catch (e: Exception) {
+                null
+            }
         }
-        val endsAt = coupon.endsAt?.let { 
-            try { LocalDateTime.parse(it, formatter) } catch (e: Exception) { null }
+        val endsAt = coupon.endsAt?.let {
+            try {
+                LocalDateTime.parse(it, formatter)
+            } catch (e: Exception) {
+                null
+            }
         }
-        
+
         val hasStarted = startsAt == null || now.isAfter(startsAt)
         val hasNotEnded = endsAt == null || now.isBefore(endsAt)
-        
+
         return hasStarted && hasNotEnded
     }
 
     private fun isCouponExpired(coupon: CouponItem): Boolean {
         val now = LocalDateTime.now()
         val formatter = DateTimeFormatter.ISO_DATE_TIME
-        
-        val endsAt = coupon.endsAt?.let { 
-            try { LocalDateTime.parse(it, formatter) } catch (e: Exception) { null }
+
+        val endsAt = coupon.endsAt?.let {
+            try {
+                LocalDateTime.parse(it, formatter)
+            } catch (e: Exception) {
+                null
+            }
         }
-        
+
         return endsAt != null && now.isAfter(endsAt)
     }
 

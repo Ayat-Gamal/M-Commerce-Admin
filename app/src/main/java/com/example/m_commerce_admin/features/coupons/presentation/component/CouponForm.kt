@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -14,6 +15,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.MaterialTheme
@@ -21,6 +23,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -29,12 +33,14 @@ import androidx.compose.ui.graphics.Color.Companion.LightGray
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.m_commerce_admin.config.theme.LightTeal
 import com.example.m_commerce_admin.config.theme.Teal
 import com.example.m_commerce_admin.config.theme.White
 import com.example.m_commerce_admin.features.coupons.domain.entity.DiscountType
 import com.example.m_commerce_admin.features.coupons.domain.entity.DiscountType.PERCENTAGE
 import com.example.m_commerce_admin.features.coupons.domain.entity.DiscountType.entries
+import com.example.m_commerce_admin.features.coupons.presentation.states.CouponFormState
 import kotlinx.coroutines.launch
 
 
@@ -48,11 +54,13 @@ fun CouponForm(
     selectedDiscountType: MutableState<DiscountType>,
     isFormValid: Boolean,
     isEditMode: Boolean = false,
-    onSubmit: () -> Unit
+    state: CouponFormState,
+    onSubmit: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-
+     val isLoading =
+        state is CouponFormState.Loading
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -163,7 +171,23 @@ fun CouponForm(
                 .fillMaxWidth(),
 
             ) {
-            Text(if (isEditMode) "Update Coupon" else "Add Coupon")
+
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = Color.White
+                )
+            } else {
+
+
+
+                Text(
+                    text = if (isEditMode) "Update Coupon" else "Add Coupon",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            }
         }
     }
 }

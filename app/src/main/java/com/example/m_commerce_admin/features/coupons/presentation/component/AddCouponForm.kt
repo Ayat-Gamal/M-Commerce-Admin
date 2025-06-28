@@ -1,6 +1,11 @@
 package com.example.m_commerce_admin.features.coupons.presentation.component
 
+import java.util.*
+import kotlin.random.Random
+import java.text.SimpleDateFormat
+
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,8 +13,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -42,6 +50,8 @@ import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.ui.unit.sp
+import com.example.m_commerce_admin.features.coupons.domain.entity.DiscountType
 import com.example.m_commerce_admin.features.coupons.presentation.states.CouponFormState
 
 
@@ -55,8 +65,7 @@ fun AddForm(
     val state by viewModel.couponFormState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-
-
+    val randomCoupon by viewModel.randomCoupon.collectAsState()
     // UI States
     val titleState = remember { mutableStateOf("") }
     val summaryState = remember { mutableStateOf("") }
@@ -64,11 +73,18 @@ fun AddForm(
     val discountValueState = remember { mutableStateOf("") }
     val usageLimitState = remember { mutableStateOf("") }
     val selectedDiscountType = remember { mutableStateOf(PERCENTAGE) }
-
     // Validation
     val isFormValid = remember(titleState.value, codeState.value, discountValueState.value) {
         val discount = discountValueState.value.toDoubleOrNull()
         titleState.value.isNotBlank() && codeState.value.isNotBlank() && discount != null && discount > 0
+    }
+    LaunchedEffect(Unit) {
+        titleState.value = randomCoupon.title ?: ""
+        summaryState.value = randomCoupon.summary ?: ""
+        codeState.value = randomCoupon.code ?: ""
+        discountValueState.value = randomCoupon.discountValue.toString()
+        usageLimitState.value = randomCoupon.usageLimit?.toString() ?: ""
+        selectedDiscountType.value = randomCoupon.discountType
     }
 
 
@@ -82,7 +98,7 @@ fun AddForm(
                     )
                     delay(1500)
                     viewModel.resetCouponFormState()
-             //       navController?.popBackStack()
+                    //       navController?.popBackStack()
                 }
             }
 
@@ -127,7 +143,10 @@ fun AddForm(
             )
         },
         snackbarHost = {
-            SnackbarHost(modifier = Modifier.navigationBarsPadding(), hostState = snackbarHostState) { Snackbar(it) }
+            SnackbarHost(
+                modifier = Modifier.systemBarsPadding(),
+                hostState = snackbarHostState
+            ) { Snackbar(it) }
         }
     ) { paddingValues ->
         Box(
@@ -143,7 +162,9 @@ fun AddForm(
             ) {
 
 
+
                 CouponForm(
+
                     title = titleState,
                     summary = summaryState,
                     code = codeState,
@@ -151,8 +172,8 @@ fun AddForm(
                     usageLimit = usageLimitState,
                     selectedDiscountType = selectedDiscountType,
                     isFormValid = isFormValid,
-
-                    ) {
+                    state = state
+                ) {
                     val input = CouponInput(
                         title = titleState.value,
                         summary = summaryState.value.takeIf { it.isNotBlank() },
@@ -162,11 +183,13 @@ fun AddForm(
                         usageLimit = usageLimitState.value.toIntOrNull(),
                         discountType = selectedDiscountType.value,
                         discountValue = discountValueState.value.toDoubleOrNull() ?: 0.0,
-                    )
+
+                        )
 
                     viewModel.addCoupon(input)
 
                 }
+
             }
 
 
@@ -177,4 +200,3 @@ fun AddForm(
 
 
 }
-
