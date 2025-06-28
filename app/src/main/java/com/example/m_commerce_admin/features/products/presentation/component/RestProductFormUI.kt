@@ -74,7 +74,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun RestProductFormUI(
     viewModel: RestProductsViewModel = hiltViewModel(),
-    inventoryViewModel: InventoryViewModel = hiltViewModel(),
     navController: NavController? = null,
     isEditMode: Boolean = false,
     productToEdit: RestProduct? = null,

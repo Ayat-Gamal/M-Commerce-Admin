@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
@@ -86,7 +87,12 @@ fun CouponScreenUI(
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = {
+            SnackbarHost(
+                modifier = Modifier.navigationBarsPadding(),
+                hostState = snackbarHostState
+            )
+        }
     ) { paddingValues ->
 
         Column(
@@ -145,7 +151,13 @@ fun CouponScreenUI(
                     items(coupons) { coupon ->
                         CouponCard(
                             coupon = coupon,
-                            onEditClick = { navController?.navigate(AppRoutes.UpdateCouponForm(coupon.id)) },
+                            onEditClick = {
+                                navController?.navigate(
+                                    AppRoutes.UpdateCouponForm(
+                                        coupon.id
+                                    )
+                                )
+                            },
                             onDeleteClick = {
                                 viewModel.deleteCoupon(coupon.code)
                             }

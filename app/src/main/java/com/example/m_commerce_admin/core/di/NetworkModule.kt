@@ -56,7 +56,7 @@ object NetworkModule {
     @Singleton
     fun provideShopifyProductApi(): ShopifyProductApi {
         return Retrofit.Builder()
-            .baseUrl("https://mad45-alex-and02.myshopify.com/admin/api/2024-04/")
+            .baseUrl(BuildConfig.shopDomainRest)
             .addConverterFactory(GsonConverterFactory.create())
             .client(
                 OkHttpClient.Builder()
@@ -80,7 +80,7 @@ object NetworkModule {
     @Singleton
     fun provideShopifyCouponApi(): ShopifyCouponApi {
         return Retrofit.Builder()
-            .baseUrl("https://mad45-alex-and02.myshopify.com/admin/api/2024-04/")
+            .baseUrl(BuildConfig.shopDomainRest)
             .addConverterFactory(GsonConverterFactory.create())
             .client(
                 OkHttpClient.Builder()
@@ -104,7 +104,7 @@ object NetworkModule {
     @Singleton
     fun provideShopifyInventoryApi(): ShopifyInventoryApi {
         return Retrofit.Builder()
-            .baseUrl("https://mad45-alex-and02.myshopify.com/admin/api/2024-04/")
+            .baseUrl(BuildConfig.shopDomainRest)
             .addConverterFactory(GsonConverterFactory.create())
             .client(
                 OkHttpClient.Builder()

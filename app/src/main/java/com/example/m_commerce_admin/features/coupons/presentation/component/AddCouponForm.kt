@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -81,7 +82,7 @@ fun AddForm(
                     )
                     delay(1500)
                     viewModel.resetCouponFormState()
-                    navController?.popBackStack()
+             //       navController?.popBackStack()
                 }
             }
 
@@ -126,7 +127,7 @@ fun AddForm(
             )
         },
         snackbarHost = {
-            SnackbarHost(snackbarHostState) { Snackbar(it) }
+            SnackbarHost(modifier = Modifier.navigationBarsPadding(), hostState = snackbarHostState) { Snackbar(it) }
         }
     ) { paddingValues ->
         Box(

@@ -21,7 +21,7 @@ import com.example.m_commerce_admin.features.home.presentation.orders.OrdersScre
 import com.example.m_commerce_admin.features.inventory.presentation.InventoryScreenUI
 import com.example.m_commerce_admin.features.login.presentation.LoginScreenUI
 import com.example.m_commerce_admin.features.products.ProductScreenUI
- import com.example.m_commerce_admin.features.products.presentation.component.RestProductFormUI
+import com.example.m_commerce_admin.features.products.presentation.component.RestProductFormUI
 
 import com.example.m_commerce_admin.features.splash.SplashScreenUI
 
@@ -44,7 +44,8 @@ fun NavSetup(
         composable<AppRoutes.HomeScreen> {
             showBottomNavbar.value = true
             HomeScreenUI(
-                navController = navController,)
+                navController = navController,
+            )
         }
 
         composable<AppRoutes.ProductScreen> {
@@ -70,7 +71,7 @@ fun NavSetup(
         }
         composable<AppRoutes.AddCouponForm> {
             showBottomNavbar.value = false
-             AddForm(navController = navController)
+            AddForm(navController = navController)
         }
         composable<AppRoutes.SplashScreen> {
             showBottomNavbar.value = false
@@ -92,11 +93,9 @@ fun NavSetup(
             }
         }
 
-  composable<AppRoutes.RestProductForm> {
+        composable<AppRoutes.RestProductForm> {
             showBottomNavbar.value = false
-
-      RestProductFormUI(navController = navController)
-
+            RestProductFormUI(navController = navController)
         }
 
 

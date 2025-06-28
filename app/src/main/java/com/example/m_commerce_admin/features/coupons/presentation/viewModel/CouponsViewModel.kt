@@ -1,7 +1,11 @@
 package com.example.m_commerce_admin.features.coupons.presentation.viewModel
 
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.m_commerce_admin.features.coupons.domain.entity.CouponInput
 import com.example.m_commerce_admin.features.coupons.domain.entity.CouponItem
 import com.example.m_commerce_admin.features.coupons.domain.entity.DiscountType
@@ -21,7 +25,7 @@ import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
-
+@RequiresApi(Build.VERSION_CODES.O)
 @HiltViewModel
 class CouponsViewModel @Inject constructor(
     private val getAllCouponsUseCase: GetAllCouponsUseCase,
@@ -55,13 +59,22 @@ class CouponsViewModel @Inject constructor(
     private var lastDeleteCode: String? = null
 
     fun fetchAllCoupons() {
-        getAllCouponsUseCase().onEach { couponsList ->
-            _allCoupons.value = couponsList
-            applyFilters()
-        }.launchIn(viewModelScope)
+        viewModelScope.launch {
+            runCatching {
+                getAllCouponsUseCase(Unit).collect { result ->
+                    _allCoupons.emit(result)
+                    applyFilters()
+                    Log.d("TAG", "fetchAllCoupons: $result")
+                }
+            }.onFailure { exception ->
+                Log.e("TAG", "Error fetching coupons", exception)
+
+             }
+        }
     }
 
     // Filtering functions
+    @RequiresApi(Build.VERSION_CODES.O)
     fun updateSearchQuery(query: String) {
         _searchQuery.value = query
         applyFilters()

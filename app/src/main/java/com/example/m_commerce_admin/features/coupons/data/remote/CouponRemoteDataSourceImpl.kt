@@ -252,26 +252,6 @@ class CouponRemoteDataSourceImpl @Inject constructor(
         }
     }
 
-    private suspend fun getPriceRuleIdFromCouponId(couponId: String?): Long? {
-        if (couponId == null) return null
-        return when {
-            couponId.contains("PriceRule/") -> {
-                val priceRuleId = couponId.split("PriceRule/").lastOrNull()?.toLongOrNull()
-
-                priceRuleId
-            }
-
-            couponId.matches(Regex("^\\d+$")) -> {
-                val priceRuleId = couponId.toLongOrNull()
-                priceRuleId
-            }
-
-            else -> {
-                findPriceRuleIdBySearching()
-            }
-        }
-    }
-
     private suspend fun findPriceRuleIdBySearching(): Long? {
         return try {
 

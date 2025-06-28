@@ -1,6 +1,7 @@
 package com.example.m_commerce_admin.features.coupons.presentation.component
 
 import android.os.Build
+import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,6 +42,7 @@ import com.example.m_commerce_admin.features.coupons.domain.entity.DiscountType.
 import com.example.m_commerce_admin.features.coupons.domain.entity.DiscountType.PERCENTAGE
 import com.example.m_commerce_admin.features.coupons.presentation.states.CouponFormState
 import com.example.m_commerce_admin.features.coupons.presentation.viewModel.CouponsViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -92,6 +94,7 @@ fun AddCouponFormUI(
         }
     }
 
+
     LaunchedEffect(state) {
         when (state) {
             is CouponFormState.Success -> {
@@ -99,9 +102,10 @@ fun AddCouponFormUI(
                     snackbarHostState.showSnackbar(
                         "Coupon updated successfully"
                     )
-                    navController?.popBackStack()
                     viewModel.resetCouponFormState()
                 }
+
+
             }
 
             is CouponFormState.Error -> {

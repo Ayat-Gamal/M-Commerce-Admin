@@ -18,9 +18,10 @@ sealed class AppRoutes {
     object CouponScreen : AppRoutes()
 
     @Serializable
-    data class UpdateCouponForm(val id:String?) : AppRoutes()
+    data class UpdateCouponForm(val id: String?) : AppRoutes()
+
     @Serializable
-   object AddCouponForm : AppRoutes()
+    object AddCouponForm : AppRoutes()
 
     @Serializable
     object LoginScreen : AppRoutes()
@@ -32,12 +33,9 @@ sealed class AppRoutes {
     @Serializable
     object OrdersScreen : AppRoutes()
 
-    @Serializable
-    object ProductForm : AppRoutes()
 
     @Serializable
     object RestProductForm : AppRoutes()
-
 
 
 }

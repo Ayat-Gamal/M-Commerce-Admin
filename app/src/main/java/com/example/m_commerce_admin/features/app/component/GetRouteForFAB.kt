@@ -13,13 +13,18 @@ fun getFABForRouteWithAction(
 ): @Composable (() -> Unit)? {
     return when {
         isRouteSelected(AppRoutes.ProductScreen, currentDestination) -> {
-         //   { FAB(onClick = { navController.navigate(AppRoutes.ProductForm)}, screen = "Product") }
-            { FAB(onClick = { navController.navigate(AppRoutes.RestProductForm)}, screen = "Product") }
+            {
+                FAB(onClick = { navController.navigate(AppRoutes.RestProductForm) }, screen = "Product")
+            }
 
         }
+
         isRouteSelected(AppRoutes.CouponScreen, currentDestination) -> {
-            { FAB(onClick = {navController.navigate(AppRoutes.AddCouponForm)  }, screen = "Coupon") }
+            {
+                FAB(onClick = { navController.navigate(AppRoutes.AddCouponForm) }, screen = "Coupon")
+            }
         }
+
         else -> null
     }
 }

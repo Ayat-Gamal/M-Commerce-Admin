@@ -25,7 +25,6 @@ fun CustomTAB(
         actions = {
 
             IconButton(onClick = {
-
                 loginViewModel.logout()
                 toLogin()
             }) {

@@ -16,20 +16,3 @@ data class CouponItem(
     val amount: Double,
     val currencyCode: String?
 )
-
-
-fun CouponItem.toCouponInput(): CouponInput {
-    return CouponInput(
-        id = this.id,
-        title = this.title,
-        summary = this.summary,
-        code = this.code,
-        startsAt = this.startsAt,
-        endsAt = this.endsAt,
-        usageLimit = this.usageLimit,
-        discountValue = this.value ?: this.amount,
-        discountType = if (this.value != null) DiscountType.PERCENTAGE else DiscountType.FIXED_AMOUNT,
-        currencyCode = this.currencyCode,
-        appliesOncePerCustomer = true
-    )
-}
