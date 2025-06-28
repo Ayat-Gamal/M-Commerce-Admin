@@ -9,8 +9,8 @@ interface InventoryRepository {
         inventoryItemId: Long,
         availableAdjustment: Int
     ): InventoryLevel
+
     suspend fun getInventoryLevels(): Flow<Result<List<InventoryLevel>>>
 
 
-
-} 
+}

@@ -5,8 +5,6 @@ import com.example.m_commerce_admin.features.inventory.data.dto.ConnectInventory
 import com.example.m_commerce_admin.features.inventory.data.dto.InventoryAdjustmentRequest
 import com.example.m_commerce_admin.features.inventory.data.dto.InventoryAdjustmentResponse
 import com.example.m_commerce_admin.features.inventory.data.dto.InventoryLevelsResponse
-import com.example.m_commerce_admin.features.inventory.data.dto.InventoryItemResponse
-import com.example.m_commerce_admin.features.inventory.data.dto.SetInventoryLevelRequest
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -25,11 +23,6 @@ interface ShopifyInventoryApi {
         @Query("location_ids") locationIds: String = BuildConfig.locationID,
         @Query("limit") limit: Int = 250,
     ): InventoryLevelsResponse
-
-    @GET("inventory_items.json")
-    suspend fun getInventoryItems(
-        @Query("ids") inventoryItemIds: String
-    ): List<InventoryItemResponse>
 
     @POST("inventory_levels/connect.json")
     suspend fun connectInventoryLevel(@Body request: ConnectInventoryRequest): Response<Unit>

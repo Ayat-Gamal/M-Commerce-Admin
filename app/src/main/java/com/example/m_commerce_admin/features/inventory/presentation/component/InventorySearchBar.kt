@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
@@ -45,7 +44,7 @@ fun InventorySearchBar(
     modifier: Modifier = Modifier
 ) {
     var showFilterDropdown by remember { mutableStateOf(false) }
-    
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -78,9 +77,9 @@ fun InventorySearchBar(
             shape = RoundedCornerShape(12.dp),
             singleLine = true
         )
-        
+
         Spacer(modifier = Modifier.height(12.dp))
-        
+
         // Filter Row
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -98,7 +97,7 @@ fun InventorySearchBar(
                     fontWeight = FontWeight.Medium
                 )
             }
-            
+
             DropdownMenu(
                 expanded = showFilterDropdown,
                 onDismissRequest = { showFilterDropdown = false }
@@ -113,7 +112,7 @@ fun InventorySearchBar(
                     )
                 }
             }
-            
+
             // Clear Filters Button
             if (searchQuery.isNotEmpty() || selectedFilter != InventoryFilter.ALL) {
                 TextButton(

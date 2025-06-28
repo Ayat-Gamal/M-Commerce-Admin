@@ -1,6 +1,7 @@
 package com.example.m_commerce_admin.features.inventory.domain.usecase
 
 import com.example.m_commerce_admin.core.shared.components.usecase.UseCase
+import com.example.m_commerce_admin.features.inventory.domain.usecase.params.GetProductsForInventoryParams
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProduct
 import com.example.m_commerce_admin.features.products.domain.repository.RestProductRepository
 import kotlinx.coroutines.flow.Flow
@@ -15,8 +16,3 @@ class GetProductsForInventoryUseCase @Inject constructor(
     }
 }
 
-data class GetProductsForInventoryParams(
-    val limit: Int = 250,
-    val pageInfo: String? = null,
-    val status: String? = null
-) 

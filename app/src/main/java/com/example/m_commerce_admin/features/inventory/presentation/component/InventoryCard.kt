@@ -81,9 +81,9 @@ fun InventoryCard(
                     )
                 }
             }
-            
+
             Spacer(modifier = Modifier.width(12.dp))
-            
+
             // Product Details
             Column(
                 modifier = Modifier.weight(1f)
@@ -97,9 +97,9 @@ fun InventoryCard(
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
-                
+
                 Spacer(modifier = Modifier.height(4.dp))
-                
+
                 // Price and SKU
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -112,7 +112,7 @@ fun InventoryCard(
                             color = Teal
                         )
                     }
-                    
+
                     if (data.productSku != null) {
                         Text(
                             text = "SKU: ${data.productSku}",
@@ -121,9 +121,9 @@ fun InventoryCard(
                         )
                     }
                 }
-                
+
                 Spacer(modifier = Modifier.height(8.dp))
-                
+
                 // Inventory Information
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -138,22 +138,22 @@ fun InventoryCard(
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Medium
                     )
-                    
+
                     IconButton(
                         onClick = { onEdit(data.inventoryItemId) },
                         modifier = Modifier.size(32.dp)
                     ) {
                         Icon(
-                            Icons.Default.Edit, 
-                            contentDescription = "Edit", 
+                            Icons.Default.Edit,
+                            contentDescription = "Edit",
                             tint = Teal,
                             modifier = Modifier.size(20.dp)
                         )
                     }
                 }
-                
+
                 Spacer(modifier = Modifier.height(4.dp))
-                
+
                 // Updated At
                 Text(
                     text = "Updated: ${formatIsoDate(data.updatedAt)}",

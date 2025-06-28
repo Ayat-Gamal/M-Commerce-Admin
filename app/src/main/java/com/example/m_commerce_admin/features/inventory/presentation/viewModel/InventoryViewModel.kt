@@ -5,8 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.m_commerce_admin.features.inventory.domain.entity.InventoryLevel
 import com.example.m_commerce_admin.features.inventory.domain.usecase.AdjustInventoryUseCase
 import com.example.m_commerce_admin.features.inventory.domain.usecase.GetInventoryLevelsUseCase
-import com.example.m_commerce_admin.features.inventory.domain.usecase.GetProductsForInventoryParams
 import com.example.m_commerce_admin.features.inventory.domain.usecase.GetProductsForInventoryUseCase
+import com.example.m_commerce_admin.features.inventory.domain.usecase.params.AdjustInventoryLevelParam
+import com.example.m_commerce_admin.features.inventory.domain.usecase.params.GetProductsForInventoryParams
 import com.example.m_commerce_admin.features.inventory.presentation.state.InventoryLevelsState
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProduct
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductImage
@@ -31,6 +32,8 @@ class InventoryViewModel @Inject constructor(
 
     private val _adjustState = MutableStateFlow<Result<InventoryLevel>?>(null)
     val adjustState: StateFlow<Result<InventoryLevel>?> = _adjustState
+    private val _isAdjusting = MutableStateFlow(false)
+    val isAdjusting: StateFlow<Boolean> = _isAdjusting.asStateFlow()
 
     private val _stockLevel = MutableStateFlow<List<InventoryLevel>?>(null)
     val stockLevel: StateFlow<List<InventoryLevel>?> = _stockLevel
@@ -52,7 +55,7 @@ class InventoryViewModel @Inject constructor(
 
     fun getLowStock() {
         viewModelScope.launch {
-            getInventoryLevelsUseCase()
+            getInventoryLevelsUseCase(Unit)
                 .collect { result ->
                     result
                         .onSuccess { levels ->
@@ -74,14 +77,17 @@ class InventoryViewModel @Inject constructor(
 
     fun adjustInventoryLevel(inventoryItemId: Long, adjustment: Int) {
         viewModelScope.launch {
+                _isAdjusting.value = true
 
             try {
-                val level = adjustInventoryUseCase(inventoryItemId, adjustment)
+                val level = adjustInventoryUseCase(AdjustInventoryLevelParam(inventoryItemId, adjustment))
                 _adjustState.value = Result.success(level)
                 refreshInventoryData()
 
             } catch (e: Exception) {
                 _adjustState.value = Result.failure(e)
+            }finally {
+                _isAdjusting.value = false
             }
         }
     }
@@ -90,7 +96,7 @@ class InventoryViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = InventoryLevelsState.Loading
 
-            getInventoryLevelsUseCase()
+            getInventoryLevelsUseCase(Unit)
                 .collect { result ->
                     result
                         .onSuccess { levels ->
@@ -211,7 +217,7 @@ class InventoryViewModel @Inject constructor(
                     productPrice = variant?.price ?: "0.00",
                     productSku = variant?.sku ?: "SKU-${level.inventoryItemId}",
 
-                )
+                    )
             }
         } catch (e: Exception) {
             inventoryLevels

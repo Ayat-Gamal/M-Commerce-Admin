@@ -2,6 +2,7 @@ package com.example.m_commerce_admin.features.inventory.presentation
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,9 +22,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.m_commerce_admin.config.theme.Teal
+import com.example.m_commerce_admin.core.shared.components.LoadingBox
 import com.example.m_commerce_admin.core.shared.components.states.Empty
 import com.example.m_commerce_admin.core.shared.components.states.Failed
 import com.example.m_commerce_admin.features.inventory.presentation.component.AdjustInventorySheet
@@ -45,11 +49,13 @@ fun InventoryScreenUI(
     val coroutineScope = rememberCoroutineScope()
     var selectedItemId by remember { mutableStateOf<Long?>(null) }
     var isSheetVisible by remember { mutableStateOf(false) }
+    val isAdjusting by viewModel.isAdjusting.collectAsStateWithLifecycle()
 
 
     AdjustInventorySheet(
         visible = isSheetVisible,
         inventoryItemId = selectedItemId,
+        state = isAdjusting,
         onConfirm = { itemId, adjustment ->
             viewModel.adjustInventoryLevel(itemId, adjustment)
         },
@@ -77,6 +83,8 @@ fun InventoryScreenUI(
 
             // Content
             Box(modifier = Modifier.fillMaxSize()) {
+
+
                 when (uiState) {
                     InventoryLevelsState.Loading -> {
                         Box(
@@ -138,6 +146,17 @@ fun InventoryScreenUI(
                         )
                     }
                 }
+            }
+        }
+        // Overlay loading indicator
+        if (isAdjusting) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.3f)),
+                contentAlignment = Alignment.Center
+            ) {
+                LoadingBox("Updating Inventory Level")
             }
         }
     }

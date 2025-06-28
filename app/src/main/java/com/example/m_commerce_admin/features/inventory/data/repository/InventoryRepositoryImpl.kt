@@ -1,5 +1,6 @@
 package com.example.m_commerce_admin.features.inventory.data.repository
 
+import com.example.m_commerce_admin.BuildConfig
 import com.example.m_commerce_admin.features.inventory.data.remote.InventoryRemoteDataSource
 import com.example.m_commerce_admin.features.inventory.domain.entity.InventoryLevel
 import com.example.m_commerce_admin.features.inventory.domain.repository.InventoryRepository
@@ -22,7 +23,11 @@ class InventoryRepositoryImpl @Inject constructor(
         inventoryItemId: Long,
         availableAdjustment: Int
     ): InventoryLevel {
-        return remote.adjustInventoryLevel(inventoryItemId, locationId = 82774655225, availableAdjustment)
+        return remote.adjustInventoryLevel(
+            inventoryItemId,
+            locationId = BuildConfig.locationID.toLong(),
+            availableAdjustment
+        )
     }
 
 }

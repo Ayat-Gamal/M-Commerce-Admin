@@ -7,8 +7,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -22,13 +24,18 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Red
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImagePainter
 import com.example.m_commerce_admin.config.theme.Black
 import com.example.m_commerce_admin.config.theme.Gray
 import com.example.m_commerce_admin.config.theme.Teal
 import com.example.m_commerce_admin.config.theme.White
+import com.example.m_commerce_admin.features.coupons.presentation.states.CouponFormState
+import com.example.m_commerce_admin.features.inventory.presentation.state.InventoryLevelsState
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,11 +43,13 @@ import kotlinx.coroutines.launch
 fun AdjustInventorySheet(
     visible: Boolean,
     inventoryItemId: Long?,
+    state: Boolean,
     onConfirm: (inventoryItemId: Long, adjustment: Int) -> Unit,
     onDismiss: () -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
     var adjustmentCount by remember { mutableStateOf(0) }
+
 
     if (visible && inventoryItemId != null) {
         ModalBottomSheet(
@@ -108,7 +117,22 @@ fun AdjustInventorySheet(
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Confirm Adjustment")
+
+                    if (state) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = Color.White
+                        )
+                    } else {
+
+
+                        Text(
+                            text = "Confirm Adjustment",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                    }
                 }
             }
         }

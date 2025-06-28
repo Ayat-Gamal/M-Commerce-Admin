@@ -1,13 +1,12 @@
 package com.example.m_commerce_admin.features.inventory.data.remote
 
 import android.util.Log
+import com.example.m_commerce_admin.BuildConfig
 import com.example.m_commerce_admin.features.inventory.data.dto.ConnectInventoryRequest
 import com.example.m_commerce_admin.features.inventory.data.dto.InventoryAdjustmentRequest
-import com.example.m_commerce_admin.features.inventory.data.dto.SetInventoryLevelRequest
 import com.example.m_commerce_admin.features.inventory.data.remote.service.ShopifyInventoryApi
 import com.example.m_commerce_admin.features.inventory.domain.entity.InventoryLevel
 import com.example.m_commerce_admin.features.inventory.domain.entity.toDomain
-import com.google.gson.Gson
 import kotlinx.coroutines.delay
 import retrofit2.HttpException
 import java.io.IOException
@@ -48,45 +47,25 @@ class InventoryRemoteDataSourceImpl @Inject constructor(
         locationId: Long,
         availableAdjustment: Int
     ): InventoryLevel {
-// After product creation
-        val LOCATION_ID = 82774655225
+
         val conn = ConnectInventoryRequest(
-            location_id = LOCATION_ID,
+            location_id = BuildConfig.locationID.toLong(),
             inventory_item_id = inventoryItemId
         )
 
-        // 2. Then adjust
-        val connectResponse = api.connectInventoryLevel(conn)
-        Log.d("DEBUG", "Connected inventory: ${connectResponse.code()} ${connectResponse.isSuccessful}")
+        api.connectInventoryLevel(conn)
         delay(2000)
-        val adjustmentRequest = InventoryAdjustmentRequest(
-            inventoryItemId,
-            locationId = LOCATION_ID,
-            availableAdjustment
-        )
-
-
-        Log.d("DEBUG", "Sending inventory adjustment request: $adjustmentRequest")
 
         val response = api.adjustInventoryLevel(
             InventoryAdjustmentRequest(
                 inventoryItemId,
-                locationId = LOCATION_ID,
+                locationId = BuildConfig.locationID.toLong(),
                 availableAdjustment
             )
         )
-        Log.d("DEBUG", "adjustInventoryLevel: ${response.level}")
-        Log.d("DEBUG", "Raw inventory response: ${response}")
         val level = response.level
-        if (level == null) {
-            throw IllegalStateException("Inventory adjustment failed: response.level is null")
-        }
-        Log.d("Inventory", "Raw adjustment response: ${Gson().toJson(response)}")
-
         return level.toDomain()
-
     }
-
 
 
 }
