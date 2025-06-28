@@ -13,6 +13,7 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -22,8 +23,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.m_commerce_admin.config.routes.AppRoutes
+import com.example.m_commerce_admin.core.shared.components.LoadingBox
 import com.example.m_commerce_admin.features.login.presentation.component.LoginFormSection
 import com.example.m_commerce_admin.features.login.presentation.component.LoginHeaderSection
+import com.example.m_commerce_admin.features.login.presentation.state.LoginState
+import com.example.m_commerce_admin.features.login.presentation.viewModel.LoginViewModel
 import kotlinx.coroutines.launch
 
 @Composable
@@ -35,7 +39,7 @@ fun LoginScreenUI(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
     val message by viewModel.messageState.collectAsStateWithLifecycle()
-
+    val isLogged by viewModel.isLogged.collectAsState()
 
     LaunchedEffect(message) {
         if (message.isNotBlank()) {
@@ -73,6 +77,7 @@ fun LoginScreenUI(
                         "Logged In Successful",
                         duration = SnackbarDuration.Short
                     )
+
                     navigate(AppRoutes.HomeScreen)
                 }
             }
@@ -98,6 +103,17 @@ fun LoginScreenUI(
             item { LoginFormSection() }
 
         }
+        if (isLogged) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.3f)),
+                contentAlignment = Alignment.Center
+            ) {
 
+                LoadingBox("Logging...")
+
+            }
+        }
     }
 }

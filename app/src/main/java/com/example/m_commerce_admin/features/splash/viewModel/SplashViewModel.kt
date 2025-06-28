@@ -1,4 +1,4 @@
-package com.example.m_commerce_admin.features.splash
+package com.example.m_commerce_admin.features.splash.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

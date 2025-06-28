@@ -29,13 +29,13 @@ import com.example.m_commerce_admin.R
 import com.example.m_commerce_admin.config.routes.AppRoutes
 import com.example.m_commerce_admin.config.theme.SplashTeal
 import com.example.m_commerce_admin.features.home.presentation.viewModel.HomeViewModel
+import com.example.m_commerce_admin.features.splash.viewModel.SplashViewModel
 import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreenUI(
     viewModel: SplashViewModel = hiltViewModel(),
     homeViewModel: HomeViewModel = hiltViewModel(),
-
     navigate: (AppRoutes) -> Unit
 ) {
     val isLoggedIn by viewModel.isLoggedIn.collectAsState()

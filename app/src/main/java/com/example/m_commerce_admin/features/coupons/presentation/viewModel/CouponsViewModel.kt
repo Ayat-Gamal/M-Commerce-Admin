@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -43,7 +44,7 @@ class CouponsViewModel @Inject constructor(
     // Filtered coupons for UI
     private val _coupons = MutableStateFlow<List<CouponItem>>(emptyList())
     val coupons: StateFlow<List<CouponItem>> = _coupons.asStateFlow()
-
+    val loadingCoupons = MutableStateFlow<Boolean>(false)
     // Search and filter state
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
@@ -103,10 +104,8 @@ class CouponsViewModel @Inject constructor(
                 getAllCouponsUseCase(Unit).collect { result ->
                     _allCoupons.emit(result)
                     applyFilters()
-                    Log.d("TAG", "fetchAllCoupons: $result")
-                }
+                 }
             }.onFailure { exception ->
-                Log.e("TAG", "Error fetching coupons", exception)
 
             }
         }
