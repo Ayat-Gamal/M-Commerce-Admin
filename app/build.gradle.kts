@@ -45,8 +45,8 @@ android {
 
         buildConfigField("String", "adminToken", properties.getProperty("ADMIN_TOKEN"))
         buildConfigField("String", "shopDomain", shopDomain)
-        buildConfigField( "String", "locationID", locationID)
-        buildConfigField( "String", "shopDomainRest", shopDomainRest)
+        buildConfigField("String", "locationID", locationID)
+        buildConfigField("String", "shopDomainRest", shopDomainRest)
         resValue("string", "ADMIN_TOKEN", adminToken)
 
 
@@ -150,9 +150,34 @@ dependencies {
     //JSON parsing for Shopify API
     implementation("org.json:json:20231013")
 
- //lotti
+    //lotti
 
     implementation("com.airbnb.android:lottie-compose:6.3.0")
+
+
+// JUnit + Coroutine Test
+    testImplementation(libs.junit)
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.8.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.8.2")
+
+// Robolectric
+    testImplementation("org.robolectric:robolectric:4.11.1")
+
+// AndroidX Test
+    testImplementation("androidx.test.ext:junit-ktx:1.1.3")
+    testImplementation("androidx.test:core-ktx:1.5.0")
+    testImplementation("androidx.arch.core:core-testing:2.1.0")
+
+// Mockk
+    testImplementation("io.mockk:mockk-android:1.13.17")
+    testImplementation("io.mockk:mockk-agent:1.13.17")
+
+// Hamcrest
+    testImplementation("org.hamcrest:hamcrest:2.2")
+    testImplementation("org.hamcrest:hamcrest-library:2.2")
+
 
 
 
