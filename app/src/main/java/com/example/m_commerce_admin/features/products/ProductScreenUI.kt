@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.m_commerce_admin.config.theme.Teal
+import com.example.m_commerce_admin.core.shared.components.ConfirmDeleteDialog
 import com.example.m_commerce_admin.core.shared.components.states.Empty
 import com.example.m_commerce_admin.core.shared.components.states.Failed
 import com.example.m_commerce_admin.features.inventory.presentation.viewModel.InventoryViewModel
@@ -61,6 +62,7 @@ fun ProductScreenUI(
     val listState = rememberLazyListState()
     val snackbarHostState = remember { SnackbarHostState() }
 
+    val showDeleteDialog = remember { mutableStateOf(false) }
 
     // State for edit mode
     var showEditForm by remember { mutableStateOf(false) }
@@ -219,12 +221,23 @@ fun ProductScreenUI(
                                                 showEditForm = true
                                             },
                                             onDelete = {
+                                                showDeleteDialog.value = true
+                                            }
+                                        )
+                                        ConfirmDeleteDialog(
+                                            showDialog = showDeleteDialog,
+                                            itemName = product.title ?: "Product",
+                                            onConfirm = {
                                                 viewModel.deleteProduct(product.id)
+                                            },
+                                            onDismiss = {
+                                                showDeleteDialog.value = false
                                             }
                                         )
                                     }
                                 }
                             }
+
                         }
 
                         RestProductsState.Idle -> {

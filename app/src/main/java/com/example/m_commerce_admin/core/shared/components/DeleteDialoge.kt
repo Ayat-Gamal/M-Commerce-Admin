@@ -1,5 +1,6 @@
 package com.example.m_commerce_admin.core.shared.components
 
+import androidx.compose.foundation.background
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -7,8 +8,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.Red
 import com.example.m_commerce_admin.config.theme.Teal
+import com.example.m_commerce_admin.config.theme.White
 
 @Composable
 fun ConfirmDeleteDialog(
@@ -19,6 +22,7 @@ fun ConfirmDeleteDialog(
 ) {
     if (showDialog.value) {
         AlertDialog(
+           containerColor = White,
             onDismissRequest = {
                 showDialog.value = false
                 onDismiss()
@@ -27,7 +31,7 @@ fun ConfirmDeleteDialog(
                 Text(text = "Confirm Deletion" )
             },
             text = {
-                Text(text = "Are you sure you want to delete this $itemName?")
+                Text(text = "Are you sure you want to delete  $itemName? ")
             },
             confirmButton = {
                 TextButton(

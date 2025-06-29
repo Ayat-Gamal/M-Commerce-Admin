@@ -1,11 +1,5 @@
 package com.example.m_commerce_admin.features.inventory.presentation.viewModel
 
-import com.example.m_commerce_admin.features.coupons.domain.usecase.AddCouponUseCase
-import com.example.m_commerce_admin.features.coupons.domain.usecase.DeleteCouponUseCase
-import com.example.m_commerce_admin.features.coupons.domain.usecase.GetAllCouponsUseCase
-import com.example.m_commerce_admin.features.coupons.domain.usecase.UpdateCouponUseCase
-import com.example.m_commerce_admin.features.coupons.presentation.states.CouponFormState
-import com.example.m_commerce_admin.features.coupons.presentation.viewModel.CouponsViewModel
 import com.example.m_commerce_admin.features.inventory.domain.entity.InventoryLevel
 import com.example.m_commerce_admin.features.inventory.domain.usecase.AdjustInventoryUseCase
 import com.example.m_commerce_admin.features.inventory.domain.usecase.GetInventoryLevelsUseCase
@@ -25,7 +19,9 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
