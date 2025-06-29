@@ -58,9 +58,9 @@ class CouponsViewModel @Inject constructor(
     private val _deleteCouponState = MutableStateFlow<DeleteCouponState>(DeleteCouponState.Idle)
     val deleteCouponState: StateFlow<DeleteCouponState> = _deleteCouponState.asStateFlow()
 
-    private var lastCouponInput: CouponInput? = null
-    private var isLastOperationUpdate = false
-    private var lastDeleteCode: String? = null
+      var lastCouponInput: CouponInput? = null
+      var isLastOperationUpdate = false
+      var lastDeleteCode: String? = null
 
 
     private val _randomCoupon = MutableStateFlow(generateRandomCoupon())
@@ -98,18 +98,18 @@ class CouponsViewModel @Inject constructor(
     }
 
 
-    fun fetchAllCoupons() {
-        viewModelScope.launch {
-            runCatching {
-                getAllCouponsUseCase(Unit).collect { result ->
-                    _allCoupons.emit(result)
-                    applyFilters()
-                 }
-            }.onFailure { exception ->
+        fun fetchAllCoupons() {
+            viewModelScope.launch {
+                runCatching {
+                    getAllCouponsUseCase(Unit).collect { result ->
+                        _allCoupons.emit(result)
+                        applyFilters()
+                     }
+                }.onFailure { exception ->
 
+                }
             }
         }
-    }
 
     // Filtering functions
     @RequiresApi(Build.VERSION_CODES.O)
@@ -204,15 +204,21 @@ class CouponsViewModel @Inject constructor(
                 lastCouponInput = coupon
                 isLastOperationUpdate = false
 
-                val result = addCouponUseCase(coupon)
-
-                if (result.isSuccess) {
+               // val result = addCouponUseCase(coupon)
+                try {
+                    addCouponUseCase(coupon)
                     fetchAllCoupons()
                     _couponFormState.value = CouponFormState.Success
-                } else {
-                    val errorMessage = result.exceptionOrNull()?.message ?: "Unknown error occurred"
-                    _couponFormState.value = CouponFormState.Error(errorMessage)
+                } catch (e: Exception) {
+                    _couponFormState.value = CouponFormState.Error(e.message ?: "Unknown error")
                 }
+//                if (result.isSuccess) {
+//                    fetchAllCoupons()
+//                    _couponFormState.value = CouponFormState.Success
+//                } else {
+//                    val errorMessage = result.exceptionOrNull()?.message ?: "Unknown error occurred"
+//                    _couponFormState.value = CouponFormState.Error(errorMessage)
+//                }
             } catch (e: Exception) {
                 _couponFormState.value =
                     CouponFormState.Error(e.message ?: "An unexpected error occurred")

@@ -63,7 +63,6 @@ class LoginViewModelTest {
 
         coEvery { loginUseCase(admin) } returns false
 
-        loginViewModel = LoginViewModel(loginUseCase, adminPreferences)
         loginViewModel.login(admin.username, admin.password)
 
         advanceUntilIdle()
