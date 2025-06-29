@@ -44,6 +44,12 @@ class CouponsViewModelTest {
 
 
     }
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @After
+    fun detach() {
+        Dispatchers.resetMain()
+    }
+
 
     @Test
     fun `addCoupon sets state to Error when use case returns failure`() = runTest {
@@ -69,12 +75,6 @@ class CouponsViewModelTest {
         advanceUntilIdle()
 
         assertTrue(couponsViewModel.couponFormState.value is CouponFormState.Error)
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @After
-    fun detach() {
-        Dispatchers.resetMain()
     }
 
 
