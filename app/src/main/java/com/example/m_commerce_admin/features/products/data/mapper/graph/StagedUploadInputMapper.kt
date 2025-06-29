@@ -1,4 +1,4 @@
-package com.example.m_commerce_admin.features.products.data.mapper
+package com.example.m_commerce_admin.features.products.data.mapper.graph
 
 import com.example.m_commerce_admin.features.products.domain.entity.StagedUploadInput as LocalInput
 import com.example.m_commerce_admin.type.StagedUploadInput as GQLInput

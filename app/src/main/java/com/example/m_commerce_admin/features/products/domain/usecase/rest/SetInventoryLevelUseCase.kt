@@ -1,7 +1,5 @@
 package com.example.m_commerce_admin.features.products.domain.usecase.rest
 
-import com.example.m_commerce_admin.features.inventory.domain.repository.InventoryRepository
-import com.example.m_commerce_admin.features.products.domain.repository.ProductRepository
 import com.example.m_commerce_admin.features.products.domain.repository.RestProductRepository
 import javax.inject.Inject
 

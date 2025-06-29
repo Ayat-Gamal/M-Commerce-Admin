@@ -6,7 +6,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.m_commerce_admin.BuildConfig
- import com.example.m_commerce_admin.features.inventory.domain.usecase.AdjustInventoryUseCase
+import com.example.m_commerce_admin.features.inventory.domain.usecase.AdjustInventoryUseCase
 import com.example.m_commerce_admin.features.inventory.domain.usecase.params.AdjustInventoryLevelParam
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProduct
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductImageInput
@@ -15,15 +15,15 @@ import com.example.m_commerce_admin.features.products.domain.entity.rest.RestPro
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductUpdateInput
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductVariantInput
 import com.example.m_commerce_admin.features.products.domain.usecase.PublishProductUseCase
-import com.example.m_commerce_admin.features.products.domain.usecase.rest.AddRestProductWithImagesParams
+import com.example.m_commerce_admin.features.products.domain.usecase.params.AddRestProductWithImagesParams
+import com.example.m_commerce_admin.features.products.domain.usecase.params.GetAllRestProductsParams
+import com.example.m_commerce_admin.features.products.domain.usecase.params.UpdateRestProductParams
 import com.example.m_commerce_admin.features.products.domain.usecase.rest.AddRestProductWithImagesUseCase
 import com.example.m_commerce_admin.features.products.domain.usecase.rest.CreateRestProductUseCase
 import com.example.m_commerce_admin.features.products.domain.usecase.rest.DeleteRestProductUseCase
-import com.example.m_commerce_admin.features.products.domain.usecase.rest.GetAllRestProductsParams
-import com.example.m_commerce_admin.features.products.domain.usecase.rest.GetAllRestProductsUseCase
+ import com.example.m_commerce_admin.features.products.domain.usecase.rest.GetAllRestProductsUseCase
 import com.example.m_commerce_admin.features.products.domain.usecase.rest.SetInventoryLevelUseCase
-import com.example.m_commerce_admin.features.products.domain.usecase.rest.UpdateRestProductParams
-import com.example.m_commerce_admin.features.products.domain.usecase.rest.UpdateRestProductUseCase
+ import com.example.m_commerce_admin.features.products.domain.usecase.rest.UpdateRestProductUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow

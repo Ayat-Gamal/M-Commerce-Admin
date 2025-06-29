@@ -3,6 +3,7 @@ package com.example.m_commerce_admin.features.products.domain.usecase.rest
 import com.example.m_commerce_admin.core.shared.components.usecase.UseCase
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProduct
 import com.example.m_commerce_admin.features.products.domain.repository.RestProductRepository
+import com.example.m_commerce_admin.features.products.domain.usecase.params.GetAllRestProductsParams
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -15,8 +16,3 @@ class GetAllRestProductsUseCase @Inject constructor(
     }
 }
 
-data class GetAllRestProductsParams(
-    val limit: Int = 50,
-    val pageInfo: String? = null,
-    val status: String? = null
-) 

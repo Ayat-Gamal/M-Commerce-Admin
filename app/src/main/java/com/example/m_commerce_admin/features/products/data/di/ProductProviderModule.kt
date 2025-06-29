@@ -1,15 +1,13 @@
 package com.example.m_commerce_admin.features.products.data.di
 
 import com.apollographql.apollo.ApolloClient
-import com.example.m_commerce_admin.features.products.data.remote.ProductRemoteDataSource
-import com.example.m_commerce_admin.features.products.data.remote.ProductRemoteDataSourceImpl
 import com.example.m_commerce_admin.features.products.data.repository.rest.RestProductRepositoryImpl
 import com.example.m_commerce_admin.features.products.data.retrofitRemote.RetrofitProductDataSource
 import com.example.m_commerce_admin.features.products.data.retrofitRemote.RetrofitProductDataSourceImpl
 import com.example.m_commerce_admin.features.products.data.retrofitRemote.ShopifyProductApi
-import com.example.m_commerce_admin.features.products.domain.repository.ProductRepository
 import com.example.m_commerce_admin.features.products.domain.repository.RestProductRepository
-import com.example.m_commerce_admin.features.products.domain.usecase.*
+import com.example.m_commerce_admin.features.products.domain.usecase.PublishProductUseCase
+import com.example.m_commerce_admin.features.products.domain.usecase.UploadProductImagesUseCase
 import com.example.m_commerce_admin.features.products.domain.usecase.rest.AddRestProductWithImagesUseCase
 import com.example.m_commerce_admin.features.products.domain.usecase.rest.CreateRestProductUseCase
 import com.example.m_commerce_admin.features.products.domain.usecase.rest.DeleteRestProductUseCase
@@ -27,45 +25,37 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object ProductProviderModule {
 
-    // GraphQL Data Source
-    @Provides
-    @Singleton
-    fun ProductRemoteDataSource(apolloClient: ApolloClient, okHttpClient: OkHttpClient): ProductRemoteDataSource {
-        return ProductRemoteDataSourceImpl(apolloClient, okHttpClient)
-    }
+//    // GraphQL Data Source
+//    @Provides
+//    @Singleton
+//    fun ProductRemoteDataSource(
+//        apolloClient: ApolloClient,
+//        okHttpClient: OkHttpClient
+//    ): ProductRemoteDataSource {
+//        return ProductRemoteDataSourceImpl(apolloClient, okHttpClient)
+//    }
+
 
     // REST API Data Source
     @Provides
     @Singleton
-    fun provideRetrofitProductDataSource(api: ShopifyProductApi, graph:ApolloClient): RetrofitProductDataSource {
-        return RetrofitProductDataSourceImpl(api,graph)
+    fun provideRetrofitProductDataSource(
+        api: ShopifyProductApi,
+        graph: ApolloClient
+    ): RetrofitProductDataSource {
+        return RetrofitProductDataSourceImpl(api, graph)
     }
 
     // REST API Repository
     @Provides
     @Singleton
-    fun provideRestProductRepository(dataSource: RetrofitProductDataSource, okHttpClient: OkHttpClient): RestProductRepository {
+    fun provideRestProductRepository(
+        dataSource: RetrofitProductDataSource,
+        okHttpClient: OkHttpClient
+    ): RestProductRepository {
         return RestProductRepositoryImpl(dataSource, okHttpClient)
     }
 
-    // GraphQL Use Cases
-    @Provides
-    @Singleton
-    fun provideGetProductUseCase(repo: ProductRepository): GetAllProductsUseCase {
-        return GetAllProductsUseCase(repo)
-    }
-
-    @Provides
-    @Singleton
-    fun provideAddProductUseCase(repo: ProductRepository): AddProductUseCase {
-        return AddProductUseCase(repo)
-    }
-
-    @Provides
-    @Singleton
-    fun provideDeleteProductUseCase(repo: ProductRepository): DeleteProductUseCase {
-        return DeleteProductUseCase(repo)
-    }
 
     // REST API Use Cases
     @Provides
@@ -109,9 +99,10 @@ object ProductProviderModule {
     fun providePublishProductUseCase(repo: RestProductRepository): PublishProductUseCase {
         return PublishProductUseCase(repo)
     }
+
     @Provides
     @Singleton
-    fun provideSetInventoryLevelUseCase (repo: RestProductRepository): SetInventoryLevelUseCase {
-        return SetInventoryLevelUseCase (repo)
+    fun provideSetInventoryLevelUseCase(repo: RestProductRepository): SetInventoryLevelUseCase {
+        return SetInventoryLevelUseCase(repo)
     }
 }

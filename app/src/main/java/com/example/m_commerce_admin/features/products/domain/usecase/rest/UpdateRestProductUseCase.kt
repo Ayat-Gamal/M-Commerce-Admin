@@ -2,8 +2,8 @@ package com.example.m_commerce_admin.features.products.domain.usecase.rest
 
 import com.example.m_commerce_admin.core.shared.components.usecase.UseCase
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProduct
-import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductUpdateInput
 import com.example.m_commerce_admin.features.products.domain.repository.RestProductRepository
+import com.example.m_commerce_admin.features.products.domain.usecase.params.UpdateRestProductParams
 import javax.inject.Inject
 
 class UpdateRestProductUseCase @Inject constructor(
@@ -14,8 +14,3 @@ class UpdateRestProductUseCase @Inject constructor(
         return repository.updateProduct(params.productId, params.product)
     }
 }
-
-data class UpdateRestProductParams(
-    val productId: Long,
-    val product: RestProductUpdateInput
-) 

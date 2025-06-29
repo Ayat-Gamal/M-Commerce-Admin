@@ -10,14 +10,14 @@ import kotlinx.coroutines.flow.Flow
 
 interface ProductRepository {
 
-    fun getProducts(first: Int, after: String?): Flow<GetProductState>
-    suspend fun addProduct(product: ProductInput): Result<Unit>
-    suspend fun uploadImagesAndAddProduct(
-        product: DomainProductInput,
-        imageUris: List<Uri>,
-        context: Context
-    ): Result<Unit>
-    suspend fun deleteProduct(productId: String): Result<Unit>
+ //   fun getProducts(first: Int, after: String?): Flow<GetProductState>
+//    suspend fun addProduct(product: ProductInput): Result<Unit>
+//    suspend fun uploadImagesAndAddProduct(
+//        product: DomainProductInput,
+//        imageUris: List<Uri>,
+//        context: Context
+//    ): Result<Unit>
+//    suspend fun deleteProduct(productId: String): Result<Unit>
 
 
 }
