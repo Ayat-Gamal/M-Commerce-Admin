@@ -59,6 +59,7 @@ import com.example.m_commerce_admin.config.theme.Teal
 import com.example.m_commerce_admin.core.shared.components.ImagePicker
 import com.example.m_commerce_admin.features.inventory.presentation.viewModel.InventoryViewModel
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProduct
+import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductImageInput
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductInput
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductOptionInput
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductUpdateInput
@@ -67,8 +68,10 @@ import com.example.m_commerce_admin.features.products.domain.entity.rest.RestPro
 import com.example.m_commerce_admin.features.products.presentation.viewModel.AddRestProductState
 import com.example.m_commerce_admin.features.products.presentation.viewModel.RestProductsViewModel
 import com.example.m_commerce_admin.features.products.presentation.viewModel.UpdateRestProductState
+import com.google.gson.Gson
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import okhttp3.internal.notifyAll
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -93,11 +96,17 @@ fun RestProductFormUI(
     var vendorOptions =
         listOf("NIKE", "ADIDAS", "VANS", "PUMA", "FLEX FIT", "ASICS TIGER", "LOCAL", "Other")
 
-    var selectedProductType by rememberSaveable { mutableStateOf("") }
-    var customProductType by rememberSaveable { mutableStateOf("") }
+    var selectedProductType by rememberSaveable {
 
-    var selectedVendor by rememberSaveable { mutableStateOf("") }
-    var customVendor by rememberSaveable { mutableStateOf("") }
+        mutableStateOf(if (isEditMode && productToEdit != null) productToEdit.productType else " ") }
+
+    var customProductType by rememberSaveable {
+        mutableStateOf(if (isEditMode && productToEdit != null) productToEdit.productType else " ")
+
+    }
+
+    var selectedVendor by rememberSaveable { mutableStateOf(if (isEditMode && productToEdit != null) productToEdit.vendor else " ") }
+    var customVendor by rememberSaveable { mutableStateOf(if (isEditMode && productToEdit != null) productToEdit.vendor else " ") }
 
 
     var variantList by remember {
@@ -118,9 +127,14 @@ fun RestProductFormUI(
         )
     }
 
-    var singleProductPrice by remember { mutableStateOf("") }
-    var singleProductSku by remember { mutableStateOf("") }
-    var singleProductQuantity by remember { mutableStateOf("") }
+    var singleProductPrice by rememberSaveable { mutableStateOf(if (isEditMode && productToEdit != null) productToEdit.variants.first().price else "") }
+    var singleProductSku by rememberSaveable {
+        mutableStateOf(if (isEditMode && productToEdit != null) productToEdit.variants.first().sku else "")
+    }
+
+    var singleProductQuantity by rememberSaveable {
+        mutableStateOf(if (isEditMode && productToEdit != null) productToEdit.variants.first().quantity else 0)
+    }
 
 
     var selectedStatus by remember {
@@ -308,9 +322,9 @@ fun RestProductFormUI(
                     DropdownWithCustomInput(
                         label = "Product Type",
                         options = productTypeOptions,
-                        selectedOption = if( selectedProductType.isNotEmpty())  selectedProductType else customProductType  ,
+                        selectedOption =(if(selectedProductType?.isNotEmpty() == true)  selectedProductType else customProductType).toString()  ,
                         onOptionSelected = { selectedProductType = it },
-                        customInput = customProductType,
+                        customInput = customProductType.toString(),
                         onCustomInputChange = { customProductType = it }
                     )
 
@@ -318,9 +332,9 @@ fun RestProductFormUI(
                     DropdownWithCustomInput(
                         label = "Vendor",
                         options = vendorOptions,
-                        selectedOption =    if( selectedVendor.isNotEmpty())  selectedVendor else customVendor ,
+                        selectedOption =    (if(selectedVendor?.isNotEmpty() == true)  selectedVendor else customVendor).toString() ,
                         onOptionSelected = { selectedVendor = it },
-                        customInput = customVendor,
+                        customInput = customVendor.toString(),
                         onCustomInputChange = { customVendor = it }
                     )
 
@@ -390,8 +404,8 @@ fun RestProductFormUI(
                         Spacer(modifier = Modifier.height(8.dp))
 
                         FormField(
-                            value = singleProductQuantity,
-                            onValueChange = { singleProductQuantity = it },
+                            value = singleProductQuantity.toString(),
+                            onValueChange = { singleProductQuantity = it.toIntOrNull() ?: 0  },
                             label = "Inventory Quantity",
                             placeholder = "e.g., 50",
                             keyboardType = KeyboardType.Number,
@@ -498,7 +512,7 @@ fun RestProductFormUI(
                 val singleVariant = RestProductVariantInput(
                     price = singleProductPrice,
                     sku = singleProductSku,
-                    inventoryQuantity = singleProductQuantity.toIntOrNull() ?: 0
+                    inventoryQuantity = singleProductQuantity
                 )
                 variantList = listOf(singleVariant)
             }
@@ -509,17 +523,27 @@ fun RestProductFormUI(
                     if (isEditMode && productToEdit != null) {
                         val updateInput = RestProductUpdateInput(
                             title = title,
-                            productType =  if( selectedProductType.isNotEmpty())  selectedProductType else customVendor ,
-                            vendor =  if( selectedVendor.isNotEmpty())  selectedVendor else customVendor ,
-                            options = options,
+                            productType = if (selectedProductType!!.isNotEmpty()) selectedProductType else customProductType,
+                            vendor = if (selectedVendor!!.isNotEmpty()) selectedVendor else customVendor,
+                         
+
+                            options = productToEdit.options?.map { option ->
+                                RestProductOptionInput(
+                                    name = option.name,
+                                    values = option.values,
+                                    position = option.position
+                                )
+                            } ?: emptyList(),
                             status = selectedStatus,
                             variants = productToEdit.variants.mapIndexedNotNull { index, existing ->
                                 variantList.getOrNull(index)?.let {
                                     RestProductVariantUpdateInput(
+
                                         id = existing.id,
                                         price = it.price,
                                         sku = it.sku,
-                                        title = it.title,
+                                        title = it.title ?: "Default Title",
+
                                         inventoryManagement = it.inventoryManagement,
                                         inventoryPolicy = it.inventoryPolicy,
                                         fulfillmentService = it.fulfillmentService,
@@ -533,6 +557,7 @@ fun RestProductFormUI(
                                 }
                             }
                         )
+                        Log.d("SubmitButton", "Submitting updateInput: ${Gson().toJson(updateInput)}")
 
                         viewModel.updateProduct(productToEdit.id, updateInput)
 

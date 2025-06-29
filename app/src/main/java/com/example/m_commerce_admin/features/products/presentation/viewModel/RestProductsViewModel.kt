@@ -13,6 +13,7 @@ import com.example.m_commerce_admin.features.products.domain.entity.rest.RestPro
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductInput
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductOptionInput
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductUpdateInput
+import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductVariant
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductVariantInput
 import com.example.m_commerce_admin.features.products.domain.usecase.PublishProductUseCase
 import com.example.m_commerce_admin.features.products.domain.usecase.params.AddRestProductWithImagesParams
@@ -21,9 +22,9 @@ import com.example.m_commerce_admin.features.products.domain.usecase.params.Upda
 import com.example.m_commerce_admin.features.products.domain.usecase.rest.AddRestProductWithImagesUseCase
 import com.example.m_commerce_admin.features.products.domain.usecase.rest.CreateRestProductUseCase
 import com.example.m_commerce_admin.features.products.domain.usecase.rest.DeleteRestProductUseCase
- import com.example.m_commerce_admin.features.products.domain.usecase.rest.GetAllRestProductsUseCase
+import com.example.m_commerce_admin.features.products.domain.usecase.rest.GetAllRestProductsUseCase
 import com.example.m_commerce_admin.features.products.domain.usecase.rest.SetInventoryLevelUseCase
- import com.example.m_commerce_admin.features.products.domain.usecase.rest.UpdateRestProductUseCase
+import com.example.m_commerce_admin.features.products.domain.usecase.rest.UpdateRestProductUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,6 +32,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -44,66 +46,6 @@ class RestProductsViewModel @Inject constructor(
     private val setInventoryLevelUseCase: SetInventoryLevelUseCase,
     private val adjustInventoryUseCase: AdjustInventoryUseCase
 ) : ViewModel() {
-    fun testAddProductWithVariants(context: Context) {
-        val options = listOf(
-//            RestProductOptionInput(
-//                name = "Size",
-//                position = 1,
-//                values = listOf("Small", "Medium", "Large")
-//            ),
-            RestProductOptionInput(
-                name = "Color",
-                position = 1,
-                values = listOf("Red", "Blue")
-            )
-        )
-
-        val variants = listOf(
-            RestProductVariantInput(
-                //   option1 = "Small",
-                option1 = "Red",
-                price = "99.99",
-                sku = "S-RED",
-                inventoryQuantity = 10
-            ),
-            RestProductVariantInput(
-                // option1 = "Medium",
-                option1 = "Red",
-                price = "109.99",
-                sku = "M-RED",
-                inventoryQuantity = 5
-            ),
-            RestProductVariantInput(
-                // option1 = "Large",
-                option1 = "Blue",
-                price = "119.99",
-                sku = "L-BLUE",
-                inventoryQuantity = 7
-            )
-        )
-        val images = listOf(
-            RestProductImageInput(
-                src = "https://cdn.shopify.com/s/files/1/0755/0271/5129/collections/smart_collections_2.jpg?v=1749927992", // use any valid public URL
-                alt = "Test Image"
-            )
-        )
-        val productInput = RestProductInput(
-            title = "Saad Color Only",
-            descriptionHtml = "This is a test product with predefined Size and Color variants.",
-            productType = "Clothing",
-            vendor = "TestVendor",
-            status = "active",
-            tags = "test,static",
-            options = options,
-            variants = variants,
-            images = images
-
-        )
-
-
-        // Use empty list for images for now
-        addProduct(productInput, emptyList(), context)
-    }
 
     private val _productsState = MutableStateFlow<RestProductsState>(RestProductsState.Idle)
     val productsState: StateFlow<RestProductsState> = _productsState.asStateFlow()
@@ -176,13 +118,44 @@ class RestProductsViewModel @Inject constructor(
         }
     }
 
+    private suspend fun adjustAndSetInventory(variant: RestProductVariant) {
+        val inventoryItemId = variant.inventoryItemId
+        val quantity = variant.quantity
+
+        delay(2000)
+
+        try {
+            adjustInventoryUseCase.invoke(
+                AdjustInventoryLevelParam(
+                    inventoryItemId,
+                    quantity
+                )
+            )
+         } catch (e: Exception) {
+            _addProductState.value = AddRestProductState.Error(
+                e.message ?: "An unexpected error occurred"
+            )
+        }
+
+        try {
+            val result = setInventoryLevelUseCase(
+                inventoryItemId,
+                BuildConfig.locationID.toLong(),
+                quantity
+            )
+
+        } catch (e: Exception) {
+            _addProductState.value = AddRestProductState.Error(
+                e.message ?: "An unexpected error occurred"
+            )        }
+    }
+
     fun addProduct(
         productInput: RestProductInput,
         imageUris: List<Uri> = emptyList(),
         context: Context? = null
     ) {
         _addProductState.value = AddRestProductState.Loading
-        Log.d("DEBUG", "Submitting product: $productInput")
 
         viewModelScope.launch {
             val result = if (imageUris.isNotEmpty() && context != null) {
@@ -193,53 +166,27 @@ class RestProductsViewModel @Inject constructor(
                         context = context
                     )
                 )
-
             } else {
                 createRestProductUseCase(productInput)
             }
 
             result.fold(
                 onSuccess = { product ->
-                    try {
-                        Log.d("DEBUG", "Product successfully created: $product")
+                    _addProductState.value = AddRestProductState.Success(product)
 
-                        _addProductState.value = AddRestProductState.Success(product)
-                        getAllProducts(status = _selectedStatus.value)
-                        publishProductUseCase.invoke(product.id)
+                    getAllProducts(status = _selectedStatus.value)
+                    publishProductUseCase.invoke(product.id)
 
-                        val firstVariant = product.variants.firstOrNull()
-                        Log.d("DEBUG", "First variant: $firstVariant")
-
-                        val inventoryItemId = firstVariant?.inventoryItemId
-                        val quantity = firstVariant?.quantity
-
-                        if (inventoryItemId != null && quantity != null) {
-                            Log.d("DEBUG", "Adjusting inventory: $inventoryItemId -> $quantity")
-                            delay(2000) // 1 second delay before adjusting inventory
-                            val inventoryItemId = product.variants.first().inventoryItemId
-                            val quantity = product.variants.first().quantity
-
-
-                            // New: Set inventory
-                            val setResult = setInventoryLevelUseCase(
-                                inventoryItemId,
-                                BuildConfig.locationID.toLong(),
-                                quantity
-                            )
-
-                        } else {
-                            Log.w("DEBUG", "Variant or inventoryItemId is missing")
-                        }
-
-                    } catch (e: Exception) {
-                        Log.e("DEBUG", "Exception in onSuccess block: ${e.message}", e)
+                    val firstVariant = product.variants.firstOrNull()
+                    if (firstVariant != null) {
+                        adjustAndSetInventory(firstVariant)
                     }
                 },
                 onFailure = { error ->
                     _addProductState.value = AddRestProductState.Error(
                         error.message ?: "An unexpected error occurred"
                     )
-                }
+                 }
             )
         }
     }
@@ -275,7 +222,6 @@ class RestProductsViewModel @Inject constructor(
 
                             )
                     )
-                    // Refresh the products list
                     getAllProducts(status = _selectedStatus.value)
                 },
                 onFailure = { error ->
@@ -339,27 +285,18 @@ class RestProductsViewModel @Inject constructor(
     fun updateProduct(productId: Long, updateInput: RestProductUpdateInput) {
         _updateProductState.value = UpdateRestProductState.Loading
         viewModelScope.launch {
-            val result = updateRestProductUseCase(
-                UpdateRestProductParams(productId, updateInput)
-            )
+            val result = updateRestProductUseCase(UpdateRestProductParams(productId, updateInput))
+
             result.fold(
                 onSuccess = { product ->
                     _updateProductState.value = UpdateRestProductState.Success(product)
+
                     getAllProducts(status = _selectedStatus.value)
 
-                    val inventoryItemId = product.variants.first().inventoryItemId
-                    delay(2000)
-
-                    adjustInventoryUseCase.invoke(
-                        AdjustInventoryLevelParam(
-                            inventoryItemId,
-                            product.variants.first().quantity
-                        )
-                    )
-                    Log.d(
-                        "DEBUG",
-                        "addProduct: ${inventoryItemId}${product.variants.first().quantity}"
-                    )
+                    val firstVariant = product.variants.firstOrNull()
+                    if (firstVariant != null) {
+                        adjustAndSetInventory(firstVariant)
+                    }
                 },
                 onFailure = { error ->
                     _updateProductState.value =

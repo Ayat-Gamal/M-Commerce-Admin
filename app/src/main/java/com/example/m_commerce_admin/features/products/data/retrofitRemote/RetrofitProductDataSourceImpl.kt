@@ -21,6 +21,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
+import retrofit2.HttpException
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -62,11 +63,17 @@ class RetrofitProductDataSourceImpl @Inject constructor(
         product: ProductUpdateDto
     ): Result<ProductDto> {
         return try {
-            Result.success(api.updateProduct(productId, UpdateProductRequest(product)).product)
+            val response = api.updateProduct(productId, UpdateProductRequest(product)).product
+            Result.success(response)
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            Log.e("HTTP_ERROR_422", "Update failed: $errorBody")
+            Result.failure(Exception(errorBody ?: e.message()))
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
+
 
 
     override suspend fun uploadAsset(themeId: Long, asset: AssetCreateDto): Result<AssetDto> {
