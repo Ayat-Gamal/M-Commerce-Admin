@@ -14,6 +14,7 @@ import com.example.m_commerce_admin.features.products.domain.usecase.rest.Delete
 import com.example.m_commerce_admin.features.products.domain.usecase.rest.GetAllRestProductsUseCase
 import com.example.m_commerce_admin.features.products.domain.usecase.rest.SetInventoryLevelUseCase
 import com.example.m_commerce_admin.features.products.domain.usecase.rest.UpdateRestProductUseCase
+import com.example.m_commerce_admin.features.products.domain.usecase.rest.UploadImagesToExistingProductUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -104,5 +105,10 @@ object ProductProviderModule {
     @Singleton
     fun provideSetInventoryLevelUseCase(repo: RestProductRepository): SetInventoryLevelUseCase {
         return SetInventoryLevelUseCase(repo)
+    }
+    @Provides
+    @Singleton
+    fun provideUploadImagesToExistingProductUseCase(repo: RestProductRepository): UploadImagesToExistingProductUseCase {
+        return UploadImagesToExistingProductUseCase(repo)
     }
 }

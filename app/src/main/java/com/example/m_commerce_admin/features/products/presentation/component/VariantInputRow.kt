@@ -33,7 +33,7 @@ fun VariantInputRow(
             onValueChange = { onVariantChange(variant.copy(option1 = it)) },
             label = "Size (e.g. M, L, XL)",
             singleLine = true,
-            isError = variant.option1?.isBlank() ?: true
+            isError = false
         )
 
 // Color (optional)
@@ -42,7 +42,7 @@ fun VariantInputRow(
             onValueChange = { onVariantChange(variant.copy(option2 = it)) },
             label = "Color (e.g. Red, Blue)",
             singleLine = true,
-            isError = variant.option2?.isBlank() ?: true
+            isError = false
         )
 
 

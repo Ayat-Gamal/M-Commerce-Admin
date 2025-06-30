@@ -23,7 +23,11 @@ interface RestProductRepository {
     suspend fun setInventoryLevel(locationId: Long, inventoryItemId: Long, available: Int): Result<Unit>
 
     suspend fun publishProduct(productId:Long)
-
+    suspend fun uploadImagesForExistingProduct(
+        productId: Long,
+        imageUris: List<Uri>,
+        context: Context
+    ): Result<Unit>
     suspend fun uploadImagesAndAddProduct(
         product: RestProductInput,
         imageUris: List<Uri>,

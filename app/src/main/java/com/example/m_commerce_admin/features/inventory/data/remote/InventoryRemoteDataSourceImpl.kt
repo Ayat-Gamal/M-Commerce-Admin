@@ -64,6 +64,7 @@ class InventoryRemoteDataSourceImpl @Inject constructor(
             )
         )
         val level = response.level
+
         return level.toDomain()
     }
 

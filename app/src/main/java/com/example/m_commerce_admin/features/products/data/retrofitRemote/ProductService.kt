@@ -1,8 +1,13 @@
 package com.example.m_commerce_admin.features.products.data.retrofitRemote
 
 import com.google.gson.annotations.SerializedName
-import okhttp3.MultipartBody
-import retrofit2.http.*
+import retrofit2.http.Body
+import retrofit2.http.DELETE
+import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.PUT
+import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ShopifyProductApi {
     @GET("products.json")

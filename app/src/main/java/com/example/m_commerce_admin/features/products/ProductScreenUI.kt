@@ -40,6 +40,7 @@ import com.example.m_commerce_admin.config.theme.Teal
 import com.example.m_commerce_admin.core.shared.components.ConfirmDeleteDialog
 import com.example.m_commerce_admin.core.shared.components.states.Empty
 import com.example.m_commerce_admin.core.shared.components.states.Failed
+import com.example.m_commerce_admin.features.app.component.getFABForRouteWithAction
 import com.example.m_commerce_admin.features.inventory.presentation.viewModel.InventoryViewModel
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProduct
 import com.example.m_commerce_admin.features.products.presentation.component.ProductSearchBar
@@ -77,14 +78,6 @@ fun ProductScreenUI(
             lastVisibleItemIndex >= totalItemsCount - 3 && totalItemsCount > 0
         }
     }
-    val context = LocalContext.current
-//
-//    LaunchedEffect(Unit) {
-//       coroutineScope {
-//
-//        viewModel.testAddProductWithVariants(context = context)
-//       }
-//    }
 
     LaunchedEffect(shouldLoadMore) {
         if (shouldLoadMore) {
@@ -217,7 +210,7 @@ fun ProductScreenUI(
                                         RestProductCard(
                                             product = product,
                                             onEdit = {
-                                                productToEdit = product
+                                                 productToEdit = product
                                                 showEditForm = true
                                             },
                                             onDelete = {
@@ -228,6 +221,7 @@ fun ProductScreenUI(
                                             showDialog = showDeleteDialog,
                                             itemName = product.title ?: "Product",
                                             onConfirm = {
+
                                                 viewModel.deleteProduct(product.id)
                                             },
                                             onDismiss = {

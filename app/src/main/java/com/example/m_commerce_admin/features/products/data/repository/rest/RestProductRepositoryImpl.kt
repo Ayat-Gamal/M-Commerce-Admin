@@ -61,6 +61,33 @@ class RestProductRepositoryImpl @Inject constructor(
             .map { it.toRestProduct() }
     }
 
+    override suspend fun uploadImagesForExistingProduct(
+        productId: Long,
+        imageUris: List<Uri>,
+        context: Context
+    ): Result<Unit> = runCatching {
+
+
+        if (imageUris.isNotEmpty()) {
+            val inputs = retrofitDataSource.prepareStagedUploadInputs(context, imageUris)
+            val targets = retrofitDataSource.requestStagedUploads(inputs)
+
+            // Step 3: Upload images to Shopify CDN
+            imageUris.zip(targets).forEach { (uri, target) ->
+                val uploadSuccess =
+                    retrofitDataSource.uploadImageToStagedTarget(context, uri, target)
+                if (!uploadSuccess) throw Exception("Failed to upload image: ${uri.lastPathSegment}")
+            }
+
+            // Step 4: Attach CDN images to product via REST
+            val imageUrls = targets.map { it.resourceUrl }
+
+            val addImagesResult = addImagesToProduct(productId, imageUrls)
+            if (addImagesResult.isFailure) throw addImagesResult.exceptionOrNull()
+                ?: Exception("Failed to add images to product")
+        }
+
+    }
 
 
     override suspend fun uploadImagesAndAddProduct(

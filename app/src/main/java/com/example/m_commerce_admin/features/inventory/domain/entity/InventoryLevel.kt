@@ -23,3 +23,4 @@ fun InventoryLevelDto.toDomain(): InventoryLevel {
         graphqlApiId = graphqlApiId
     )
 }
+

@@ -2,19 +2,11 @@ package com.example.m_commerce_admin.features.products.presentation.viewModel
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.m_commerce_admin.BuildConfig
-import com.example.m_commerce_admin.features.inventory.domain.usecase.AdjustInventoryUseCase
-import com.example.m_commerce_admin.features.inventory.domain.usecase.params.AdjustInventoryLevelParam
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProduct
-import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductImageInput
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductInput
-import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductOptionInput
 import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductUpdateInput
-import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductVariant
-import com.example.m_commerce_admin.features.products.domain.entity.rest.RestProductVariantInput
 import com.example.m_commerce_admin.features.products.domain.usecase.PublishProductUseCase
 import com.example.m_commerce_admin.features.products.domain.usecase.params.AddRestProductWithImagesParams
 import com.example.m_commerce_admin.features.products.domain.usecase.params.GetAllRestProductsParams
@@ -23,16 +15,15 @@ import com.example.m_commerce_admin.features.products.domain.usecase.rest.AddRes
 import com.example.m_commerce_admin.features.products.domain.usecase.rest.CreateRestProductUseCase
 import com.example.m_commerce_admin.features.products.domain.usecase.rest.DeleteRestProductUseCase
 import com.example.m_commerce_admin.features.products.domain.usecase.rest.GetAllRestProductsUseCase
-import com.example.m_commerce_admin.features.products.domain.usecase.rest.SetInventoryLevelUseCase
 import com.example.m_commerce_admin.features.products.domain.usecase.rest.UpdateRestProductUseCase
+import com.example.m_commerce_admin.features.products.domain.usecase.params.UploadExistProductImagesParams
+import com.example.m_commerce_admin.features.products.domain.usecase.rest.UploadImagesToExistingProductUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -43,8 +34,7 @@ class RestProductsViewModel @Inject constructor(
     private val deleteRestProductUseCase: DeleteRestProductUseCase,
     private val updateRestProductUseCase: UpdateRestProductUseCase,
     private val publishProductUseCase: PublishProductUseCase,
-    private val setInventoryLevelUseCase: SetInventoryLevelUseCase,
-    private val adjustInventoryUseCase: AdjustInventoryUseCase
+    private val uploadImagesToExistingProductUseCase: UploadImagesToExistingProductUseCase
 ) : ViewModel() {
 
     private val _productsState = MutableStateFlow<RestProductsState>(RestProductsState.Idle)
@@ -101,7 +91,7 @@ class RestProductsViewModel @Inject constructor(
                             currentPageInfo = null
                         } else {
 
-                            _allProducts.value = _allProducts.value + products
+                            _allProducts.value += products
                         }
 
                         applyFilters()
@@ -116,38 +106,6 @@ class RestProductsViewModel @Inject constructor(
                 )
             }
         }
-    }
-
-    private suspend fun adjustAndSetInventory(variant: RestProductVariant) {
-        val inventoryItemId = variant.inventoryItemId
-        val quantity = variant.quantity
-
-        delay(2000)
-
-        try {
-            adjustInventoryUseCase.invoke(
-                AdjustInventoryLevelParam(
-                    inventoryItemId,
-                    quantity
-                )
-            )
-         } catch (e: Exception) {
-            _addProductState.value = AddRestProductState.Error(
-                e.message ?: "An unexpected error occurred"
-            )
-        }
-
-        try {
-            val result = setInventoryLevelUseCase(
-                inventoryItemId,
-                BuildConfig.locationID.toLong(),
-                quantity
-            )
-
-        } catch (e: Exception) {
-            _addProductState.value = AddRestProductState.Error(
-                e.message ?: "An unexpected error occurred"
-            )        }
     }
 
     fun addProduct(
@@ -173,20 +131,14 @@ class RestProductsViewModel @Inject constructor(
             result.fold(
                 onSuccess = { product ->
                     _addProductState.value = AddRestProductState.Success(product)
-
                     getAllProducts(status = _selectedStatus.value)
                     publishProductUseCase.invoke(product.id)
-
-                    val firstVariant = product.variants.firstOrNull()
-                    if (firstVariant != null) {
-                        adjustAndSetInventory(firstVariant)
-                    }
                 },
                 onFailure = { error ->
                     _addProductState.value = AddRestProductState.Error(
                         error.message ?: "An unexpected error occurred"
                     )
-                 }
+                }
             )
         }
     }
@@ -282,29 +234,71 @@ class RestProductsViewModel @Inject constructor(
         applyFilters()
     }
 
-    fun updateProduct(productId: Long, updateInput: RestProductUpdateInput) {
+    fun updateProduct(
+        productId: Long,
+        updateInput: RestProductUpdateInput,
+        context: Context? = null,
+        imagesUri: List<Uri> = emptyList()
+    ) {
         _updateProductState.value = UpdateRestProductState.Loading
+
         viewModelScope.launch {
             val result = updateRestProductUseCase(UpdateRestProductParams(productId, updateInput))
+
+            if (result.isSuccess && context != null && imagesUri.isNotEmpty()) {
+                updateProductWithImages(
+                    productId = productId,
+                    updateInput = updateInput,
+                    imageUris = imagesUri,
+                    context = context
+                )
+            }
 
             result.fold(
                 onSuccess = { product ->
                     _updateProductState.value = UpdateRestProductState.Success(product)
-
                     getAllProducts(status = _selectedStatus.value)
-
-                    val firstVariant = product.variants.firstOrNull()
-                    if (firstVariant != null) {
-                        adjustAndSetInventory(firstVariant)
-                    }
                 },
                 onFailure = { error ->
-                    _updateProductState.value =
-                        UpdateRestProductState.Error(error.message ?: "Failed to update product")
+                    _updateProductState.value = UpdateRestProductState.Error(
+                        error.message ?: "Failed to update product"
+                    )
                 }
             )
         }
     }
+
+    fun updateProductWithImages(
+        productId: Long,
+        updateInput: RestProductUpdateInput,
+        imageUris: List<Uri>,
+        context: Context
+    ) {
+        viewModelScope.launch {
+            val result = updateRestProductUseCase(UpdateRestProductParams(productId, updateInput))
+
+            result.fold(
+                onSuccess = { updatedProduct ->
+                    if (imageUris.isNotEmpty()) {
+                        val imageResult = uploadImagesToExistingProductUseCase(
+                            UploadExistProductImagesParams(
+                                productId = updatedProduct.id,
+                                imageUris = imageUris,
+                                context = context
+                            )
+                        )
+
+                        imageResult.onFailure {
+                            // Optional: set error state
+                        }
+                    }
+                },
+                onFailure = { error ->
+                }
+            )
+        }
+    }
+
 
     fun resetUpdateProductState() {
         _updateProductState.value = UpdateRestProductState.Idle
