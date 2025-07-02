@@ -40,6 +40,7 @@ import com.example.m_commerce_admin.config.theme.Teal
 import com.example.m_commerce_admin.core.shared.components.ConfirmDeleteDialog
 import com.example.m_commerce_admin.core.shared.components.LoadingBox
 import com.example.m_commerce_admin.core.shared.components.states.Empty
+import com.example.m_commerce_admin.core.shared.components.states.NoNetwork
 import com.example.m_commerce_admin.features.coupons.presentation.component.CouponCard
 import com.example.m_commerce_admin.features.coupons.presentation.component.CouponSearchBar
 import com.example.m_commerce_admin.features.coupons.presentation.states.DeleteCouponState
@@ -52,7 +53,8 @@ import kotlinx.coroutines.launch
 fun CouponScreenUI(
     modifier: Modifier = Modifier,
     viewModel: CouponsViewModel = hiltViewModel(),
-    navController: NavController? = null
+    navController: NavController? = null,
+    isConnected: Boolean
 ) {
     val coupons = viewModel.coupons.collectAsState().value
     val searchQuery = viewModel.searchQuery.collectAsState().value
@@ -93,7 +95,10 @@ fun CouponScreenUI(
             }
         }
     }
+    if (!isConnected) {
+        NoNetwork()
 
+    }else{
     Scaffold(
         snackbarHost = {
             SnackbarHost(
@@ -201,3 +206,4 @@ fun CouponScreenUI(
         }
     }
 }
+    }

@@ -87,7 +87,15 @@ fun DropdownWithCustomInput(
                 value = customInput,
                 onValueChange = onCustomInputChange,
                 label = { Text("Enter custom $label") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Teal,
+                    unfocusedBorderColor = Gray,
+                    focusedLabelColor = Teal,
+                    errorBorderColor = Teal
+                )
             )
         }
     }

@@ -20,7 +20,7 @@ import com.example.m_commerce_admin.config.theme.Teal
 import com.example.m_commerce_admin.config.theme.White
 
 @Composable
-fun FAB(onClick: () -> Unit, screen: String) {
+fun FAB(onClick: () -> Unit, screen: String  ) {
 
     ExtendedFloatingActionButton(
         modifier = Modifier
@@ -35,7 +35,7 @@ fun FAB(onClick: () -> Unit, screen: String) {
         icon = { Icon(Icons.Default.Add, screen, tint = Teal) },
         text = { Text(text = screen, style = TextStyle(color = Black)) },
         containerColor = White,
-        elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
+        elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation(),
 
     )
 }

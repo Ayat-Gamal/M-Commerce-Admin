@@ -32,7 +32,9 @@ fun NavSetup(
     navController: NavHostController,
     snackBarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
-    showBottomNavbar: MutableState<Boolean>
+    showBottomNavbar: MutableState<Boolean>,
+    isConnected: Boolean,
+
 ) {
     val startingScreen = AppRoutes.SplashScreen
 
@@ -45,24 +47,25 @@ fun NavSetup(
             showBottomNavbar.value = true
             HomeScreenUI(
                 navController = navController,
+                isConnected = isConnected
             )
         }
 
         composable<AppRoutes.ProductScreen> {
             showBottomNavbar.value = true
 
-            ProductScreenUI()
+            ProductScreenUI(   isConnected = isConnected)
         }
 
         composable<AppRoutes.InventoryScreen> {
             showBottomNavbar.value = true
 
-            InventoryScreenUI()
+            InventoryScreenUI(   isConnected = isConnected)
         }
         composable<AppRoutes.CouponScreen> {
             showBottomNavbar.value = true
 
-            CouponScreenUI(navController = navController)
+            CouponScreenUI(navController = navController,   isConnected = isConnected)
         }
         composable<AppRoutes.UpdateCouponForm> {
             showBottomNavbar.value = false
@@ -95,7 +98,7 @@ fun NavSetup(
 
         composable<AppRoutes.RestProductForm> {
             showBottomNavbar.value = false
-            RestProductFormUI(navController = navController)
+            RestProductFormUI(navController = navController, isEditMode = isEditMode)
         }
 
 

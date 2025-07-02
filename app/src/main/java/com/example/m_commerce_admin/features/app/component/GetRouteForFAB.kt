@@ -9,12 +9,13 @@ import com.example.m_commerce_admin.core.helpers.isRouteSelected
 
 fun getFABForRouteWithAction(
     currentDestination: NavDestination?,
-    navController: NavController
+    navController: NavController,
 ): @Composable (() -> Unit)? {
     return when {
         isRouteSelected(AppRoutes.ProductScreen, currentDestination) -> {
             {
-                FAB(onClick = { navController.navigate(AppRoutes.RestProductForm) }, screen = "Product")
+                FAB(onClick = { navController.navigate(AppRoutes.RestProductForm) }, screen = "Product" )
+
             }
 
         }

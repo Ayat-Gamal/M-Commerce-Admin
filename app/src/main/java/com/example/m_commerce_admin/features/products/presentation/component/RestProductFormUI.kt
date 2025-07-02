@@ -25,6 +25,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -120,7 +121,7 @@ fun RestProductFormUI(
                     )
                 }
             } else {
-                listOf(RestProductVariantInput(option1 = "Size", price = ""))
+                listOf(RestProductVariantInput(option1 = "", price = ""))
             }
         )
     }
@@ -234,6 +235,7 @@ fun RestProductFormUI(
         when (updateProductState) {
             is UpdateRestProductState.Success -> {
                 scope.launch {
+
                     snackbarHostState.showSnackbar("Product updated successfully!")
                     delay(1500)
 
@@ -281,7 +283,8 @@ fun RestProductFormUI(
         },
         snackbarHost = {
             SnackbarHost(snackbarHostState) { Snackbar(it) }
-        }
+        },
+
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -361,8 +364,8 @@ fun RestProductFormUI(
                             listOf(RestProductVariantInput(option1 = "Default", price = ""))
                         } else {
                             listOf(
-                                RestProductVariantInput(option1 = "Size", price = ""),
-                                RestProductVariantInput(option2 = "Color", price = "")
+                                RestProductVariantInput(option1 = " ", price = ""),
+                                RestProductVariantInput(option2 = " ", price = "")
                             )
                         }
                     }
@@ -400,7 +403,6 @@ fun RestProductFormUI(
                             onValueChange = { singleProductSku = it },
                             label = "SKU (Optional)",
                             placeholder = "e.g., SKU001",
-
                             isError = false
                         )
 
@@ -581,8 +583,6 @@ fun RestProductFormUI(
                         )
 
                         viewModel.addProduct(productInput, selectedImages, context)
-
-
                     }
                 },
                 modifier = Modifier
@@ -600,8 +600,6 @@ fun RestProductFormUI(
                         color = Color.White
                     )
                 } else {
-                    Log.d("ProductForm", "Submitting with variants: $variantList")
-
                     Text(
                         if (isEditMode) "Update Product" else "Add Product",
                         fontSize = 16.sp,

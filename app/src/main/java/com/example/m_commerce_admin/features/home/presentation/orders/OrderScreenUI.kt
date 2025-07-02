@@ -29,7 +29,7 @@ import com.example.m_commerce_admin.features.home.presentation.component.OrderIt
 @Composable
 fun OrdersScreenUI(
     viewModel: HomeViewModel = hiltViewModel(),
-    onBackClick: () -> Unit
+     onBackClick: () -> Unit,
 ) {
     val state by viewModel.orderState.collectAsState()
 

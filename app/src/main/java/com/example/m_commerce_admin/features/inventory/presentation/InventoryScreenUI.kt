@@ -30,6 +30,7 @@ import com.example.m_commerce_admin.config.theme.Teal
 import com.example.m_commerce_admin.core.shared.components.LoadingBox
 import com.example.m_commerce_admin.core.shared.components.states.Empty
 import com.example.m_commerce_admin.core.shared.components.states.Failed
+import com.example.m_commerce_admin.core.shared.components.states.NoNetwork
 import com.example.m_commerce_admin.features.inventory.presentation.component.AdjustInventorySheet
 import com.example.m_commerce_admin.features.inventory.presentation.component.InventoryCard
 import com.example.m_commerce_admin.features.inventory.presentation.component.InventorySearchBar
@@ -41,7 +42,8 @@ import com.example.m_commerce_admin.features.inventory.presentation.viewModel.In
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InventoryScreenUI(
-    viewModel: InventoryViewModel = hiltViewModel()
+    viewModel: InventoryViewModel = hiltViewModel(),
+    isConnected: Boolean
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
@@ -64,6 +66,12 @@ fun InventoryScreenUI(
             selectedItemId = null
         }
     )
+
+
+    if (!isConnected) {
+        NoNetwork()
+
+    }else{
 
 
     Scaffold { innerPadding ->
@@ -160,4 +168,5 @@ fun InventoryScreenUI(
             }
         }
     }
+}
 }

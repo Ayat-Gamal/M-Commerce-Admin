@@ -32,7 +32,7 @@ fun VariantInputRow(
             value = variant.option1 ?: " ",
             onValueChange = { onVariantChange(variant.copy(option1 = it)) },
             label = "Size (e.g. M, L, XL)",
-            singleLine = true,
+             singleLine = true,
             isError = false
         )
 

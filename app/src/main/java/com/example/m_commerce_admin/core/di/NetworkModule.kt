@@ -2,6 +2,8 @@ package com.example.m_commerce_admin.core.di
 
 import com.apollographql.apollo.ApolloClient
 import com.example.m_commerce_admin.BuildConfig
+import com.example.m_commerce_admin.config.connectivity.ConnectivityObserver
+import com.example.m_commerce_admin.config.connectivity.ConnectivityObserverImpl
 import com.example.m_commerce_admin.features.coupons.data.remote.service.ShopifyCouponApi
 import com.example.m_commerce_admin.features.inventory.data.remote.service.ShopifyInventoryApi
 import com.example.m_commerce_admin.features.products.data.retrofitRemote.ShopifyProductApi
@@ -123,4 +125,5 @@ object NetworkModule {
             .build()
             .create(ShopifyInventoryApi::class.java)
     }
+
 }
