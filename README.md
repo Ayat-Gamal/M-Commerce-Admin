@@ -39,6 +39,7 @@ This project complements the Client App and communicates with Shopify's Admin AP
 
 ### Networking
 - `Retrofit`
+- `Apollo`
 - `Apollo GraphQL`
 - `OkHttp`
 
