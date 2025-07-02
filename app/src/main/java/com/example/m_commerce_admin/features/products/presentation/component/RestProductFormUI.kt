@@ -77,6 +77,7 @@ fun RestProductFormUI(
     viewModel: RestProductsViewModel = hiltViewModel(),
     navController: NavController? = null,
     isEditMode: Boolean = false,
+    snackBarHostState: SnackbarHostState,
     productToEdit: RestProduct? = null,
     onBackPressed: (() -> Unit)? = null
 ) {
@@ -151,7 +152,7 @@ fun RestProductFormUI(
     val addProductState by viewModel.addProductState.collectAsState()
     val updateProductState by viewModel.updateProductState.collectAsState()
     val scrollState = rememberScrollState()
-    val snackbarHostState = remember { SnackbarHostState() }
+    //snackBarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val hasOnlySize = variantList.all { !it.option1.isNullOrBlank() && it.option2.isNullOrBlank() }
@@ -203,7 +204,7 @@ fun RestProductFormUI(
             is AddRestProductState.Success -> {
                 // Reset form
                 scope.launch {
-                    snackbarHostState.showSnackbar("Product added successfully!")
+                    snackBarHostState.showSnackbar("Product added successfully!")
                     delay(1500)
                     if (isEditMode) {
                         onBackPressed?.invoke()
@@ -223,7 +224,7 @@ fun RestProductFormUI(
 
             is AddRestProductState.Error -> {
                 scope.launch {
-                    snackbarHostState.showSnackbar("Error: ${(addProductState as AddRestProductState.Error).message}")
+                    snackBarHostState.showSnackbar("Error: ${(addProductState as AddRestProductState.Error).message}")
                 }
             }
 
@@ -236,7 +237,7 @@ fun RestProductFormUI(
             is UpdateRestProductState.Success -> {
                 scope.launch {
 
-                    snackbarHostState.showSnackbar("Product updated successfully!")
+                    snackBarHostState.showSnackbar("Product updated successfully!")
                     delay(1500)
 
                     if (isEditMode) {
@@ -251,7 +252,7 @@ fun RestProductFormUI(
             is UpdateRestProductState.Error -> {
 
                 scope.launch {
-                    snackbarHostState.showSnackbar("Error: ${(updateProductState as UpdateRestProductState.Error).message}")
+                    snackBarHostState.showSnackbar("Error: ${(updateProductState as UpdateRestProductState.Error).message}")
                 }
 
             }
@@ -282,7 +283,7 @@ fun RestProductFormUI(
             )
         },
         snackbarHost = {
-            SnackbarHost(snackbarHostState) { Snackbar(it) }
+            SnackbarHost(snackBarHostState) { Snackbar(it) }
         },
 
     ) { paddingValues ->

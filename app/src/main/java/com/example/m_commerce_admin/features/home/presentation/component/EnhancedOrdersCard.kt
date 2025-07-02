@@ -12,11 +12,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -44,10 +46,10 @@ fun EnhancedOrdersCard(
 ) {
     if (orders.isEmpty()) {
         Empty("No orders available")
-        return
+        //return
     }
 
-    val recentOrders = orders.take(3)
+    val recentOrders = orders.take(1)
     val remainingCount = orders.size - recentOrders.size
 
     Card(
@@ -125,7 +127,7 @@ fun EnhancedOrdersCard(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Divider(color = Gray.copy(alpha = 0.3f))
+            HorizontalDivider(color = Gray.copy(alpha = 0.3f))
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -149,7 +151,7 @@ fun EnhancedOrdersCard(
                 Spacer(modifier = Modifier.padding(4.dp))
 
                 Icon(
-                    imageVector = Icons.Default.ArrowForward,
+                    imageVector = Icons.Filled.ChevronRight,
                     contentDescription = "View All",
                     modifier = Modifier.size(16.dp)
                 )

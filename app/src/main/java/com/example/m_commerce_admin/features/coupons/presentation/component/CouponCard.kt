@@ -145,8 +145,7 @@ fun CouponCard(
                     )
                 }
             }
-
-            Spacer(modifier = Modifier.padding(8.dp))
+             Spacer(modifier = Modifier.padding(8.dp))
 
             // Date information
             Row(

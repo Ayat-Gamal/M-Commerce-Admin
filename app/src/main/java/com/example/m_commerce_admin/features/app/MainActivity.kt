@@ -90,7 +90,7 @@ fun Main(showBottomNavbar: MutableState<Boolean>, isConnected: Boolean) {
         currentDestination = currentRoute,
         navController,
 
-    )
+        )
 
     Scaffold(
         modifier = Modifier.safeContentPadding(),

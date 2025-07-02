@@ -43,7 +43,6 @@ fun BottomNavigationBar(navController: NavController) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-          //  .padding(start = 32.dp, end = 32.dp, bottom = 12.dp)
             .padding(vertical = 0.dp, horizontal = 16.dp)
             .navigationBarsPadding()
             ,
@@ -54,6 +53,7 @@ fun BottomNavigationBar(navController: NavController) {
                 .padding(vertical = 8.dp, horizontal = 8.dp)
                 .clip(CircleShape)
                 .background(color = DarkestGray)
+                .padding(4.dp)
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically

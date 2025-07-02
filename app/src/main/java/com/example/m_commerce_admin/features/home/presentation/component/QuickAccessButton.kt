@@ -27,7 +27,7 @@ fun QuickAccessButtons(
     onAddProductClick: () -> Unit,
     onAddCouponClick: () -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Column(

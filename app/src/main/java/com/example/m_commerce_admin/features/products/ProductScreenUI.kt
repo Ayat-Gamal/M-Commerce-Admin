@@ -53,7 +53,6 @@ import com.example.m_commerce_admin.features.products.presentation.viewModel.Res
 fun ProductScreenUI(
     viewModel: RestProductsViewModel = hiltViewModel(),
     isConnected: Boolean,
-
 ) {
     val state by viewModel.productsState.collectAsState()
     val deleteState by viewModel.deleteProductState.collectAsState()
@@ -120,7 +119,8 @@ fun ProductScreenUI(
                         showEditForm = false
                         productToEdit = null
                     },
-                 )
+                    snackBarHostState = snackbarHostState
+                )
             } else {
 
                 Column(
@@ -179,7 +179,12 @@ fun ProductScreenUI(
                                             Row(
                                                 modifier = Modifier
                                                     .fillMaxWidth()
-                                                    .padding(16.dp),
+                                                    .padding(
+                                                        start = 16.dp,
+                                                        end = 16.dp,
+                                                        bottom = 4.dp,
+                                                        top = 4.dp
+                                                    ),
                                                 horizontalArrangement = Arrangement.SpaceBetween,
                                                 verticalAlignment = Alignment.CenterVertically
                                             ) {
@@ -221,7 +226,7 @@ fun ProductScreenUI(
                                                     showDeleteDialog.value = true
                                                 },
 
-                                            )
+                                                )
                                             ConfirmDeleteDialog(
                                                 showDialog = showDeleteDialog,
                                                 itemName = product.title ?: "Product",

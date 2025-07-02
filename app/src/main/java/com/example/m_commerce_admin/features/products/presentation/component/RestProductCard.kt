@@ -93,16 +93,25 @@ fun RestProductCard(
                     contentScale = ContentScale.Crop
                 )
             }
+          // Title
+                Text(
+                    product.title,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = DarkestGray
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
 
-            // Title
-            Text(product.title, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = DarkestGray)
-
-            // Type + Vendor
-            if (!product.productType.isNullOrBlank()) {
-                Text("Type: ${product.productType}", fontSize = 12.sp, color = DarkGray)
-            }
-            if (!product.vendor.isNullOrBlank()) {
-                Text("Vendor: ${product.vendor}", fontSize = 12.sp, color = DarkGray)
+                // Type + Vendor
+                if (!product.productType.isNullOrBlank()) {
+                    Text("Type: ${product.productType}", fontSize = 12.sp, color = DarkGray)
+                }
+                if (!product.vendor.isNullOrBlank()) {
+                    Text("Vendor: ${product.vendor}", fontSize = 12.sp, color = DarkGray)
+                }
             }
 
             // Price, Stock, Status
