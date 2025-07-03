@@ -74,11 +74,13 @@ fun SplashScreenUI(
                 LottieAnimation(
                     composition = composition,
                     progress = { progress },
-                    modifier = Modifier.size(200.dp)
+                    modifier = Modifier.size(200.dp),
+                    alignment = Alignment.Center
                 )
                 Spacer(Modifier.height(16.dp))
                 Text(
-                    text = "Dashboard",
+
+                    text = "     ShopX",
                     style = TextStyle(
                         color = SplashTeal,
                         fontSize = 36.sp,
