@@ -1,0 +1,30 @@
+mutation AddProduct($input: ProductInput!) {
+    productCreate(input: $input) {
+        product {
+            id
+            title
+            status
+            createdAt
+            totalInventory
+            publishedAt
+            featuredImage {
+                url
+            }
+            variants(first: 10) {
+                edges {
+                    node {
+                        id
+                        title
+                        price
+                        sku
+                        inventoryQuantity
+                    }
+                }
+            }
+        }
+        userErrors {
+            field
+            message
+        }
+    }
+}

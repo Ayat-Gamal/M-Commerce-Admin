@@ -1,0 +1,23 @@
+query GetLastOrders {
+    orders(first: 5, reverse: true) {
+        edges {
+            node {
+                id
+                name
+
+                totalPriceSet {
+                    shopMoney {
+                        amount
+                        currencyCode
+                    }
+                }
+displayFulfillmentStatus
+                createdAt
+                customer {
+                    displayName
+                    email
+                }
+            }
+        }
+    }
+}

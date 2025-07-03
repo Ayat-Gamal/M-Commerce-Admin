@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">M-Commerce-Admin</string>
+    <string name="app_name">ShopX Admin</string>
+    <string name="no_connection">No Internet Connection</string>
 </resources>

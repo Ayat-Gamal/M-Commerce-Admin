@@ -1,0 +1,40 @@
+mutation UpdateCoupon($id: ID!, $couponInput: DiscountCodeBasicInput!) {
+    discountCodeBasicUpdate(id: $id, basicCodeDiscount: $couponInput) {
+        codeDiscountNode {
+            id
+            codeDiscount {
+                ... on DiscountCodeBasic {
+                    title
+                    summary
+                    usageLimit
+                    startsAt
+                    endsAt
+                    codes(first: 1) {
+                        edges {
+                            node {
+                                code
+                            }
+                        }
+                    }
+                    customerGets {
+                        value {
+                            ... on DiscountPercentage {
+                                percentage
+                            }
+                            ... on DiscountAmount {
+                                amount {
+                                    amount
+                                    currencyCode
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        userErrors {
+            field
+            message
+        }
+    }
+}

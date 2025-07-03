@@ -1,0 +1,41 @@
+mutation AddProductWithImages($input: ProductInput!, $media: [CreateMediaInput!]) {
+    productCreate(input: $input, media: $media) {
+        product {
+            id
+            title
+            status
+            createdAt
+            totalInventory
+            publishedAt
+            publishedOnCurrentPublication
+            featuredImage {
+                url
+            }
+
+            images(first: 10) {
+                edges {
+                    node {
+                        id
+                        url
+                        altText
+                    }
+                }
+            }
+            variants(first: 10) {
+                edges {
+                    node {
+                        id
+                        title
+                        price
+                        sku
+                        inventoryQuantity
+                    }
+                }
+            }
+        }
+        userErrors {
+            field
+            message
+        }
+    }
+}
